@@ -1,0 +1,16 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\HudController.cs">
+    <Files>
+      <File FileName="Assets\Scripts\HudController.cs" Line="477" Column="1" />
+      <File FileName="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs" Line="149" Column="1" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="61" Column="64" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\HudController.cs" line="222" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
