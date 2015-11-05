@@ -10,7 +10,7 @@ public struct MinMax
 
 public class EvasiveManeuver : MonoBehaviour {
 
-    Rigidbody craft;
+    public Rigidbody craft;
     public MinMax startDelay;
     private float strafeTarget;
     public float dodge;
@@ -30,7 +30,6 @@ public class EvasiveManeuver : MonoBehaviour {
 	
 	public void FixedUpdate () 
     {
-        
         float movement = Mathf.MoveTowards(craft.velocity.x, strafeTarget, Time.deltaTime * smoothing);
         craft.velocity = new Vector3(movement, 0f, currentVelocity);
         craft.position = new Vector3(
