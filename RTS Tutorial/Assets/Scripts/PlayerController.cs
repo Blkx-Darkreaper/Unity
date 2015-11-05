@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour {
         resourceLimits[type] = limit;
     }
 
-    public void SpawnUnit(string unitName, Vector3 spawnPoint, Quaternion startingOrientation)
+    public void SpawnUnit(string unitName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation)
     {
         GameObject allUnits = transform.Find("Units").gameObject;
         if (allUnits == null)
@@ -68,7 +68,23 @@ public class PlayerController : MonoBehaviour {
         //Units allUnits = GetComponentInChildren<Units>();
         GameObject unitToSpawn = (GameObject)Instantiate(GameManager.activeInstance.GetUnit(unitName), spawnPoint, startingOrientation);
         unitToSpawn.transform.parent = allUnits.transform;
-
         Debug.Log(string.Format("Spawned {0} for player {1}", unitName, username));
+
+        if (rallyPoint == ResourceManager.invalidPoint)
+        {
+            return;
+        }
+        if (spawnPoint == rallyPoint)
+        {
+            return;
+        }
+
+        UnitController controller = unitToSpawn.GetComponent<UnitController>();
+        if (controller == null)
+        {
+            return;
+        }
+
+        controller.SetWaypoint(rallyPoint);        
     }
 }

@@ -58,7 +58,7 @@ public class EntityController : MonoBehaviour
         return owner.Equals(player);
     }
 
-    public void SetSelection(bool selected)
+    public virtual void SetSelection(bool selected)
     {
         isSelected = selected;
         if (selected == false)
@@ -88,7 +88,9 @@ public class EntityController : MonoBehaviour
     public void CalculateBounds()
     {
         selectionBounds = new Bounds(transform.position, Vector3.zero);
-        foreach (Renderer renderer in GetComponentsInChildren<Renderer>())
+        GameObject meshes = transform.Find("Meshes").gameObject;
+        Renderer[] allRenderers = meshes.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in allRenderers)
         {
             selectionBounds.Encapsulate(renderer.bounds);
         }

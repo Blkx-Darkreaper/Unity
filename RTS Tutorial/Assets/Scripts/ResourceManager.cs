@@ -40,7 +40,7 @@ namespace RTS
 
     public enum CursorState
     {
-        select, move, attack, panLeft, panRight, panUp, panDown, harvest
+        select, move, attack, panLeft, panRight, panUp, panDown, harvest, rallyPoint
     }
 
     //public struct CursorState

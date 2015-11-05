@@ -24,10 +24,11 @@ public class HudController : MonoBehaviour {
 
     [HideInInspector]
     public Texture2D activeCursor;
-    public Texture2D selectCursor, panLeftCursor, panRightCursor, panUpCursor, panDownCursor;
+    public Texture2D selectCursor, panLeftCursor, panRightCursor, panUpCursor, panDownCursor, rallyPointCursor;
     public Texture2D[] moveCursors, attackCursors, harvestCursors;
     private CursorState activeCursorState;
     private int currentFrame = 0;
+    public CursorState previousCursorState { get; private set; }
 
     public Texture2D[] resourceIcons;
     private Dictionary<ResourceType, Texture2D> allResources;
@@ -38,6 +39,7 @@ public class HudController : MonoBehaviour {
     public Texture2D buttonHover, buttonClick;
     private int buildAreaHeight;
     public Texture2D buildFrame, buildMask;
+    public Texture2D smallButtonHover, smallButtonClick;
 
 
     public void SetResourceValues(Dictionary<ResourceType, int> resourceValues, Dictionary<ResourceType, int> resourceLimits)
@@ -133,6 +135,11 @@ public class HudController : MonoBehaviour {
 
     public void SetCursorState(CursorState state)
     {
+        if (activeCursorState != state)
+        {
+            previousCursorState = activeCursorState;
+        }
+
         activeCursorState = state;
         UpdateCursorAnimation();
     }
@@ -172,6 +179,10 @@ public class HudController : MonoBehaviour {
             case CursorState.panDown:
                 activeCursor = panDownCursor;
                 break;
+
+            case CursorState.rallyPoint:
+                activeCursor = rallyPointCursor;
+                break;
         }
     }
 
@@ -205,6 +216,10 @@ public class HudController : MonoBehaviour {
                 topEdge -= height / 2;
                 leftEdge -= width / 2;
                 break;
+
+            case CursorState.rallyPoint:
+                topEdge -= activeCursor.height;
+                break;
         }
 
         Rect cursorBox = new Rect(leftEdge, topEdge, width, height);
@@ -226,14 +241,16 @@ public class HudController : MonoBehaviour {
         width = ORDERS_BAR_WIDTH;
         GUI.Box(new Rect(x, y, width, height), string.Empty);
 
-        DisplayAvailableActions();
-        DisplayBuildQueue();
-        DisplaySelectedNameInOrdersBar();
+        DrawAvailableActions();
+        StructureController selectedStructure = GetSelectedStructure();
+        DrawBuildQueue(selectedStructure);
+        DrawStandardStructureOptions(selectedStructure);
+        DrawSelectedNameInOrdersBar();
 
         GUI.EndGroup();
     }
 
-    private void DisplaySelectedNameInOrdersBar()
+    private void DrawSelectedNameInOrdersBar()
     {
         if (player.selectedEntity == null)
         {
@@ -255,7 +272,7 @@ public class HudController : MonoBehaviour {
         //Debug.Log(string.Format("Selected entity is named {0}", selectionName));
     }
 
-    private void DisplayAvailableActions()
+    private void DrawAvailableActions()
     {
         if (player == null)
         {
@@ -311,8 +328,8 @@ public class HudController : MonoBehaviour {
                 continue;
             }
 
-            bool buttonCreated = GUI.Button(buttonArea, actionIcon);
-            if (buttonCreated == false)
+            bool buttonClicked = GUI.Button(buttonArea, actionIcon);
+            if (buttonClicked == false)
             {
                 continue;
             }
@@ -371,13 +388,19 @@ public class HudController : MonoBehaviour {
         return scrollArea;
     }
 
-    private void DisplayBuildQueue()
+    private StructureController GetSelectedStructure()
     {
         if (previousSelection == null)
         {
-            return;
+            return null;
         }
+
         StructureController selectedStructure = previousSelection.GetComponent<StructureController>();
+        return selectedStructure;
+    }
+
+    private void DrawBuildQueue(StructureController selectedStructure)
+    {
         if (selectedStructure == null)
         {
             return;
@@ -405,6 +428,67 @@ public class HudController : MonoBehaviour {
             }
             int leftEdge = 2 * BUILD_IMAGE_PADDING;
             GUI.DrawTexture(new Rect(leftEdge, topEdge, width, height), buildMask);
+        }
+    }
+
+    private void DrawStandardStructureOptions(StructureController structure)
+    {
+        if (structure == null)
+        {
+            return;
+        }
+
+        GUIStyle smallButtons = new GUIStyle();
+        smallButtons.hover.background = smallButtonHover;
+        smallButtons.active.background = smallButtonClick;
+        GUI.skin.button = smallButtons;
+
+        int leftEdge = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH + BUTTON_SPACING;
+        int topEdge = buildAreaHeight - BUILD_IMAGE_HEIGHT / 2;
+        int width = BUILD_IMAGE_WIDTH / 2;
+        int height = BUILD_IMAGE_HEIGHT / 2;
+
+        bool hasSpawnPoint = structure.HasSpawnPoint();
+        if (hasSpawnPoint == false)
+        {
+            return;
+        }
+
+        SellButtonHandler(structure, leftEdge, topEdge, width, height);
+        RallyPointButtonHandler(structure, leftEdge, topEdge, width, height);
+    }
+
+    private void SellButtonHandler(StructureController structure, int leftEdge, int topEdge, int width, int height)
+    {
+        Texture2D sellIcon = structure.sellIcon;
+        leftEdge += width + BUTTON_SPACING;
+
+        bool buttonPressed = GUI.Button(new Rect(leftEdge, topEdge, width, height), sellIcon);
+        if (buttonPressed == false)
+        {
+            return;
+        }
+
+        structure.Sell();
+    }
+
+    private void RallyPointButtonHandler(StructureController structure, int leftEdge, int topEdge, int width, int height)
+    {
+        Texture2D rallyPointIcon = structure.rallyPointIcon;
+        bool buttonPressed = GUI.Button(new Rect(leftEdge, topEdge, width, height), rallyPointIcon);
+        if (buttonPressed == false)
+        {
+            return;
+        }
+
+        if (activeCursorState != CursorState.rallyPoint && previousCursorState != CursorState.rallyPoint)
+        {
+            SetCursorState(CursorState.rallyPoint);
+        }
+        else
+        {
+            SetCursorState(CursorState.panRight);
+            SetCursorState(CursorState.select);
         }
     }
 

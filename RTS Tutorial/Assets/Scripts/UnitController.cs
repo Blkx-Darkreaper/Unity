@@ -101,7 +101,7 @@ public class UnitController : EntityController {
         }
 
         float x = hitPoint.x;
-        float y = hitPoint.y + player.selectedEntity.transform.position.y;  // Ensures unity statys on top of the surface it is on
+        float y = hitPoint.y + player.selectedEntity.transform.position.y;  // Ensures unit stays on top of the surface it is on
         float z = hitPoint.z;
         Vector3 destination = new Vector3(x, y, z);
         SetWaypoint(destination);
