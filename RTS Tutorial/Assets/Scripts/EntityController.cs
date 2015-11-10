@@ -270,6 +270,9 @@ public class EntityController : MonoBehaviour
         {
             return;
         }
+		if (hitEntity == this) {
+			return;
+		}
 
         ResourceController hitResource = hitGameObject.GetComponentInParent<ResourceController>();
         if (hitResource != null)
@@ -295,17 +298,14 @@ public class EntityController : MonoBehaviour
         }
 
         PlayerController hitEntityOwner = hitEntity.owner;
-        if (hitEntityOwner == null)
+        if (hitEntityOwner != null)
         {
-            ChangeSelection(hitEntity, player);
-            return;
-        }
-
-        bool samePlayer = owner.username.Equals(hitEntityOwner.username);
-        if (samePlayer == true)
-        {
-            ChangeSelection(hitEntity, player);
-            return;
+			bool samePlayer = owner.username.Equals(hitEntityOwner.username);
+			if (samePlayer == true)
+			{
+				ChangeSelection(hitEntity, player);
+				return;
+			}
         }
 
         SetAttackTarget(hitEntity);
@@ -397,7 +397,13 @@ public class EntityController : MonoBehaviour
     {
         Destroy(gameObject);
 
-        Debug.Log(string.Format("{0}'s {1} has been destroyed", owner.username, entityName));
+        string ownersName = "Neutral";
+        if (owner != null)
+        {
+            ownersName = string.Format("{0}'s", owner.username);
+        }
+
+        Debug.Log(string.Format("{0} {1} has been destroyed", ownersName, entityName));
     }
 
     protected virtual void SetAttackTarget(EntityController target)
@@ -492,8 +498,19 @@ public class EntityController : MonoBehaviour
     {
         currentCooldownRemaining = weaponCooldown;
 
-        Debug.Log(string.Format("{0}'s {1} fired at {2}'s {3}", owner.username, entityName, 
-            attackTarget.owner.username, attackTarget.entityName));
+        string ownersName = "Neutral";
+        string attackTargetsOwnersName = ownersName;
+        if (owner != null)
+        {
+            ownersName = owner.username;
+        }
+        if (attackTarget.owner != null)
+        {
+            attackTargetsOwnersName = attackTarget.owner.username;
+        }
+
+        Debug.Log(string.Format("{0} {1} fired at {2} {3}", ownersName, entityName, 
+            attackTargetsOwnersName, attackTarget.entityName));
     }
 
     protected virtual void AimTowardsTarget(Vector3 targetPosition)

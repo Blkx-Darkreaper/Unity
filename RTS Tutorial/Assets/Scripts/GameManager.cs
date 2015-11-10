@@ -13,6 +13,7 @@ namespace RTS
         public GameObject[] entities;
         private Dictionary<string, GameObject> allEntities;
         public GameObject player;
+        public bool isMenuOpen { get; set; }
 
         public static GameManager activeInstance = null;
 

@@ -23,6 +23,18 @@ namespace RTS
             public static Texture2D critical;
         }
 
+        public struct Menu
+        {
+            public static float width { get { return headerWidth + 2 * buttonHeight + 4 * padding; } }
+            public static float pauseMenuHeight { get { return headerHeight + 2 * buttonHeight + 4 * padding; } }
+            public static float padding = 10f;
+            public static float textHeight = 25f;
+            public static float headerWidth = 256f;
+            public static float headerHeight = 32f;
+            public static float buttonWidth { get { return (width - 3 * padding) / 2; } }
+            public static float buttonHeight = 40f;
+        }
+
         private static Vector3 invalidPositionValue = new Vector3(-99999f, -99999f, -99999f);
         public static Vector3 invalidPoint { get { return invalidPositionValue; } }
         public static GUISkin selectionBoxSkin { get; set; }

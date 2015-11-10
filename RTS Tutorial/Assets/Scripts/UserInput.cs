@@ -14,17 +14,18 @@ public class UserInput : MonoBehaviour
 
     private void Update()
     {
-        UpdateCamera();
-        RespondToMouseActivity();
-    }
-
-    private void UpdateCamera()
-    {
         if (player.isNPC == true)
         {
             return;
         }
 
+        UpdateCamera();
+        RespondToMouseActivity();
+        RespondToKeyboardActivity();
+    }
+
+    private void UpdateCamera()
+    {
         MoveCamera();
         RotateCamera();
     }
@@ -376,5 +377,22 @@ public class UserInput : MonoBehaviour
     {
         player.selectedEntity.SetSelection(false);
         player.selectedEntity = null;
+    }
+
+    private void RespondToKeyboardActivity()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            OpenPauseMenu();
+        }
+    }
+
+    private void OpenPauseMenu()
+    {
+        Time.timeScale = 0f;
+        GetComponentInChildren<PauseMenuController>().enabled = true;
+        GetComponent<UserInput>().enabled = false;
+        Cursor.visible = true;
+        GameManager.activeInstance.isMenuOpen = true;
     }
 }
