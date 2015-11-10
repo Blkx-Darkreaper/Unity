@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
 
     [HideInInspector]
     public HudController hud;
+    public Color teamColour;
     public EntityController selectedEntity { get; set; }
     public int startingMoney, startingMoneyLimit, startingPower, startingPowerLimit;
     private Dictionary<ResourceType, int> resources, resourceLimits;
@@ -59,7 +60,7 @@ public class PlayerController : MonoBehaviour {
 
         constructionSite.UpdateBounds();
 
-        bool validConstructionSite = CheckConstructionSiteIsValid();
+        bool validConstructionSite = IsConstructionSiteValid();
         if (validConstructionSite == true)
         {
             constructionSite.SetTransparencyMaterial(allowedMaterial, false);
@@ -70,7 +71,7 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    public bool CheckConstructionSiteIsValid()
+    public bool IsConstructionSiteValid()
     {
         Bounds buildSiteBounds = constructionSite.selectionBounds;
 
@@ -228,8 +229,8 @@ public class PlayerController : MonoBehaviour {
 
     public void SetConstructionPoint()
     {
-        Vector3 constructionLocation = UserInput.GetHitPoint();
-        constructionLocation.y = 0;
-        constructionSite.transform.position = constructionLocation;
+        Vector3 constructionPosition = UserInput.GetHitPoint();
+        constructionPosition.y = 0;
+        constructionSite.transform.position = constructionPosition;
     }
 }

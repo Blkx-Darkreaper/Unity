@@ -69,7 +69,7 @@ public class HarvesterUnit : UnitController
             isDepositing = true;
             HideArms(arms);
             SetWaypoint(resourceStore.transform.position, resourceStore.gameObject);
-            Debug.Log(string.Format("{0} is returning to depository to offload", entityName));
+            Debug.Log(string.Format("{0}'s {1} is returning to depository to offload", owner.username, entityName));
         }
 
         if (isDepositing == true)
@@ -91,7 +91,7 @@ public class HarvesterUnit : UnitController
 
             isHarvesting = true;
             SetWaypoint(resourceDeposit.transform.position, resourceDeposit.gameObject);
-            Debug.Log(string.Format("{0} is harvesting", entityName));
+            Debug.Log(string.Format("{0}'s {1} is harvesting", owner.username, entityName));
         }
     }
 
@@ -149,9 +149,9 @@ public class HarvesterUnit : UnitController
         }
     }
 
-    public override void SetOverState(GameObject entityUnderMouse)
+    public override void SetHoverState(GameObject entityUnderMouse)
     {
-        base.SetOverState(entityUnderMouse);
+        base.SetHoverState(entityUnderMouse);
 
         if (owner == null)
         {
@@ -246,7 +246,7 @@ public class HarvesterUnit : UnitController
 
     private void StopHarvesting()
     {
-        Debug.Log(string.Format("{0} has stopped harvesting", entityName));
+        Debug.Log(string.Format("{0}'s {1} has stopped harvesting", owner.username, entityName));
     }
 
     private void HarvestResource()
@@ -268,7 +268,7 @@ public class HarvesterUnit : UnitController
         resourceDeposit.Harvest(amountHarvested);
         currentLoad += amountHarvested;
 
-        //Debug.Log(string.Format("{0} harvested {1} {2}", entityName, amountHarvested, harvestType.ToString()));
+        //Debug.Log(string.Format("{0}'s {1} harvested {2} {3}", owner.username, entityName, amountHarvested, harvestType.ToString()));
     }
 
     private void Offload()
@@ -292,7 +292,7 @@ public class HarvesterUnit : UnitController
 
         owner.AddResource(depositType, deposit);
 
-        //Debug.Log(string.Format("{0} offloaded {1} {2}", entityName, deposit, harvestType.ToString()));
+        //Debug.Log(string.Format("{0}'s {1} offloaded {2} {3}", owner.username, entityName, deposit, harvestType.ToString()));
     }
 
     protected override void DrawSelectionBox(Rect selectionBox)

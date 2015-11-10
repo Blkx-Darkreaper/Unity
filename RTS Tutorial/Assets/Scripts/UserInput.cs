@@ -64,7 +64,7 @@ public class UserInput : MonoBehaviour
 
         destination = new Vector3(
             destination.x,
-            Mathf.Clamp(destination.y, ResourceManager.Camera.minHeight, ResourceManager.Camera.maxHeight),
+            destination.y = Mathf.Clamp(destination.y, ResourceManager.Camera.minHeight, ResourceManager.Camera.maxHeight),
             destination.z
         );
 
@@ -241,7 +241,7 @@ public class UserInput : MonoBehaviour
 
         if (player.selectedEntity != null)
         {
-            player.selectedEntity.SetOverState(entityUnderMouse);
+            player.selectedEntity.SetHoverState(entityUnderMouse);
         }
         else
         {
@@ -293,7 +293,7 @@ public class UserInput : MonoBehaviour
         bool settingBuildPoint = player.isSettingConstructionPoint;
         if (settingBuildPoint == true)
         {
-            bool validBuildPoint = player.CheckConstructionSiteIsValid();
+            bool validBuildPoint = player.IsConstructionSiteValid();
             if (validBuildPoint == false)
             {
                 return;

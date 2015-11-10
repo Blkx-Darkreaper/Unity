@@ -189,7 +189,7 @@ public class StructureController : EntityController {
         flag.transform.forward = transform.forward;
     }
 
-    public bool CheckHasValidSpawnPoint()
+    public bool HasValidSpawnPoint()
     {
         bool hasSpawnPoint = spawnPoint != ResourceManager.invalidPoint;
         bool hasRallyPoint = rallyPoint != ResourceManager.invalidPoint;
@@ -197,9 +197,9 @@ public class StructureController : EntityController {
         return hasSpawnPoint && hasRallyPoint;
     }
 
-    public override void SetOverState(GameObject entityUnderMouse)
+    public override void SetHoverState(GameObject entityUnderMouse)
     {
-        base.SetOverState(entityUnderMouse);
+        base.SetHoverState(entityUnderMouse);
 
         if (owner == null)
         {
@@ -265,5 +265,6 @@ public class StructureController : EntityController {
         currentHitPoints = maxHitPoints;
         constructionComplete = true;
         RestoreMaterials();
+        SetTeamColour();
     }
 }

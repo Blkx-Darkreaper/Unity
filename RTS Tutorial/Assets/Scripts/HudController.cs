@@ -133,7 +133,7 @@ public class HudController : MonoBehaviour {
         }
         if (player.isNPC == true)
         {
-            Debug.Log(string.Format("Non-Human player"));
+            //Debug.Log(string.Format("Non-Human player"));
             return;
         }
 
@@ -330,7 +330,7 @@ public class HudController : MonoBehaviour {
             return;
         }
 
-        bool ownedByPlayer = player.selectedEntity.CheckOwnedByPlayer(player);
+        bool ownedByPlayer = player.selectedEntity.IsOwnedByPlayer(player);
         if (ownedByPlayer == false)
         {
             return;
@@ -508,7 +508,7 @@ public class HudController : MonoBehaviour {
         int width = BUILD_IMAGE_WIDTH / 2;
         int height = BUILD_IMAGE_HEIGHT / 2;
 
-        bool hasSpawnPoint = structure.CheckHasValidSpawnPoint();
+        bool hasSpawnPoint = structure.HasValidSpawnPoint();
         if (hasSpawnPoint == false)
         {
             return;

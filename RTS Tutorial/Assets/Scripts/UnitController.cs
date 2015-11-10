@@ -99,7 +99,10 @@ public class UnitController : EntityController
     {
         if (isMoving == false)
         {
-            return;
+            if (isAdvancing == false)
+            {
+                return;
+            }
         }
 
         transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, Time.deltaTime * moveSpeed);
@@ -111,6 +114,7 @@ public class UnitController : EntityController
         }
 
         isMoving = false;
+        isAdvancing = false;
     }
 
     public override void MouseClick(GameObject hitEntity, Vector3 hitPoint, PlayerController player)
@@ -172,9 +176,9 @@ public class UnitController : EntityController
         targetEntity = target;
     }
 
-    public override void SetOverState(GameObject entityUnderMouse)
+    public override void SetHoverState(GameObject entityUnderMouse)
     {
-        base.SetOverState(entityUnderMouse);
+        base.SetHoverState(entityUnderMouse);
 
         if (owner == null)
         {

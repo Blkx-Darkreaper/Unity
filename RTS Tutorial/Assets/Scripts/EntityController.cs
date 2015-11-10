@@ -15,14 +15,23 @@ public class EntityController : MonoBehaviour
     private const int HEALTH_BAR_VERTICAL_OFFSET = 7;
     private const int HEALTH_BAR_HEIGHT = 5;
     protected GUIStyle healthStyle = new GUIStyle();
-    public PlayerController owner { get; set; }
-    //protected string[] actionsValues = { };
-    public string[] actions { get; protected set; }
-    protected bool isSelected = false;
-    //protected Bounds selectionBoundsValue;
     public Bounds selectionBounds { get; protected set; }
     public Rect playingArea { get; set; }
     private List<Material> oldMaterials = new List<Material>();
+    public PlayerController owner { get; set; }
+    public string[] actions { get; protected set; }
+    protected bool isSelected = false;
+    protected bool isAttacking = false;
+    protected bool isAdvancing = false;
+    protected bool isAiming = false;
+    protected EntityController attackTarget = null;
+    public float weaponRange = 10f;
+    private const float DEFAULT_WEAPON_RANGE = 10f;
+    public float weaponAimSpeed = 1f;
+    private const float DEFAULT_WEAPON_AIM_SPEED = 1f;
+    public float weaponCooldown = 1f;
+    private const float DEFAULT_WEAPON_COOLDOWN = 1f;
+    private float currentCooldownRemaining;
 
     protected virtual void Awake()
     {
@@ -45,10 +54,29 @@ public class EntityController : MonoBehaviour
         }
 
         //Debug.Log(string.Format("{0} belongs to {1}", entityName, player.username));
+        SetTeamColour();
+        SetWeaponDefaults();
     }
 
     protected virtual void Update()
     {
+        currentCooldownRemaining -= Time.deltaTime;
+		currentCooldownRemaining = Mathf.Clamp(currentCooldownRemaining, 0f, float.MaxValue);
+
+        if (isAttacking == false)
+        {
+            return;
+        }
+        if (isAdvancing == true)
+        {
+            return;
+        }
+        if (isAiming == true)
+        {
+            return;
+        }
+
+        AttackTarget(attackTarget);
     }
 
     protected virtual void OnGUI()
@@ -61,7 +89,59 @@ public class EntityController : MonoBehaviour
         DrawSelection();
     }
 
-    public bool CheckOwnedByPlayer(PlayerController player)
+    protected void SetTeamColour()
+    {
+        TeamColour[] allTeamColours = GetComponentsInChildren<TeamColour>();
+        foreach (TeamColour teamColour in allTeamColours)
+        {
+            teamColour.GetComponent<Renderer>().material.color = owner.teamColour;
+        }
+    }
+
+    private void SetWeaponDefaults()
+    {
+        bool readyToAttack = IsAbleToAttack();
+        if (readyToAttack == false)
+        {
+            return;
+        }
+
+        SetDefaultWeaponRange();
+        SetDefaultWeaponAimSpeed();
+        SetDefaultWeaponCooldown();
+    }
+
+    private void SetDefaultWeaponRange()
+    {
+        if (weaponRange > 0)
+        {
+            return;
+        }
+
+        weaponRange = DEFAULT_WEAPON_RANGE;
+    }
+
+    private void SetDefaultWeaponAimSpeed()
+    {
+        if (weaponAimSpeed > 0)
+        {
+            return;
+        }
+
+        weaponAimSpeed = DEFAULT_WEAPON_AIM_SPEED;
+    }
+
+    private void SetDefaultWeaponCooldown()
+    {
+        if (weaponCooldown > 0)
+        {
+            return;
+        }
+
+        weaponCooldown = DEFAULT_WEAPON_COOLDOWN;
+    }
+
+    public bool IsOwnedByPlayer(PlayerController player)
     {
         if (owner == null)
         {
@@ -169,39 +249,66 @@ public class EntityController : MonoBehaviour
     {
     }
 
-    public virtual void MouseClick(GameObject hitEntity, Vector3 hitPoint, PlayerController player)
+    public virtual void MouseClick(GameObject hitGameObject, Vector3 hitPoint, PlayerController player)
     {
         if (isSelected == false)
         {
             return;
         }
-        if (hitEntity == null)
+        if (hitGameObject == null)
         {
             return;
         }
-        bool isGround = hitEntity.CompareTag(Tags.ground);
+        bool isGround = hitGameObject.CompareTag(Tags.ground);
         if (isGround == true)
         {
             return;
         }
 
-        EntityController entity = hitEntity.GetComponentInParent<EntityController>();
-        if (entity == null)
+        EntityController hitEntity = hitGameObject.GetComponentInParent<EntityController>();
+        if (hitEntity == null)
         {
             return;
         }
 
-        ResourceController resource = hitEntity.GetComponentInParent<ResourceController>();
-        if (resource != null)
+        ResourceController hitResource = hitGameObject.GetComponentInParent<ResourceController>();
+        if (hitResource != null)
         {
-            bool resourceDepleted = resource.isEmpty;
+            bool resourceDepleted = hitResource.isEmpty;
             if (resourceDepleted == true)
             {
                 return;
             }
         }
 
-        ChangeSelection(entity, player);
+        bool readyToAttack = IsAbleToAttack();
+        if (readyToAttack == false)
+        {
+            ChangeSelection(hitEntity, player);
+            return;
+        }
+
+        if (hitEntity.maxHitPoints == 0)
+        {
+            ChangeSelection(hitEntity, player);
+            return;
+        }
+
+        PlayerController hitEntityOwner = hitEntity.owner;
+        if (hitEntityOwner == null)
+        {
+            ChangeSelection(hitEntity, player);
+            return;
+        }
+
+        bool samePlayer = owner.username.Equals(hitEntityOwner.username);
+        if (samePlayer == true)
+        {
+            ChangeSelection(hitEntity, player);
+            return;
+        }
+
+        SetAttackTarget(hitEntity);
     }
 
     private void ChangeSelection(EntityController otherEntity, PlayerController player)
@@ -222,7 +329,7 @@ public class EntityController : MonoBehaviour
         otherEntity.SetSelection(true);
     }
 
-    public virtual void SetOverState(GameObject entityUnderMouse)
+    public virtual void SetHoverState(GameObject gameObjectUnderMouse)
     {
         if (owner == null)
         {
@@ -237,13 +344,185 @@ public class EntityController : MonoBehaviour
             return;
         }
 
-        bool isGround = entityUnderMouse.CompareTag(Tags.ground);
+        bool isGround = gameObjectUnderMouse.CompareTag(Tags.ground);
         if (isGround == true)
         {
             return;
         }
 
         owner.hud.SetCursorState(CursorState.select);
+
+        bool canAttack = IsAbleToAttack();
+        if (canAttack == false)
+        {
+            return;
+        }
+
+        EntityController entityUnderMouse = gameObjectUnderMouse.GetComponentInParent<EntityController>();
+        if (entityUnderMouse == null)
+        {
+            return;
+        }
+
+        if (entityUnderMouse.maxHitPoints == 0)
+        {
+            return;
+        }
+
+        PlayerController entityOwner = entityUnderMouse.owner;
+        if (entityOwner != null)
+        {
+            bool samePlayer = owner.username.Equals(entityOwner.username);
+            if (samePlayer == true)
+            {
+                return;
+            }
+        }
+
+        owner.hud.SetCursorState(CursorState.attack);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHitPoints -= damage;
+        if (currentHitPoints > 0)
+        {
+            return;
+        }
+
+        DestroyEntity();
+    }
+
+    protected void DestroyEntity()
+    {
+        Destroy(gameObject);
+
+        Debug.Log(string.Format("{0}'s {1} has been destroyed", owner.username, entityName));
+    }
+
+    protected virtual void SetAttackTarget(EntityController target)
+    {
+        attackTarget = target;
+
+        Vector3 targetPosition = attackTarget.transform.position;
+        bool targetInRange = IsTargetInRange(targetPosition);
+        if (targetInRange == true)
+        {
+            isAttacking = true;
+            AttackTarget(attackTarget);
+        }
+        else
+        {
+            AdvanceTowardsTarget(targetPosition);
+        }
+    }
+
+    public virtual bool IsAbleToAttack()
+    {
+        return false;
+    }
+
+    private bool IsTargetInRange(Vector3 targetPosition)
+    {
+        
+        Vector3 bearingToTarget = targetPosition - transform.position;
+        float weaponsRangeSquared = weaponRange * weaponRange;
+        if (bearingToTarget.sqrMagnitude < weaponsRangeSquared)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void AttackTarget(EntityController attackTarget)
+    {
+        if (attackTarget == null)
+        {
+            isAttacking = false;
+            return;
+        }
+
+        Vector3 targetPosition = attackTarget.transform.position;
+        bool targetInRange = IsTargetInRange(targetPosition);
+        if (targetInRange == false)
+        {
+            AdvanceTowardsTarget(targetPosition);
+            return;
+        }
+
+        bool targetInSights = IsTargetInSights(targetPosition);
+        if (targetInSights == false)
+        {
+            AimTowardsTarget(targetPosition);
+            return;
+        }
+
+        bool readyToFire = IsReadyToFire();
+        if (readyToFire == false)
+        {
+            return;
+        }
+
+        FireWeaponAtTarget(attackTarget);
+    }
+
+    private bool IsTargetInSights(Vector3 targetPosition)
+    {
+        Vector3 bearingToTarget = targetPosition - transform.position;
+        if (bearingToTarget.normalized == transform.forward.normalized)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsReadyToFire()
+    {
+        if (currentCooldownRemaining <= 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected virtual void FireWeaponAtTarget(EntityController attackTarget)
+    {
+        currentCooldownRemaining = weaponCooldown;
+
+        Debug.Log(string.Format("{0}'s {1} fired at {2}'s {3}", owner.username, entityName, 
+            attackTarget.owner.username, attackTarget.entityName));
+    }
+
+    protected virtual void AimTowardsTarget(Vector3 targetPosition)
+    {
+        isAiming = true;
+    }
+
+    private void AdvanceTowardsTarget(Vector3 targetPosition)
+    {
+        UnitController unit = this as UnitController;
+        if (unit == null)
+        {
+            isAttacking = false;
+            return;
+        }
+
+        isAdvancing = true;
+        Vector3 attackPosition = GetNearestAttackPosition(targetPosition);
+        unit.SetWaypoint(attackPosition);
+        isAttacking = true;
+    }
+
+    private Vector3 GetNearestAttackPosition(Vector3 targetPosition)
+    {
+        Vector3 bearingToTarget = targetPosition - transform.position;
+        float distanceToTarget = bearingToTarget.magnitude;
+        float distanceToTravel = distanceToTarget - (0.9f * weaponRange);   // Move in slightly closer than weapon's range
+        Vector3 attackPosition = Vector3.Lerp(transform.position, targetPosition, distanceToTravel / distanceToTarget);
+        return attackPosition;
     }
 
     public void SetColliders(bool enabled)
