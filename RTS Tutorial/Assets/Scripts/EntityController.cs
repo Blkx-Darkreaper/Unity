@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using RTS;
 
 public class EntityController : MonoBehaviour
@@ -10,16 +11,28 @@ public class EntityController : MonoBehaviour
     public int cost, sellValue, maxHitPoints;
     [HideInInspector]
     public int currentHitPoints;
-    protected PlayerController owner;
-    protected string[] actions = { };
+    protected float healthPercentage;
+    private const int HEALTH_BAR_VERTICAL_OFFSET = 7;
+    private const int HEALTH_BAR_HEIGHT = 5;
+    protected GUIStyle healthStyle = new GUIStyle();
+    public PlayerController owner { get; set; }
+    //protected string[] actionsValues = { };
+    public string[] actions { get; protected set; }
     protected bool isSelected = false;
-    protected Bounds selectionBounds;
-    protected Rect playingArea = new Rect(0f, 0f, 0f, 0f);
+    //protected Bounds selectionBoundsValue;
+    public Bounds selectionBounds { get; protected set; }
+    public Rect playingArea { get; set; }
+    private List<Material> oldMaterials = new List<Material>();
 
     protected virtual void Awake()
     {
         selectionBounds = ResourceManager.invalidBounds;
-        CalculateBounds();
+        UpdateBounds();
+
+        currentHitPoints = maxHitPoints;
+        UpdateHealthPercentage();
+
+        playingArea = new Rect(0f, 0f, 0f, 0f);
     }
 
     protected virtual void Start()
@@ -48,7 +61,7 @@ public class EntityController : MonoBehaviour
         DrawSelection();
     }
 
-    public bool OwnedByPlayer(PlayerController player)
+    public bool CheckOwnedByPlayer(PlayerController player)
     {
         if (owner == null)
         {
@@ -66,13 +79,12 @@ public class EntityController : MonoBehaviour
             return;
         }
 
-        this.playingArea = owner.hud.GetPlayingArea();
-        //this.playingArea = playingArea;
+        this.playingArea = HudController.GetPlayingArea();
     }
 
     private void DrawSelection()
     {
-        GUI.skin = ResourceManager.selectBoxSkin;
+        GUI.skin = ResourceManager.selectionBoxSkin;
         Rect selectionBox = GameManager.CalculateSelectionBox(selectionBounds, playingArea);
 
         GUI.BeginGroup(playingArea);
@@ -83,22 +95,74 @@ public class EntityController : MonoBehaviour
     protected virtual void DrawSelectionBox(Rect selectionBox)
     {
         GUI.Box(selectionBox, string.Empty);
+
+        UpdateHealthPercentage();
+        DrawHealthBar(selectionBox);
     }
 
-    public void CalculateBounds()
+    protected void DrawHealthBar(Rect selectionBox)
     {
-        selectionBounds = new Bounds(transform.position, Vector3.zero);
+        DrawHealthBarWithLabel(selectionBox, string.Empty);
+    }
+
+    protected void DrawHealthBarWithLabel(Rect selectionBox, string label)
+    {
+        healthStyle.padding.top = -20;
+        healthStyle.fontStyle = FontStyle.Bold;
+
+        float x = selectionBox.x;
+        float y = selectionBox.y - HEALTH_BAR_VERTICAL_OFFSET;
+        float width = selectionBox.width * healthPercentage;
+        float height = HEALTH_BAR_HEIGHT;
+        GUI.Label(new Rect(x, y, width, height), label, healthStyle);
+    }
+
+    protected virtual void UpdateHealthPercentage()
+    {
+        UpdateHealthPercentage(0.65f, 0.35f);
+    }
+
+    protected virtual void UpdateHealthPercentage(float healthyThreshold, float damagedThreshold)
+    {
+        if (maxHitPoints == 0)
+        {
+            healthPercentage = 0f;
+            return;
+        }
+
+        healthPercentage = (float)currentHitPoints / (float)maxHitPoints;
+
+        if (healthPercentage > healthyThreshold)
+        {
+            healthStyle.normal.background = ResourceManager.HealthBarTextures.healthy;
+            return;
+        }
+        if (healthPercentage > damagedThreshold)
+        {
+            healthStyle.normal.background = ResourceManager.HealthBarTextures.damaged;
+            return;
+        }
+
+        healthStyle.normal.background = ResourceManager.HealthBarTextures.critical;
+    }
+
+    public void UpdateBounds()
+    {
+        Bounds updatedBounds = new Bounds(transform.position, Vector3.zero);
         GameObject meshes = transform.Find("Meshes").gameObject;
         Renderer[] allRenderers = meshes.GetComponentsInChildren<Renderer>();
         foreach (Renderer renderer in allRenderers)
         {
-            selectionBounds.Encapsulate(renderer.bounds);
-        }
-    }
+            bool enabled = renderer.enabled;
+            if (enabled == false)
+            {
+                continue;
+            }
 
-    public string[] GetActions()
-    {
-        return actions;
+			updatedBounds.Encapsulate(renderer.bounds);
+        }
+
+        selectionBounds = updatedBounds;
     }
 
     public virtual void PerformAction(string actionToPerform)
@@ -117,7 +181,6 @@ public class EntityController : MonoBehaviour
         }
         bool isGround = hitEntity.CompareTag(Tags.ground);
         if (isGround == true)
-        //if (hitEntity.name == Tags.ground)
         {
             return;
         }
@@ -126,6 +189,16 @@ public class EntityController : MonoBehaviour
         if (entity == null)
         {
             return;
+        }
+
+        ResourceController resource = hitEntity.GetComponentInParent<ResourceController>();
+        if (resource != null)
+        {
+            bool resourceDepleted = resource.isEmpty;
+            if (resourceDepleted == true)
+            {
+                return;
+            }
         }
 
         ChangeSelection(entity, player);
@@ -145,7 +218,7 @@ public class EntityController : MonoBehaviour
         }
 
         player.selectedEntity = otherEntity;
-        playingArea = player.hud.GetPlayingArea();
+        playingArea = HudController.GetPlayingArea();
         otherEntity.SetSelection(true);
     }
 
@@ -171,5 +244,48 @@ public class EntityController : MonoBehaviour
         }
 
         owner.hud.SetCursorState(CursorState.select);
+    }
+
+    public void SetColliders(bool enabled)
+    {
+        Collider[] allColliders = GetComponentsInChildren<Collider>();
+        foreach (Collider collider in allColliders)
+        {
+            collider.enabled = enabled;
+        }
+    }
+
+    public void SetTransparencyMaterial(Material transparencyMaterial, bool saveCurrentMaterial)
+    {
+        if (saveCurrentMaterial == true)
+        {
+            oldMaterials.Clear();
+        }
+
+        Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in allRenderers)
+        {
+            if (saveCurrentMaterial == true)
+            {
+                oldMaterials.Add(renderer.material);
+            }
+
+            renderer.material = transparencyMaterial;
+        }
+    }
+
+    public void RestoreMaterials()
+    {
+        Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
+        int totalRenderers = allRenderers.Length;
+        if (oldMaterials.Count != totalRenderers)
+        {
+            return;
+        }
+
+        for (int i = 0; i < totalRenderers; i++)
+        {
+            allRenderers[i].material = oldMaterials[i];
+        }
     }
 }

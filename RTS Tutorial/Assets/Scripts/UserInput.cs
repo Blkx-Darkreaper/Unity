@@ -166,9 +166,15 @@ public class UserInput : MonoBehaviour
         Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * ResourceManager.Camera.rotationSpeed);
     }
 
-    private GameObject FindHitEntity()
+    public static GameObject GetHitGameObject()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Vector3 mousePosition = Input.mousePosition;
+        return GetHitGameObject(mousePosition);
+    }
+
+    public static GameObject GetHitGameObject(Vector3 origin)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(origin);
         RaycastHit hit;
         bool foundEntity = Physics.Raycast(ray, out hit);
         if (foundEntity == false)
@@ -180,7 +186,13 @@ public class UserInput : MonoBehaviour
         return gameObject;
     }
 
-    private Vector3 FindHitPoint()
+    public static Vector3 GetHitPoint()
+    {
+        Vector3 mousePosition = Input.mousePosition;
+        return GetHitPoint(mousePosition);
+    }
+
+    public static Vector3 GetHitPoint(Vector3 origin)
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -215,7 +227,13 @@ public class UserInput : MonoBehaviour
             return;
         }
 
-        GameObject entityUnderMouse = FindHitEntity();
+        if (player.isSettingConstructionPoint == true)
+        {
+            player.SetConstructionPoint();
+            return;
+        }
+
+        GameObject entityUnderMouse = GetHitGameObject();
         if (entityUnderMouse == null)
         {
             return;
@@ -272,13 +290,26 @@ public class UserInput : MonoBehaviour
             return;
         }
 
-        GameObject hitEntity = FindHitEntity();
+        bool settingBuildPoint = player.isSettingConstructionPoint;
+        if (settingBuildPoint == true)
+        {
+            bool validBuildPoint = player.CheckConstructionSiteIsValid();
+            if (validBuildPoint == false)
+            {
+                return;
+            }
+
+            player.StartConstruction();
+            return;
+        }
+
+        GameObject hitEntity = GetHitGameObject();
         if (hitEntity == null)
         {
             return;
         }
 
-        Vector3 hitPoint = FindHitPoint();
+        Vector3 hitPoint = GetHitPoint();
         if (hitPoint == ResourceManager.invalidPoint)
         {
             return;
@@ -302,17 +333,17 @@ public class UserInput : MonoBehaviour
                 return;
             }
 
-            player.selectedEntity = entity;
-            entity.SetSelection(true);
+            SelectEntity(entity);
         }
     }
 
-    private void RightMouseClick()
+    private void SelectEntity(EntityController entityToSelect)
     {
-        Deselect();
+        player.selectedEntity = entityToSelect;
+        entityToSelect.SetSelection(true);
     }
 
-    private void Deselect()
+    private void RightMouseClick()
     {
         bool mouseInBounds = player.hud.MouseInPlayArea();
         if (mouseInBounds == false)
@@ -330,6 +361,19 @@ public class UserInput : MonoBehaviour
             return;
         }
 
+        bool settingConstructionSite = player.isSettingConstructionPoint;
+        if (settingConstructionSite == true)
+        {
+            player.CancelConstruction();
+        }
+        else
+        {
+            Deselect();
+        }
+    }
+
+    private void Deselect()
+    {
         player.selectedEntity.SetSelection(false);
         player.selectedEntity = null;
     }

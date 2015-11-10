@@ -1,16 +1,17 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\HudController.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\EntityController.cs">
     <Files>
-      <File FileName="Assets\Scripts\HudController.cs" Line="477" Column="1" />
-      <File FileName="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs" Line="149" Column="1" />
-      <File FileName="Assets\Scripts\PlayerController.cs" Line="61" Column="64" />
+      <File FileName="Assets\Scripts\EntityController.cs" Line="163" Column="10" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="170" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\HudController.cs" line="222" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\PlayerController.cs" line="93" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="Assets\Scripts\OreDeposit.cs" line="37" offsetX="702" offsetY="756" expression="transform.Find(&quot;Meshes&quot;).gameObject" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
 </Properties>

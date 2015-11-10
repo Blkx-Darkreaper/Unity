@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using RTS;
 
@@ -6,7 +6,9 @@ public class StructureController : EntityController {
 
     protected Queue<string> buildQueue;
     private float currentBuildProgress = 0f;
-    public float buildComplete;
+    public float buildTime;
+    public bool constructionComplete { get; protected set; }
+    private const string CONSTRUCTION_MESSAGE = "Building...";
     private Vector3 spawnPoint;
     protected Vector3 rallyPoint;
     public Texture2D rallyPointIcon;
@@ -20,6 +22,7 @@ public class StructureController : EntityController {
         float spawnZ = selectionBounds.center.z + transform.forward.z * selectionBounds.extents.z + transform.forward.z * 10;
         spawnPoint = new Vector3(spawnX, 0f, spawnZ);
         rallyPoint = spawnPoint;
+        constructionComplete = true;
     }
 
     protected override void Start()
@@ -36,6 +39,27 @@ public class StructureController : EntityController {
     protected override void OnGUI()
     {
         base.OnGUI();
+
+        if (constructionComplete == true)
+        {
+            return;
+        }
+
+        DrawConstructionProgress();
+    }
+
+    private void DrawConstructionProgress()
+    {
+        GUI.skin = ResourceManager.selectionBoxSkin;
+        Rect selectionBox = GameManager.CalculateSelectionBox(selectionBounds, playingArea);
+
+        // Draw the selection box around the currently selected object, within the bounds of the main draw area
+        GUI.BeginGroup(playingArea);
+
+        UpdateHealthPercentage(0.99f, 0.5f);
+        DrawHealthBarWithLabel(selectionBox, CONSTRUCTION_MESSAGE);
+
+        GUI.EndGroup();
     }
 
     protected void BuildUnit(string unitName)
@@ -51,7 +75,7 @@ public class StructureController : EntityController {
         }
 
         currentBuildProgress += Time.deltaTime * ResourceManager.buildSpeed;
-        if (currentBuildProgress < buildComplete)
+        if (currentBuildProgress < buildTime)
         {
             return;
         }
@@ -61,7 +85,7 @@ public class StructureController : EntityController {
         }
 
         string unitName = buildQueue.Dequeue();
-        owner.SpawnUnit(unitName, spawnPoint, rallyPoint, transform.rotation);
+        owner.SpawnUnit(unitName, spawnPoint, rallyPoint, transform.rotation, this);
         currentBuildProgress = 0f;
     }
 
@@ -73,7 +97,7 @@ public class StructureController : EntityController {
 
     public float GetBuildCompletionPercentage()
     {
-        float completionPercentage = currentBuildProgress / buildComplete;
+        float completionPercentage = currentBuildProgress / buildTime;
         return completionPercentage;
     }
 
@@ -165,7 +189,7 @@ public class StructureController : EntityController {
         flag.transform.forward = transform.forward;
     }
 
-    public bool HasSpawnPoint()
+    public bool CheckHasValidSpawnPoint()
     {
         bool hasSpawnPoint = spawnPoint != ResourceManager.invalidPoint;
         bool hasRallyPoint = rallyPoint != ResourceManager.invalidPoint;
@@ -220,5 +244,26 @@ public class StructureController : EntityController {
         }
 
         Destroy(this.gameObject);
+    }
+
+    public void StartConstruction()
+    {
+        UpdateBounds();
+        constructionComplete = false;
+        currentHitPoints = 0;
+    }
+
+    public void Construct(int amount)
+    {
+        currentHitPoints += amount;
+
+        if (currentHitPoints < maxHitPoints)
+        {
+            return;
+        }
+
+        currentHitPoints = maxHitPoints;
+        constructionComplete = true;
+        RestoreMaterials();
     }
 }

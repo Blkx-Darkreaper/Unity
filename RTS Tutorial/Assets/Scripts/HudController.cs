@@ -6,7 +6,7 @@ using RTS;
 
 public class HudController : MonoBehaviour {
 
-    public GUISkin resourceSkin, ordersSkin, selectBoxSkin;
+    public GUISkin resourceSkin, ordersSkin, selectionBoxSkin;
     [HideInInspector]
     public GUISkin mouseCursorSkin;
     private const int ORDERS_BAR_WIDTH = 150;
@@ -41,6 +41,9 @@ public class HudController : MonoBehaviour {
     public Texture2D buildFrame, buildMask;
     public Texture2D smallButtonHover, smallButtonClick;
 
+    public Texture2D healthyTexture, damagedTexture, criticalTexture;
+    public Texture2D[] resourceHealthBars;
+
 
     public void SetResourceValues(Dictionary<ResourceType, int> resourceValues, Dictionary<ResourceType, int> resourceLimits)
     {
@@ -51,12 +54,39 @@ public class HudController : MonoBehaviour {
     private void Start()
     {
         player = GetComponentInParent<PlayerController>();
-        ResourceManager.selectBoxSkin = this.selectBoxSkin;
+        StoreSelectionBoxTextures(selectionBoxSkin, healthyTexture, damagedTexture, criticalTexture);
+        StoreResourceHealthBarTextures();
         SetCursorState(CursorState.select);
         resourceValues = new Dictionary<ResourceType, int>();
         resourceLimits = new Dictionary<ResourceType, int>();
         InitResources();
         buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
+    }
+
+    private void StoreSelectionBoxTextures(GUISkin skin, Texture2D healthyTexture, Texture2D damagedTexture, Texture2D criticalTexture)
+    {
+        ResourceManager.selectionBoxSkin = skin;
+        ResourceManager.HealthBarTextures.healthy = healthyTexture;
+        ResourceManager.HealthBarTextures.damaged = damagedTexture;
+        ResourceManager.HealthBarTextures.critical = criticalTexture;
+    }
+
+    private void StoreResourceHealthBarTextures()
+    {
+        Dictionary<ResourceType, Texture2D> resourceHealthBarTextures = new Dictionary<ResourceType, Texture2D>();
+        for (int i = 0; i < resourceHealthBars.Length; i++)
+        {
+            var resourceHealthBar = resourceHealthBars[i];
+
+            switch (resourceHealthBar.name)
+            {
+                case "ore":
+                    resourceHealthBarTextures.Add(ResourceType.ore, resourceHealthBar);
+                    break;
+            }
+        }
+
+        ResourceManager.SetResourceBarTextures(resourceHealthBarTextures);
     }
 
     private void InitResources()
@@ -69,16 +99,28 @@ public class HudController : MonoBehaviour {
             {
                 case "Money":
                     allResources.Add(ResourceType.money, resource);
-                    resourceValues.Add(ResourceType.money, 0);
-                    resourceLimits.Add(ResourceType.money, 0);
                     break;
 
                 case "Power":
                     allResources.Add(ResourceType.power, resource);
-                    resourceValues.Add(ResourceType.power, 0);
-                    resourceLimits.Add(ResourceType.power, 0);
+                    break;
+
+                case "Ore":
+                    break;
+
+                case "Unknown":
+                    break;
+
+                default:
                     break;
             }
+        }
+
+        ResourceType[] allTypes = (ResourceType[]) Enum.GetValues(typeof(ResourceType));
+        foreach (ResourceType type in allTypes)
+        {
+            resourceValues.Add(type, 0);
+            resourceLimits.Add(type, 0);
         }
     }
 
@@ -112,6 +154,11 @@ public class HudController : MonoBehaviour {
             drawCustomCursor = true;
         }
         //drawCustomCursor = drawCustomCursor && MouseOnScreen();
+        if (player.isSettingConstructionPoint == true)
+        {
+            Cursor.visible = false;
+            return;
+        }
 
         if (drawCustomCursor == false)
         {
@@ -283,20 +330,25 @@ public class HudController : MonoBehaviour {
             return;
         }
 
-        bool ownedByPlayer = player.selectedEntity.OwnedByPlayer(player);
+        bool ownedByPlayer = player.selectedEntity.CheckOwnedByPlayer(player);
         if (ownedByPlayer == false)
         {
             return;
         }
 
         ResetSlider();
-        string[] allActions = player.selectedEntity.GetActions();
+        string[] allActions = player.selectedEntity.actions;
         DrawActions(allActions);
         previousSelection = player.selectedEntity;
     }
 
     private void DrawActions(string[] actionsToDraw)
     {
+        if (actionsToDraw == null)
+        {
+            return;
+        }
+
         GUIStyle buttons = new GUIStyle();
         buttons.hover.background = buttonHover;
         buttons.active.background = buttonClick;
@@ -433,6 +485,14 @@ public class HudController : MonoBehaviour {
 
     private void DrawStandardStructureOptions(StructureController structure)
     {
+        if (player == null)
+        {
+            return;
+        }
+        if (player.selectedEntity == null)
+        {
+            return;
+        }
         if (structure == null)
         {
             return;
@@ -448,7 +508,7 @@ public class HudController : MonoBehaviour {
         int width = BUILD_IMAGE_WIDTH / 2;
         int height = BUILD_IMAGE_HEIGHT / 2;
 
-        bool hasSpawnPoint = structure.HasSpawnPoint();
+        bool hasSpawnPoint = structure.CheckHasValidSpawnPoint();
         if (hasSpawnPoint == false)
         {
             return;
@@ -507,8 +567,9 @@ public class HudController : MonoBehaviour {
         int topEdge = 4;
         int iconLeft = 4;
         int textLeft = 20;
-        ResourceType[] allResources = (ResourceType[]) Enum.GetValues(typeof(ResourceType));
-        foreach(ResourceType resource in allResources) {
+        ResourceType[] typesToDisplay = new ResourceType[] { ResourceType.money, ResourceType.power };
+        foreach (ResourceType resource in typesToDisplay)
+        {
             DrawResourceIcon(resource, iconLeft, textLeft, topEdge);
             iconLeft += TEXT_WIDTH;
             textLeft += TEXT_WIDTH;
@@ -547,7 +608,7 @@ public class HudController : MonoBehaviour {
         return xInBounds && yInBounds;
     }
 
-    public Rect GetPlayingArea()
+    public static Rect GetPlayingArea()
     {
         int x = 0;
         int y = RESOURCE_BAR_HEIGHT;

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace RTS
 {
@@ -15,12 +16,40 @@ namespace RTS
             public static float rotationSpeed = 100f;
         }
 
+        public struct HealthBarTextures
+        {
+            public static Texture2D healthy;
+            public static Texture2D damaged;
+            public static Texture2D critical;
+        }
+
         private static Vector3 invalidPositionValue = new Vector3(-99999f, -99999f, -99999f);
         public static Vector3 invalidPoint { get { return invalidPositionValue; } }
-        public static GUISkin selectBoxSkin { get; set; }
+        public static GUISkin selectionBoxSkin { get; set; }
         private static Bounds invalidBoundsValue = new Bounds(new Vector3(-99999f, -99999f, -99999f), Vector3.zero);
         public static Bounds invalidBounds { get { return invalidBoundsValue; } }
         public static int buildSpeed { get { return 2; } }
+        private static Dictionary<ResourceType, Texture2D> resourceHealthBarTextures;
+
+        public static Texture2D GetResourceBarTexture(ResourceType type)
+        {
+            if (resourceHealthBarTextures == null)
+            {
+                return null;
+            }
+            if (!resourceHealthBarTextures.ContainsKey(type))
+            {
+                return null;
+            }
+
+            Texture2D healthBarTexture = resourceHealthBarTextures[type];
+            return healthBarTexture;
+        }
+
+        public static void SetResourceBarTextures(Dictionary<ResourceType, Texture2D> images)
+        {
+            resourceHealthBarTextures = images;
+        }
     }
 
     public struct KeyMappings
@@ -57,6 +86,6 @@ namespace RTS
 
     public enum ResourceType
     {
-        money, power
+        money, power, ore, unknown
     }
 }

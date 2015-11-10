@@ -163,15 +163,36 @@ namespace RTS
 
         public static Rect CalculateSelectionBox(Bounds selectionBounds, Rect playingArea)
         {
+            List<Vector3> corners = GetBoundsCorners(selectionBounds);
+
+            // Determine the bounds on screen for the selection bounds
+            Bounds screenBounds = new Bounds(corners[0], Vector3.zero);
+            for (int i = 1; i < corners.Count; i++)
+            {
+                screenBounds.Encapsulate(corners[i]);
+            }
+
+            // Screen coordinates start in the bottom left corner, rather than the top left corner
+            float selectionBoxTop = playingArea.height - (screenBounds.center.y + screenBounds.extents.y);
+            float selectionBoxLeft = screenBounds.center.x - screenBounds.extents.x;
+            float selectionBoxWidth = 2 * screenBounds.extents.x;
+            float selectionBoxHeight = 2 * screenBounds.extents.y;
+
+            Rect selectionBox = new Rect(selectionBoxLeft, selectionBoxTop, selectionBoxWidth, selectionBoxHeight);
+            return selectionBox;
+        }
+
+        public static List<Vector3> GetBoundsCorners(Bounds bounds)
+        {
             float[] centers = new float[3];
-            centers[0] = selectionBounds.center.x;
-            centers[1] = selectionBounds.center.y;
-            centers[2] = selectionBounds.center.z;
+            centers[0] = bounds.center.x;
+            centers[1] = bounds.center.y;
+            centers[2] = bounds.center.z;
 
             float[] extents = new float[3];
-            extents[0] = selectionBounds.extents.x;
-            extents[1] = selectionBounds.extents.y;
-            extents[2] = selectionBounds.extents.z;
+            extents[0] = bounds.extents.x;
+            extents[1] = bounds.extents.y;
+            extents[2] = bounds.extents.z;
 
             // Determine the screen coordinates for the corners of the selection bounds
             List<Vector3> corners = new List<Vector3>();
@@ -192,21 +213,7 @@ namespace RTS
                 }
             }
 
-            // Determine the bounds on screen for the selection bounds
-            Bounds screenBounds = new Bounds(corners[0], Vector3.zero);
-            for (int i = 1; i < corners.Count; i++)
-            {
-                screenBounds.Encapsulate(corners[i]);
-            }
-
-            // Screen coordinates start in the bottom left corner, rather than the top left corner
-            float selectionBoxTop = playingArea.height - (screenBounds.center.y + screenBounds.extents.y);
-            float selectionBoxLeft = screenBounds.center.x - screenBounds.extents.x;
-            float selectionBoxWidth = 2 * screenBounds.extents.x;
-            float selectionBoxHeight = 2 * screenBounds.extents.y;
-
-            Rect selectionBox = new Rect(selectionBoxLeft, selectionBoxTop, selectionBoxWidth, selectionBoxHeight);
-            return selectionBox;
+            return corners;
         }
     }
 }
