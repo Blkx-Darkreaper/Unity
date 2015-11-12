@@ -21,7 +21,24 @@ public class PlayerController : MonoBehaviour {
 
     private void Awake()
     {
+        InitUsername();
         InitResourceLists();
+    }
+
+    private void InitUsername()
+    {
+        if (username == null)
+        {
+            username = "Unknown";
+            return;
+        }
+
+        if (username.Equals(string.Empty) == false)
+        {
+            return;
+        }
+
+        username = "Unknown";
     }
 
     private void InitResourceLists()

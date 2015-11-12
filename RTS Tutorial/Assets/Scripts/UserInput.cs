@@ -390,7 +390,7 @@ public class UserInput : MonoBehaviour
     private void OpenPauseMenu()
     {
         Time.timeScale = 0f;
-        GetComponentInChildren<PauseMenuController>().enabled = true;
+        GetComponentInChildren<PauseMenu>().enabled = true;
         GetComponent<UserInput>().enabled = false;
         Cursor.visible = true;
         GameManager.activeInstance.isMenuOpen = true;

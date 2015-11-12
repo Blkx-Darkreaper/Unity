@@ -35,6 +35,12 @@ namespace RTS
             public static float buttonHeight = 40f;
         }
 
+        public struct Levels
+        {
+            public const string MAIN_MENU = "mainMenu";
+            public const string GAME = "map";
+        }
+
         private static Vector3 invalidPositionValue = new Vector3(-99999f, -99999f, -99999f);
         public static Vector3 invalidPoint { get { return invalidPositionValue; } }
         public static GUISkin selectionBoxSkin { get; set; }
@@ -42,6 +48,7 @@ namespace RTS
         public static Bounds invalidBounds { get { return invalidBoundsValue; } }
         public static int buildSpeed { get { return 2; } }
         private static Dictionary<ResourceType, Texture2D> resourceHealthBarTextures;
+        private static Dictionary<int, Texture2D> playerAvatars;
 
         public static Texture2D GetResourceBarTexture(ResourceType type)
         {
@@ -58,9 +65,61 @@ namespace RTS
             return healthBarTexture;
         }
 
-        public static void SetResourceBarTextures(Dictionary<ResourceType, Texture2D> images)
+        public static void SetResourceBarTextures(Texture2D[] images)
         {
-            resourceHealthBarTextures = images;
+            resourceHealthBarTextures = new Dictionary<ResourceType, Texture2D>();
+            foreach (Texture2D resourceHealthBar in images)
+            {
+                switch (resourceHealthBar.name)
+                {
+                    case "ore":
+                        resourceHealthBarTextures.Add(ResourceType.ore, resourceHealthBar);
+                        break;
+                }
+            }
+        }
+
+        public static Texture2D GetAvatar(int avatarId)
+        {
+            if (playerAvatars == null)
+            {
+                return null;
+            }
+            if (playerAvatars.ContainsKey(avatarId) == false)
+            {
+                return null;
+            }
+
+            Texture2D avatar = playerAvatars[avatarId];
+            return avatar;
+        }
+
+        public static int GetAvatarIndex(string avatarName)
+        {
+            int index = 0;
+            foreach(Texture2D avatar in playerAvatars.Values)
+            {
+                bool match = avatarName.Equals(avatar.name);
+                if (match == false)
+                {
+                    index++;
+                    continue;
+                }
+
+                return index;
+            }
+
+            return -1;
+        }
+
+        public static void SetAvatars(Texture2D[] images)
+        {
+            playerAvatars = new Dictionary<int, Texture2D>();
+            for (int i = 0; i < images.Length; i++ )
+            {
+                Texture2D avatar = images[i];
+                playerAvatars.Add(i, avatar);
+            }
         }
     }
 

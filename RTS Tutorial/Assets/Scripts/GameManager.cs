@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace RTS
 {
@@ -14,6 +16,15 @@ namespace RTS
         private Dictionary<string, GameObject> allEntities;
         public GameObject player;
         public bool isMenuOpen { get; set; }
+        private Dictionary<string, PlayerAccount> allPlayerAccounts = new Dictionary<string, PlayerAccount>();
+        public PlayerAccount currentPlayerAccount { get; protected set; }
+        public string defaultUsername = "NewPlayer";
+        public string defaultSaveFolderName = "SavedGames";
+
+        public struct JsonProperties
+        {
+            public const string PLAYERS = "Players";
+        }
 
         public static GameManager activeInstance = null;
 
@@ -33,6 +44,8 @@ namespace RTS
             InitStructures();
             InitUnits();
             InitEntities();
+
+            Load();
         }
 
         private void InitStructures()
@@ -143,6 +156,170 @@ namespace RTS
         public GameObject GetPlayer()
         {
             return player;
+        }
+
+        public string[] GetAllUsernames()
+        {
+            int count = allPlayerAccounts.Count;
+            string[] allUsernames = new string[count];
+            allPlayerAccounts.Keys.CopyTo(allUsernames, 0);
+
+            return allUsernames;
+        }
+
+        public PlayerAccount GetPlayerAccount(string username)
+        {
+            bool accountExists = allPlayerAccounts.ContainsKey(username);
+            if (accountExists == false)
+            {
+                return null;
+            }
+
+            PlayerAccount account = allPlayerAccounts[username];
+            return account;
+        }
+
+        public void SetCurrentPlayerAccount(string username, int avatarId)
+        {
+            bool playerExists = allPlayerAccounts.ContainsKey(username);
+            if (playerExists == false)
+            {
+                AddPlayerAccount(username, avatarId);
+
+                CreatePlayerSaveFolder(username);
+                Save();
+            }
+
+            currentPlayerAccount = allPlayerAccounts[username];
+        }
+
+        public void AddPlayerAccount(string username, int avatarId)
+        {
+            bool usernameConflict = allPlayerAccounts.ContainsKey(username);
+            if (usernameConflict == true)
+            {
+                Debug.Log(string.Format("Username {0} is already taken", username));
+                return;
+            }
+
+            PlayerAccount accountToAdd = new PlayerAccount(username, avatarId);
+            allPlayerAccounts.Add(username, accountToAdd);
+        }
+
+        private void VerifyAccounts()
+        {
+            string[] allUsernames = GetAllUsernames();
+            int count = allPlayerAccounts.Count;
+            if (allUsernames.Length != count)
+            {
+                Debug.Log(string.Format("{0} usernames but {1} entries", allUsernames.Length, count));
+            }
+
+            foreach (string username in allUsernames)
+            {
+                PlayerAccount account = GetPlayerAccount(username);
+                if (account == null)
+                {
+                    Debug.Log(string.Format("No account for {0}", username));
+                    continue;
+                }
+                Debug.Log(string.Format("Username: {0}, Account Username: {1}, Account avatar id: {2}",
+                                         username, account.username, account.avatarId));
+            }
+        }
+
+        private void CreatePlayerSaveFolder(string username)
+        {
+            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + username;
+            Directory.CreateDirectory(path);
+        }
+
+        public void Save()
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.NullValueHandling = NullValueHandling.Ignore;
+
+            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + JsonProperties.PLAYERS + ".json";
+            using (StreamWriter stream = new StreamWriter(path))
+            {
+                using (JsonWriter writer = new JsonTextWriter(stream))
+                {
+                    writer.WriteStartObject();
+
+                    writer.WritePropertyName(JsonProperties.PLAYERS);
+                    writer.WriteStartArray();
+                    foreach (PlayerAccount account in allPlayerAccounts.Values)
+                    {
+                        account.Save(writer);
+                    }
+                    writer.WriteEndArray();
+
+                    writer.WriteEndObject();
+                }
+            }
+        }
+
+        public void Load()
+        {
+            allPlayerAccounts.Clear();
+
+            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + JsonProperties.PLAYERS + ".json";
+
+            bool fileNotFound = ! File.Exists(path);
+            if (fileNotFound == true)
+            {
+                return;
+            }
+
+            string input;
+            using (StreamReader stream = new StreamReader(path))
+            {
+                input = stream.ReadToEnd();
+            }
+
+            if (input == null)
+            {
+                return;
+            }
+
+            using (JsonTextReader reader = new JsonTextReader(new StringReader(input)))
+            {
+                while (reader.Read())
+                {
+                    if (reader.Value == null)
+                    {
+                        continue;
+                    }
+                    if (reader.TokenType != JsonToken.PropertyName)
+                    {
+                        continue;
+                    }
+
+                    string value = (string)reader.Value;
+                    switch (value)
+                    {
+                        case JsonProperties.PLAYERS:
+                            LoadPlayers(reader);
+                            break;
+                    }
+                }
+            }
+        }
+
+        public void LoadPlayers(JsonTextReader reader)
+        {
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonToken.StartObject)
+                {
+                    PlayerAccount.Load(reader, this);
+                }
+
+                if (reader.TokenType == JsonToken.EndArray)
+                {
+                    return;
+                }
+            }
         }
 
         public Texture2D GetBuildIcon(string name)

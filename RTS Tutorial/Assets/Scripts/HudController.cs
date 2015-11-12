@@ -4,9 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using RTS;
 
-public class HudController : MonoBehaviour {
+public class HudController : MonoBehaviour
+{
 
-    public GUISkin resourceSkin, ordersSkin, selectionBoxSkin;
+    public GUISkin resourceSkin, ordersSkin, selectionBoxSkin, playerDetailsSkin;
     [HideInInspector]
     public GUISkin mouseCursorSkin;
     private const int ORDERS_BAR_WIDTH = 150;
@@ -61,6 +62,18 @@ public class HudController : MonoBehaviour {
         resourceLimits = new Dictionary<ResourceType, int>();
         InitResources();
         buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
+        SetPlayerUsername();
+    }
+
+    private void SetPlayerUsername()
+    {
+        string username = GameManager.activeInstance.currentPlayerAccount.username;
+        if (player.isNPC == true)
+        {
+            return;
+        }
+
+        player.username = username;
     }
 
     private void StoreSelectionBoxTextures(GUISkin skin, Texture2D healthyTexture, Texture2D damagedTexture, Texture2D criticalTexture)
@@ -73,20 +86,7 @@ public class HudController : MonoBehaviour {
 
     private void StoreResourceHealthBarTextures()
     {
-        Dictionary<ResourceType, Texture2D> resourceHealthBarTextures = new Dictionary<ResourceType, Texture2D>();
-        for (int i = 0; i < resourceHealthBars.Length; i++)
-        {
-            var resourceHealthBar = resourceHealthBars[i];
-
-            switch (resourceHealthBar.name)
-            {
-                case "ore":
-                    resourceHealthBarTextures.Add(ResourceType.ore, resourceHealthBar);
-                    break;
-            }
-        }
-
-        ResourceManager.SetResourceBarTextures(resourceHealthBarTextures);
+        ResourceManager.SetResourceBarTextures(resourceHealthBars);
     }
 
     private void InitResources()
@@ -116,7 +116,7 @@ public class HudController : MonoBehaviour {
             }
         }
 
-        ResourceType[] allTypes = (ResourceType[]) Enum.GetValues(typeof(ResourceType));
+        ResourceType[] allTypes = (ResourceType[])Enum.GetValues(typeof(ResourceType));
         foreach (ResourceType type in allTypes)
         {
             resourceValues.Add(type, 0);
@@ -137,9 +137,56 @@ public class HudController : MonoBehaviour {
             return;
         }
 
+        DrawPlayerDetails();
         DrawOrdersBar();
         DrawResourceBar();
         DrawMouseCursor();
+    }
+
+    private void DrawPlayerDetails()
+    {
+        GUI.skin = playerDetailsSkin;
+
+        float x = 0;
+        float y = 0;
+        float width = Screen.width;
+        float height = Screen.height;
+        GUI.BeginGroup(new Rect(x, y, width, height));
+
+        height = ResourceManager.Menu.textHeight;
+        x = ResourceManager.Menu.textHeight;
+        y = Screen.height - x - ResourceManager.Menu.padding;
+
+        x = DrawPlayerAvatar(x, y, height);
+
+        float minWidth = 0, maxWidth = 0;
+
+        string username = player.username;
+        //string currentPlayerUsername = GameManager.activeInstance.currentPlayerAccount.username;
+        //if (currentPlayerUsername.Equals(username) == false)
+        //{
+        //    Debug.Log(string.Format("Usernames do not match"));
+        //}
+
+        playerDetailsSkin.GetStyle("label").CalcMinMaxWidth(new GUIContent(username), out minWidth, out maxWidth);
+        GUI.Label(new Rect(x, y, maxWidth, height), username);
+
+        GUI.EndGroup();
+    }
+
+    private float DrawPlayerAvatar(float x, float y, float height)
+    {
+        int avatarId = GameManager.activeInstance.currentPlayerAccount.avatarId;
+        Texture2D avatar = ResourceManager.GetAvatar(avatarId);
+        if (avatar == null)
+        {
+            return x;
+        }
+
+        GUI.DrawTexture(new Rect(x, y, height, height), avatar);
+
+        x += height + ResourceManager.Menu.padding;
+        return x;
     }
 
     private void DrawMouseCursor()
@@ -372,9 +419,9 @@ public class HudController : MonoBehaviour {
             int column = i % 2;
             int row = i / 2;
             Rect buttonArea = GetButtonArea(row, column);
-            
+
             string action = actionsToDraw[i];
-			Texture2D actionIcon = GameManager.activeInstance.GetBuildIcon(action);
+            Texture2D actionIcon = GameManager.activeInstance.GetBuildIcon(action);
             if (actionIcon == null)
             {
                 continue;
@@ -561,7 +608,7 @@ public class HudController : MonoBehaviour {
         int width = Screen.width;
         int height = RESOURCE_BAR_HEIGHT;
         GUI.BeginGroup(new Rect(x, y, width, height));
-        
+
         GUI.Box(new Rect(x, y, width, height), string.Empty);
 
         int topEdge = 4;

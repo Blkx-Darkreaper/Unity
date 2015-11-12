@@ -1,6 +1,7 @@
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Assembly-CSharp.dll
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Assembly-CSharp.pdb
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Mono.Cecil.dll
+D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Newtonsoft.Json.dll
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\UnityEditor.dll
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\UnityEditor.iOS.Extensions.Xcode.dll
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\UnityEngine.dll
@@ -13,6 +14,7 @@ D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Unity.UNetWeaver.dll
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Unity.CecilTools.dll
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Mono.Cecil.Pdb.dll
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Mono.Cecil.Mdb.dll
+D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\Newtonsoft.Json.xml
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\UnityEngine.xml
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\UnityEditor.xml
 D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Temp\bin\Debug\UnityEngine.UI.xml
