@@ -53,8 +53,8 @@ public class MenuController : MonoBehaviour {
         {
             return;
         }
-        bool noUsername = player.username.Equals(string.Empty);
-        if (noUsername == false)
+        bool alreadySet = !player.username.Equals(string.Empty);
+        if (alreadySet == true)
         {
             return;
         }

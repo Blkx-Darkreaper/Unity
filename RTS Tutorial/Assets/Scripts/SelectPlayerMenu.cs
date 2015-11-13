@@ -4,7 +4,7 @@ using RTS;
 
 public class SelectPlayerMenu : MenuController {
 
-    private string username;
+    private string selectedUsername;
     public int usernameCharacterLimit = 14;
     public Texture2D[] avatars;
     private int avatarIndex = 0;
@@ -13,7 +13,7 @@ public class SelectPlayerMenu : MenuController {
     protected override void Start()
     {
         base.Start();
-        username = GameManager.activeInstance.defaultUsername;
+        selectedUsername = GameManager.activeInstance.defaultUsername;
         LoadAvatars();
         LoadUsernames();
     }
@@ -69,8 +69,8 @@ public class SelectPlayerMenu : MenuController {
         y = menuHeight - 2 * ResourceManager.Menu.padding - ResourceManager.Menu.buttonHeight - ResourceManager.Menu.textHeight;
         width = ResourceManager.Menu.width - 2 * ResourceManager.Menu.padding;
         height = ResourceManager.Menu.textHeight;
-        username = GUI.TextField(new Rect(x, y, width, height), username, usernameCharacterLimit);
-        SelectionList.SetCurrentEntryToFirstMatch(username);
+        selectedUsername = GUI.TextField(new Rect(x, y, width, height), selectedUsername, usernameCharacterLimit);
+        SelectionList.SetCurrentEntryToFirstMatch(selectedUsername);
 
         DrawAvatar(y);
 
@@ -80,23 +80,21 @@ public class SelectPlayerMenu : MenuController {
         DrawSelectionList(rect);
 
         string currentSelection = SelectionList.GetCurrentEntry();
-        if (previousSelection == currentSelection)
+        if (previousSelection != currentSelection)
         {
-            return;
+            SelectPlayerAccount(currentSelection);
         }
-
-        SelectPlayerAccount(currentSelection);
     }
 
-    private void SelectPlayerAccount(string username)
+    private void SelectPlayerAccount(string usernameToFind)
     {
-        PlayerAccount account = GameManager.activeInstance.GetPlayerAccount(username);
+        PlayerAccount account = GameManager.activeInstance.GetPlayerAccount(usernameToFind);
         if (account == null)
         {
             return;
         }
 
-        username = account.username;
+        selectedUsername = account.username;
         avatarIndex = account.avatarId;
     }
 
@@ -189,8 +187,8 @@ public class SelectPlayerMenu : MenuController {
 
     private void SelectPlayer()
     {
-        GameManager.activeInstance.SetCurrentPlayerAccount(username, avatarIndex);
-        SetUsername(username);
+        GameManager.activeInstance.SetCurrentPlayerAccount(selectedUsername, avatarIndex);
+        //SetUsername(username);
         GetComponent<SelectPlayerMenu>().enabled = false;
         MainMenu mainMenu = GetComponent<MainMenu>();
         if (mainMenu != null)

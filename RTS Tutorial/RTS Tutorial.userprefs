@@ -1,11 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManager.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\SelectPlayerMenu.cs">
     <Files>
-      <File FileName="Assets\Scripts\SelectPlayerMenu.cs" Line="201" Column="2" />
-      <File FileName="Assets\Scripts\PlayerAccount.cs" Line="64" Column="1" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="407" Column="2" />
-      <File FileName="Assets\Scripts\ResourceManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\SelectPlayerMenu.cs" Line="199" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -16,7 +13,9 @@
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\ResourceManager.cs" line="99" />
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs" line="212" />
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs" line="201" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\SelectPlayerMenu.cs" line="93" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\SelectPlayerMenu.cs" line="85" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\SelectPlayerMenu.cs" line="91" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\SelectPlayerMenu.cs" line="72" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
