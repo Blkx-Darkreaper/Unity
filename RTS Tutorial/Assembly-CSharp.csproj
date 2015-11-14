@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\AnimationController.cs" />
+     <Compile Include="Assets\Scripts\ConfirmDialogController.cs" />
      <Compile Include="Assets\Scripts\ConstructorUnit.cs" />
      <Compile Include="Assets\Scripts\EntityController.cs" />
      <Compile Include="Assets\Scripts\FactoryStructure.cs" />
@@ -53,9 +54,11 @@
      <Compile Include="Assets\Scripts\HarvesterUnit.cs" />
      <Compile Include="Assets\Scripts\HudController.cs" />
      <Compile Include="Assets\Scripts\MainMenu.cs" />
+     <Compile Include="Assets\Scripts\Manager.cs" />
      <Compile Include="Assets\Scripts\MenuController.cs" />
      <Compile Include="Assets\Scripts\OreDeposit.cs" />
      <Compile Include="Assets\Scripts\PauseMenu.cs" />
+     <Compile Include="Assets\Scripts\PersistentEntity.cs" />
      <Compile Include="Assets\Scripts\PlayerAccount.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
      <Compile Include="Assets\Scripts\ProjectileController.cs" />
@@ -63,6 +66,8 @@
      <Compile Include="Assets\Scripts\RefineryStructure.cs" />
      <Compile Include="Assets\Scripts\ResourceController.cs" />
      <Compile Include="Assets\Scripts\ResourceManager.cs" />
+     <Compile Include="Assets\Scripts\SaveManager.cs" />
+     <Compile Include="Assets\Scripts\SaveMenu.cs" />
      <Compile Include="Assets\Scripts\SelectPlayerMenu.cs" />
      <Compile Include="Assets\Scripts\SelectionList.cs" />
      <Compile Include="Assets\Scripts\StructureController.cs" />

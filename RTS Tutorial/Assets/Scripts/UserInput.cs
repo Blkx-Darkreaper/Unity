@@ -246,7 +246,7 @@ public class UserInput : MonoBehaviour
         }
         else
         {
-            bool entityIsGround = entityUnderMouse.CompareTag(Tags.ground);
+            bool entityIsGround = entityUnderMouse.CompareTag(Tags.GROUND);
             if (entityIsGround == true)
             {
                 return;
@@ -259,12 +259,12 @@ public class UserInput : MonoBehaviour
             }
 
             UnitController unit = null;
-            if(entityUnderMouse.CompareTag(Tags.unit) == true) {
+            if(entityUnderMouse.CompareTag(Tags.UNIT) == true) {
                 unit = entityUnderMouse.GetComponentInParent<UnitController>();
             }
 
             StructureController structure = null;
-            if(entityUnderMouse.CompareTag(Tags.structure) == true) {
+            if(entityUnderMouse.CompareTag(Tags.STRUCTURE) == true) {
                 structure = entityUnderMouse.GetComponentInParent<StructureController>();
             }
             bool entityNeitherUnitOrStructure = unit == null && structure == null;
@@ -322,7 +322,7 @@ public class UserInput : MonoBehaviour
         }
         else
         {
-            bool isGround = hitEntity.CompareTag(Tags.ground);
+            bool isGround = hitEntity.CompareTag(Tags.GROUND);
             if (isGround == true)
             {
                 return;

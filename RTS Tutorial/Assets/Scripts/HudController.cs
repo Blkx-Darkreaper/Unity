@@ -18,7 +18,7 @@ public class HudController : MonoBehaviour
     private const int TEXT_HEIGHT = 32;
     private const int BUILD_IMAGE_WIDTH = 64, BUILD_IMAGE_HEIGHT = 64;
     private const int BUILD_IMAGE_PADDING = 8;
-    private const int BUTTON_SPACING = 7;
+    private const int BUTTON_PADDING = 7;
     private const int SCROLL_BAR_WIDTH = 22;
 
     private PlayerController player;
@@ -61,7 +61,7 @@ public class HudController : MonoBehaviour
         resourceValues = new Dictionary<ResourceType, int>();
         resourceLimits = new Dictionary<ResourceType, int>();
         InitResources();
-        buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_SPACING;
+        buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_PADDING;
         SetPlayerUsername();
     }
 
@@ -359,7 +359,7 @@ public class HudController : MonoBehaviour
         }
 
         int x = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH + 2 * BUILD_IMAGE_PADDING;
-        int y = buildAreaHeight + BUTTON_SPACING;
+        int y = buildAreaHeight + BUTTON_PADDING;
         int width = ORDERS_BAR_WIDTH;
         int height = SELECTION_NAME_HEIGHT;
         GUI.Label(new Rect(x, y, width, height), selectionName);
@@ -482,8 +482,8 @@ public class HudController : MonoBehaviour
 
     private Rect GetScrollArea(int groupHeight)
     {
-        int height = groupHeight - 2 * BUTTON_SPACING;
-        Rect scrollArea = new Rect(BUTTON_SPACING, BUTTON_SPACING, SCROLL_BAR_WIDTH, height);
+        int height = groupHeight - 2 * BUTTON_PADDING;
+        Rect scrollArea = new Rect(BUTTON_PADDING, BUTTON_PADDING, SCROLL_BAR_WIDTH, height);
         return scrollArea;
     }
 
@@ -550,7 +550,7 @@ public class HudController : MonoBehaviour
         smallButtons.active.background = smallButtonClick;
         GUI.skin.button = smallButtons;
 
-        int leftEdge = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH + BUTTON_SPACING;
+        int leftEdge = BUILD_IMAGE_WIDTH + SCROLL_BAR_WIDTH + BUTTON_PADDING;
         int topEdge = buildAreaHeight - BUILD_IMAGE_HEIGHT / 2;
         int width = BUILD_IMAGE_WIDTH / 2;
         int height = BUILD_IMAGE_HEIGHT / 2;
@@ -568,7 +568,7 @@ public class HudController : MonoBehaviour
     private void SellButtonHandler(StructureController structure, int leftEdge, int topEdge, int width, int height)
     {
         Texture2D sellIcon = structure.sellIcon;
-        leftEdge += width + BUTTON_SPACING;
+        leftEdge += width + BUTTON_PADDING;
 
         bool buttonPressed = GUI.Button(new Rect(leftEdge, topEdge, width, height), sellIcon);
         if (buttonPressed == false)
@@ -622,7 +622,41 @@ public class HudController : MonoBehaviour
             textLeft += TEXT_WIDTH;
         }
 
+        DrawMenuButton();
+
         GUI.EndGroup();
+    }
+
+    private void DrawMenuButton()
+    {
+        int width = ORDERS_BAR_WIDTH - 2 * BUTTON_PADDING - SCROLL_BAR_WIDTH;
+        int height = RESOURCE_BAR_HEIGHT - 2 * BUTTON_PADDING;
+        int x = Screen.width - ORDERS_BAR_WIDTH / 2 - width / 2 + SCROLL_BAR_WIDTH / 2;
+        int y = BUTTON_PADDING;
+        Rect menuButton = new Rect(x, y, width, height);
+
+        bool buttonPressed = GUI.Button(menuButton, "Menu");
+        if (buttonPressed == false)
+        {
+            return;
+        }
+
+        PauseMenu();
+    }
+
+    private void PauseMenu()
+    {
+        Time.timeScale = 0f;
+        PauseMenu pauseMenu = GetComponent<PauseMenu>();
+        if (pauseMenu != null)
+        {
+            pauseMenu.enabled = true;
+        }
+        UserInput userInput = player.GetComponent<UserInput>();
+        if (userInput != null)
+        {
+            userInput.enabled = false;
+        }
     }
 
     private void DrawResourceIcon(ResourceType type, int iconLeft, int textLeft, int topEdge)

@@ -1,8 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\SelectPlayerMenu.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\PlayerController.cs">
     <Files>
-      <File FileName="Assets\Scripts\SelectPlayerMenu.cs" Line="199" Column="2" />
+      <File FileName="Assets\Scripts\SaveManager.cs" Line="206" Column="1" />
+      <File FileName="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\PlayerController.cs" Line="271" Column="28" />
+      <File FileName="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\EntityController.cs" Line="610" Column="1" />
+      <File FileName="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\PersistentEntity.cs" Line="35" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -10,12 +13,6 @@
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\PlayerController.cs" line="93" />
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\EntityController.cs" line="446" />
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\EntityController.cs" line="293" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\ResourceManager.cs" line="99" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs" line="212" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs" line="201" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\SelectPlayerMenu.cs" line="85" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\SelectPlayerMenu.cs" line="91" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\SelectPlayerMenu.cs" line="72" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>

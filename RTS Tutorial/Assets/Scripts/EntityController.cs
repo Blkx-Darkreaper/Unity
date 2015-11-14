@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using RTS;
+using Newtonsoft.Json;
 
-public class EntityController : MonoBehaviour
+public class EntityController : PersistentEntity
 {
 
     public string entityName;
+    public int entityId { get; set; }
     public Texture2D buildImage;
     public int cost, sellValue, maxHitPoints;
     [HideInInspector]
@@ -32,6 +34,18 @@ public class EntityController : MonoBehaviour
     public float weaponCooldown = 1f;
     private const float DEFAULT_WEAPON_COOLDOWN = 1f;
     private float currentCooldownRemaining;
+    protected struct EntityProperties
+    {
+        public const string TYPE = "Type";
+        public const string NAME = "Name";
+        public const string ID = "Id";
+        public const string HIT_POINTS = "HitPoints";
+        public const string IS_ATTACKING = "IsAttacking";
+        public const string IS_ADVANCING = "IsAdvancing";
+        public const string IS_AIMING = "IsAiming";
+        public const string COOLDOWN = "CurrentCooldown";
+        public const string TARGET_ID = "TargetId";
+    }
 
     protected virtual void Awake()
     {
@@ -42,6 +56,7 @@ public class EntityController : MonoBehaviour
         UpdateHealthPercentage();
 
         playingArea = new Rect(0f, 0f, 0f, 0f);
+        entityId = ResourceManager.GetNextUniqueId();
     }
 
     protected virtual void Start()
@@ -259,7 +274,7 @@ public class EntityController : MonoBehaviour
         {
             return;
         }
-        bool isGround = hitGameObject.CompareTag(Tags.ground);
+        bool isGround = hitGameObject.CompareTag(Tags.GROUND);
         if (isGround == true)
         {
             return;
@@ -344,7 +359,7 @@ public class EntityController : MonoBehaviour
             return;
         }
 
-        bool isGround = gameObjectUnderMouse.CompareTag(Tags.ground);
+        bool isGround = gameObjectUnderMouse.CompareTag(Tags.GROUND);
         if (isGround == true)
         {
             return;
@@ -582,6 +597,27 @@ public class EntityController : MonoBehaviour
         for (int i = 0; i < totalRenderers; i++)
         {
             allRenderers[i].material = oldMaterials[i];
+        }
+    }
+    
+    protected override void SaveDetails(JsonWriter writer)
+    {
+        base.SaveDetails(writer);
+
+        SaveManager.SaveString(writer, EntityProperties.TYPE, name);
+        SaveManager.SaveString(writer, EntityProperties.NAME, entityName);
+        SaveManager.SaveInt(writer, EntityProperties.ID, entityId);
+        SaveManager.SaveInt(writer, EntityProperties.HIT_POINTS, currentHitPoints);
+        SaveManager.SaveBoolean(writer, EntityProperties.IS_ATTACKING, isAttacking);
+        SaveManager.SaveBoolean(writer, EntityProperties.IS_ADVANCING, isAdvancing);
+        SaveManager.SaveBoolean(writer, EntityProperties.IS_AIMING, isAiming);
+        if (currentCooldownRemaining > 0)
+        {
+            SaveManager.SaveFloat(writer, EntityProperties.COOLDOWN, currentCooldownRemaining);
+        }
+        if (attackTarget != null)
+        {
+            SaveManager.SaveInt(writer, EntityProperties.TARGET_ID, attackTarget.entityId);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using RTS;
+using Newtonsoft.Json;
 
 public class HarvesterUnit : UnitController
 {
@@ -11,13 +12,23 @@ public class HarvesterUnit : UnitController
     private bool isDepositing = false;
     private float currentLoad = 0f;
     private ResourceType harvestType;
-    private ResourceController resourceDeposit;
+    private ResourceController resourceSource;
     public StructureController resourceStore;
     public float harvestAmount, depositAmount;
     private float currentDeposit = 0f;
     private const int MAX_HEIGHT_BUFFER = 4;
     private const int LEFT_EDGE_BUFFER = 7;
     private const int TOP_EDGE_BUFFER = 2;
+    protected struct HarvesterProperties
+    {
+        public const string IS_HARVESTING = "IsHarvesting";
+        public const string IS_DEPOSITING = "IsDepositing";
+        public const string CURRENT_LOAD = "CurrentLoad";
+        public const string CURRENT_DEPOSIT = "CurrentDeposit";
+        public const string HARVEST_TYPE = "HarvestType";
+        public const string SOURCE_ID = "ResourceSourceId";
+        public const string STORE_ID = "ResourceStoreId";
+    }
 
     public override void SetSpawner(StructureController spawner)
     {
@@ -90,14 +101,14 @@ public class HarvesterUnit : UnitController
             isDepositing = false;
             HideArms(arms);
 
-            bool depositDepleted = resourceDeposit.isEmpty;
+            bool depositDepleted = resourceSource.isEmpty;
             if (depositDepleted == true)
             {
                 return;
             }
 
             isHarvesting = true;
-            SetWaypoint(resourceDeposit.transform.position, resourceDeposit.gameObject);
+            SetWaypoint(resourceSource.transform.position, resourceSource.gameObject);
 
             string ownersName = "Neutral";
             if (owner != null)
@@ -180,7 +191,7 @@ public class HarvesterUnit : UnitController
             return;
         }
 
-        bool isGround = entityUnderMouse.CompareTag(Tags.ground);
+        bool isGround = entityUnderMouse.CompareTag(Tags.GROUND);
         if (isGround == true)
         {
             return;
@@ -214,7 +225,7 @@ public class HarvesterUnit : UnitController
             return;
         }
 
-        bool isGround = hitEntity.CompareTag(Tags.ground);
+        bool isGround = hitEntity.CompareTag(Tags.GROUND);
         if (isGround == true)
         {
             return;
@@ -246,7 +257,7 @@ public class HarvesterUnit : UnitController
 
     private void StartHarvesting(ResourceController resource)
     {
-        resourceDeposit = resource;
+        resourceSource = resource;
         SetWaypoint(resource.transform.position, resource.gameObject);
         ResourceType depositType = resource.type;
         if (harvestType != depositType)
@@ -271,12 +282,12 @@ public class HarvesterUnit : UnitController
 
     private void HarvestResource()
     {
-        if (resourceDeposit == null)
+        if (resourceSource == null)
         {
             return;
         }
 
-        bool depositDepleted = resourceDeposit.isEmpty;
+        bool depositDepleted = resourceSource.isEmpty;
         if (depositDepleted == true)
         {
             //Destroy(resourceDeposit);
@@ -285,7 +296,7 @@ public class HarvesterUnit : UnitController
 
         float amountHarvested = harvestAmount * Time.deltaTime;
         amountHarvested = Mathf.Clamp(amountHarvested, 0f, maxLoadSize - currentLoad);
-        resourceDeposit.Harvest(amountHarvested);
+        resourceSource.Harvest(amountHarvested);
         currentLoad += amountHarvested;
 
         string ownersName = "Neutral";
@@ -345,5 +356,24 @@ public class HarvesterUnit : UnitController
         }
 
         GUI.DrawTexture(new Rect(leftEdge, topEdge, width, height), resourceBar);
+    }
+
+    protected override void SaveDetails(JsonWriter writer)
+    {
+        base.SaveDetails(writer);
+
+        SaveManager.SaveBoolean(writer, HarvesterProperties.IS_HARVESTING, isHarvesting);
+        SaveManager.SaveBoolean(writer, HarvesterProperties.IS_DEPOSITING, isDepositing);
+        SaveManager.SaveFloat(writer, HarvesterProperties.CURRENT_LOAD, currentLoad);
+        SaveManager.SaveFloat(writer, HarvesterProperties.CURRENT_DEPOSIT, currentDeposit);
+        SaveManager.SaveString(writer, HarvesterProperties.HARVEST_TYPE, harvestType.ToString());
+        if (resourceSource != null)
+        {
+            SaveManager.SaveInt(writer, HarvesterProperties.SOURCE_ID, resourceSource.entityId);
+        }
+        if (resourceStore != null)
+        {
+            SaveManager.SaveInt(writer, HarvesterProperties.STORE_ID, resourceStore.entityId);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using RTS;
+using Newtonsoft.Json;
 
 public class ResourceController : EntityController
 {
@@ -20,12 +21,22 @@ public class ResourceController : EntityController
             return false;
         }
     }
+    protected struct ResourceProperties {
+        public const string CURRENT_AMOUNT = "CurrentAmount";
+    }
 
     protected override void Start()
     {
         base.Start();
 		currentAmount = startingAmount;
         type = ResourceType.unknown;
+    }
+
+    protected override void SaveDetails(JsonWriter writer)
+    {
+        base.SaveDetails(writer);
+
+        SaveManager.SaveFloat(writer, ResourceProperties.CURRENT_AMOUNT, currentAmount);
     }
 
     public void Harvest(float amountToHarvest)

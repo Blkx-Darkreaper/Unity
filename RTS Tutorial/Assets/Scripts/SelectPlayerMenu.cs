@@ -18,6 +18,18 @@ public class SelectPlayerMenu : MenuController {
         LoadUsernames();
     }
 
+    protected override void OnGUI()
+    {
+        bool doubleClick = SelectionList.MouseDoubleClick();
+        if (doubleClick == true)
+        {
+            selectedUsername = SelectionList.GetCurrentEntry();
+            SelectPlayer();
+        }
+
+        base.OnGUI();
+    }
+
     private static void LoadUsernames()
     {
         string[] allUsernames = GameManager.activeInstance.GetAllUsernames();
@@ -173,7 +185,7 @@ public class SelectPlayerMenu : MenuController {
         return avatarHeight;
     }
 
-    private float GetMenuItemsHeight()
+    protected override float GetMenuItemsHeight()
     {
         float menuItemsHeight = ResourceManager.Menu.buttonHeight + ResourceManager.Menu.textHeight + 3 * ResourceManager.Menu.padding;
 

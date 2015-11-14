@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 using RTS;
+using Newtonsoft.Json;
 
 public class TankUnit : UnitController {
 
     private Quaternion targetBearing;
     public string projectileName;
+    protected struct TankProperties
+    {
+        public const string TARGET_BEARING = "TargetBearing";
+    }
 
     protected override void Update()
     {
@@ -59,5 +64,12 @@ public class TankUnit : UnitController {
         ProjectileController projectile = gameObject.GetComponent<ProjectileController>();
         projectile.currentRangeToTarget = 0.9f * weaponRange;
         projectile.target = attackTarget;
+    }
+
+    protected override void SaveDetails(JsonWriter writer)
+    {
+        base.SaveDetails(writer);
+
+        SaveManager.SaveQuaternion(writer, TankProperties.TARGET_BEARING, targetBearing);
     }
 }

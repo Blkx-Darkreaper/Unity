@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using RTS;
+using Newtonsoft.Json;
 
 public class UnitController : EntityController
 {
@@ -9,7 +10,15 @@ public class UnitController : EntityController
     protected bool isMoving, isTurning;
     private Vector3 currentWaypoint;
     private Quaternion targetHeading;
-    private GameObject targetEntity;
+    private GameObject targetEntityGameObject;
+    protected struct UnitProperties
+    {
+        public const string IS_MOVING = "IsMoving";
+        public const string IS_TURNING = "IsTurning";
+        public const string WAYPOINT = "Waypoint";
+        public const string TARGET_HEADING = "TargetHeading";
+        public const string TARGET_ID = "TargetId";
+    }
 
     public virtual void SetSpawner(StructureController spawner)
     {
@@ -45,12 +54,12 @@ public class UnitController : EntityController
         isTurning = false;
         isMoving = true;
 
-        if (targetEntity == null)
+        if (targetEntityGameObject == null)
         {
             return;
         }
 
-        currentWaypoint = UpdateTargetWaypoint(targetEntity, currentWaypoint);
+        currentWaypoint = UpdateTargetWaypoint(targetEntityGameObject, currentWaypoint);
     }
 
     private Vector3 UpdateTargetWaypoint(GameObject target, Vector3 waypoint)
@@ -91,7 +100,7 @@ public class UnitController : EntityController
             waypoint -= bearing;
         }
 
-        waypoint.y = targetEntity.transform.position.y;
+        waypoint.y = targetEntityGameObject.transform.position.y;
         return waypoint;
     }
 
@@ -134,7 +143,7 @@ public class UnitController : EntityController
             return;
         }
 
-        bool isGround = hitEntity.CompareTag(Tags.ground);
+        bool isGround = hitEntity.CompareTag(Tags.GROUND);
         if (isGround == false)
         {
             ResourceController resource = hitEntity.GetComponentInParent<ResourceController>();
@@ -167,13 +176,13 @@ public class UnitController : EntityController
         currentWaypoint = destination;
         isTurning = true;
         isMoving = false;
-        targetEntity = null;
+        targetEntityGameObject = null;
     }
 
     public virtual void SetWaypoint(Vector3 destination, GameObject target)
     {
         SetWaypoint(destination);
-        targetEntity = target;
+        targetEntityGameObject = target;
     }
 
     public override void SetHoverState(GameObject entityUnderMouse)
@@ -193,7 +202,7 @@ public class UnitController : EntityController
             return;
         }
 
-        bool isGround = entityUnderMouse.CompareTag(Tags.ground);
+        bool isGround = entityUnderMouse.CompareTag(Tags.GROUND);
         if (isGround == false)
         {
             ResourceController resource = entityUnderMouse.GetComponentInParent<ResourceController>();
@@ -211,4 +220,23 @@ public class UnitController : EntityController
 
         owner.hud.SetCursorState(CursorState.move);
     }
+
+    protected override void SaveDetails(JsonWriter writer)
+    {
+        base.SaveDetails(writer);
+
+        SaveManager.SaveBoolean(writer, UnitProperties.IS_MOVING, isMoving);
+        SaveManager.SaveBoolean(writer, UnitProperties.IS_TURNING, isTurning);
+        SaveManager.SaveVector(writer, UnitProperties.WAYPOINT, currentWaypoint);
+        SaveManager.SaveQuaternion(writer, UnitProperties.TARGET_HEADING, targetHeading);
+        if (targetEntityGameObject != null)
+        {
+            EntityController targetEntity = targetEntityGameObject.GetComponent<EntityController>();
+            if (targetEntity != null)
+            {
+                SaveManager.SaveInt(writer, UnitProperties.TARGET_ID, targetEntity.entityId);
+            }
+        }
+    }
+
 }

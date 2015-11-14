@@ -2,8 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using RTS;
+using Newtonsoft.Json;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : PersistentEntity {
 
     public string username;
     public bool isNPC;
@@ -18,6 +19,12 @@ public class PlayerController : MonoBehaviour {
     private StructureController constructionSite;
     private UnitController constructor;
     public bool isSettingConstructionPoint { get; protected set; }
+    protected struct PlayerProperties
+    {
+        public const string USERNAME = "Username";
+        public const string IS_NPC = "IsNPC";
+        public const string TEAM_COLOUR = "TeamColour";
+    }
 
     private void Awake()
     {
@@ -102,7 +109,7 @@ public class PlayerController : MonoBehaviour {
                 continue;
             }
 
-            bool hitGameObjectIsGround = hitGameObject.CompareTag(Tags.ground);
+            bool hitGameObjectIsGround = hitGameObject.CompareTag(Tags.GROUND);
             if (hitGameObjectIsGround == true)
             {
                 continue;
@@ -249,5 +256,118 @@ public class PlayerController : MonoBehaviour {
         Vector3 constructionPosition = UserInput.GetHitPoint();
         constructionPosition.y = 0;
         constructionSite.transform.position = constructionPosition;
+    }
+
+    protected override void SaveDetails(JsonWriter writer)
+    {
+        if (writer == null)
+        {
+            return;
+        }
+
+        SaveManager.SaveString(writer, PlayerProperties.USERNAME, username);
+        SaveManager.SaveBoolean(writer, PlayerProperties.IS_NPC, isNPC);
+        SaveManager.SaveColour(writer, PlayerProperties.TEAM_COLOUR, teamColour);
+        //SaveCamera(writer);
+        SaveResources(writer);
+        SaveStructures(writer);
+        SaveUnits(writer);
+    }
+
+    private void SaveCamera(JsonWriter writer)
+    {
+        PersistentEntity camera = GetCamera();
+        if (camera == null)
+        {
+            return;
+        }
+
+        camera.SavePropertyName(writer);
+        camera.Save(writer);
+    }
+
+    private PersistentEntity GetCamera()
+    {
+        foreach (PersistentEntity entity in GetComponentsInChildren<PersistentEntity>())
+        {
+            bool tagMatch = entity.CompareTag(Tags.MAIN_CAMERA);
+            if (tagMatch == false)
+            {
+                continue;
+            }
+
+            return entity;
+        }
+
+        return null;
+    }
+
+    private void SaveResources(JsonWriter writer)
+    {
+        if (resources.Count == 0)
+        {
+            return;
+        }
+
+        writer.WritePropertyName("Resources");
+        
+        writer.WriteStartArray();
+        foreach (KeyValuePair<ResourceType, int> entry in resources)
+        {
+            writer.WriteStartObject();
+			string propertyName = entry.Key.ToString();
+			int value = entry.Value;
+            SaveManager.SaveInt(writer, propertyName, value);
+            writer.WriteEndObject();
+        }
+        writer.WriteEndArray();
+    }
+
+    private void SaveStructures(JsonWriter writer)
+    {
+        StructureController[] allStructures = GetComponentsInChildren<StructureController>();
+        if (allStructures.Length == 0)
+        {
+            return;
+        }
+
+        bool firstEntry = true;
+        foreach (StructureController structure in allStructures)
+        {
+            if (firstEntry == true)
+            {
+                structure.SavePropertyName(writer);
+                writer.WriteStartArray();
+                firstEntry = false;
+            }
+
+            structure.Save(writer);
+        }
+
+        writer.WriteEndArray();
+    }
+
+    private void SaveUnits(JsonWriter writer)
+    {
+        UnitController[] allUnits = GetComponentsInChildren<UnitController>();
+        if (allUnits.Length == 0)
+        {
+            return;
+        }
+
+        bool firstEntry = true;
+        foreach (UnitController unit in allUnits)
+        {
+            if (firstEntry == true)
+            {
+                unit.SavePropertyName(writer);
+                writer.WriteStartArray();
+                firstEntry = false;
+            }
+
+            unit.Save(writer);
+        }
+
+        writer.WriteEndArray();
     }
 }

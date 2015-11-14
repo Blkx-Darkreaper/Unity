@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using RTS;
+using Newtonsoft.Json;
 
 public class ConstructorUnit : UnitController {
 
@@ -8,6 +9,12 @@ public class ConstructorUnit : UnitController {
     private StructureController currentProject;
     private bool isConstructing = false;
     private float constructionProgress = 0f;
+    protected struct ConstructorProperties
+    {
+        public const string IS_CONSTRUCTING = "IsConstructing";
+        public const string CONSTRUCTION_PROGRESS = "ConstructionProgress";
+        public const string PROJECT_ID = "ProjectId";
+    }
 
     protected override void Start()
     {
@@ -36,7 +43,7 @@ public class ConstructorUnit : UnitController {
             return;
         }
 
-        bool constructionComplete = currentProject.constructionComplete;
+        bool constructionComplete = currentProject.isConstructionComplete;
         if (constructionComplete == true)
         {
             return;
@@ -52,7 +59,7 @@ public class ConstructorUnit : UnitController {
         constructionProgress -= progress;
         currentProject.Construct(progress);
 
-        constructionComplete = currentProject.constructionComplete;
+        constructionComplete = currentProject.isConstructionComplete;
         if (constructionComplete == false)
         {
             return;
@@ -95,7 +102,7 @@ public class ConstructorUnit : UnitController {
             return;
         }
 
-        bool isGround = hitGameObject.CompareTag(Tags.ground);
+        bool isGround = hitGameObject.CompareTag(Tags.GROUND);
         if (isGround == true)
         {
             return;
@@ -107,7 +114,7 @@ public class ConstructorUnit : UnitController {
             return;
         }
 
-        bool underConstruction = !structure.constructionComplete;
+        bool underConstruction = !structure.isConstructionComplete;
         if (underConstruction == false)
         {
             return;
@@ -156,5 +163,17 @@ public class ConstructorUnit : UnitController {
         }
 
         owner.SpawnStructure(structureName, buildPoint, this, playingArea);
+    }
+
+    protected override void SaveDetails(JsonWriter writer)
+    {
+        base.SaveDetails(writer);
+
+        SaveManager.SaveBoolean(writer, ConstructorProperties.IS_CONSTRUCTING, isConstructing);
+        SaveManager.SaveFloat(writer, ConstructorProperties.CONSTRUCTION_PROGRESS, constructionProgress);
+        if (currentProject != null)
+        {
+            SaveManager.SaveInt(writer, ConstructorProperties.PROJECT_ID, currentProject.entityId);
+        }
     }
 }

@@ -26,7 +26,6 @@ namespace RTS
         public struct Menu
         {
             public static float width { get { return headerWidth + 2 * buttonHeight + 4 * padding; } }
-            public static float pauseMenuHeight { get { return headerHeight + 2 * buttonHeight + 4 * padding; } }
             public static float padding = 10f;
             public static float textHeight = 25f;
             public static float headerWidth = 256f;
@@ -49,6 +48,19 @@ namespace RTS
         public static int buildSpeed { get { return 2; } }
         private static Dictionary<ResourceType, Texture2D> resourceHealthBarTextures;
         private static Dictionary<int, Texture2D> playerAvatars;
+        private static int nextId = 0;
+
+        public static int GetNextUniqueId()
+        {
+            int id = nextId;
+            nextId++;
+            if (nextId >= int.MaxValue)
+            {
+                nextId = 0;
+            }
+
+            return id;
+        }
 
         public static Texture2D GetResourceBarTexture(ResourceType type)
         {
@@ -132,10 +144,13 @@ namespace RTS
 
     public struct Tags
     {
-        public const string player = "Player";
-        public const string ground = "Ground";
-        public const string structure = "Structure";
-        public const string unit = "Unit";
+        public const string PLAYER = "Player";
+        public const string GROUND = "Ground";
+        public const string STRUCTURE = "Structure";
+        public const string UNIT = "Unit";
+        public const string SUN = "Sun";
+        public const string MAIN_CAMERA = "MainCamera";
+        public const string RESOURCE = "Resource";
     }
 
     public enum CursorState

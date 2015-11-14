@@ -154,6 +154,11 @@ public class MenuController : MonoBehaviour {
         return menuHeight;
     }
 
+    protected virtual float GetMenuItemsHeight()
+    {
+        return 0f;
+    }
+
     protected virtual void HandleButtonPress(string buttonName)
     {
     }
@@ -168,6 +173,10 @@ public class MenuController : MonoBehaviour {
         }
         Cursor.visible = false;
         GameManager.activeInstance.isMenuOpen = false;
+    }
+
+    protected virtual void Back()
+    {
     }
 
     protected virtual void ExitGame()

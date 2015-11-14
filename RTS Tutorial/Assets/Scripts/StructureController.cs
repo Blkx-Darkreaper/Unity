@@ -1,18 +1,27 @@
 using UnityEngine;
 using System.Collections.Generic;
 using RTS;
+using Newtonsoft.Json;
 
 public class StructureController : EntityController {
 
     protected Queue<string> buildQueue;
     private float currentBuildProgress = 0f;
     public float buildTime;
-    public bool constructionComplete { get; protected set; }
+    public bool isConstructionComplete { get; protected set; }
     private const string CONSTRUCTION_MESSAGE = "Building...";
     private Vector3 spawnPoint;
     protected Vector3 rallyPoint;
     public Texture2D rallyPointIcon;
     public Texture2D sellIcon;
+    protected struct StructureProperties
+    {
+        public const string IS_CONSTRUCTION_COMPLETE = "IsConstructionComplete";
+        public const string SPAWN_POINT = "SpawnPoint";
+        public const string RALLY_POINT = "RallyPoint";
+        public const string BUILD_PROGRESS = "BuildProgress";
+        public const string BUILD_QUEUE = "BuildQueue";
+    }
 
     protected override void Awake()
     {
@@ -22,7 +31,7 @@ public class StructureController : EntityController {
         float spawnZ = selectionBounds.center.z + transform.forward.z * selectionBounds.extents.z + transform.forward.z * 10;
         spawnPoint = new Vector3(spawnX, 0f, spawnZ);
         rallyPoint = spawnPoint;
-        constructionComplete = true;
+        isConstructionComplete = true;
     }
 
     protected override void Start()
@@ -40,7 +49,7 @@ public class StructureController : EntityController {
     {
         base.OnGUI();
 
-        if (constructionComplete == true)
+        if (isConstructionComplete == true)
         {
             return;
         }
@@ -158,7 +167,7 @@ public class StructureController : EntityController {
             return;
         }
 
-        bool isGround = hitEntity.CompareTag(Tags.ground);
+        bool isGround = hitEntity.CompareTag(Tags.GROUND);
         if (isGround == false)
         {
             return;
@@ -214,7 +223,7 @@ public class StructureController : EntityController {
             return;
         }
 
-        bool isGround = CompareTag(Tags.ground);
+        bool isGround = CompareTag(Tags.GROUND);
         if (isGround == false)
         {
             return;
@@ -249,7 +258,7 @@ public class StructureController : EntityController {
     public void StartConstruction()
     {
         UpdateBounds();
-        constructionComplete = false;
+        isConstructionComplete = false;
         currentHitPoints = 0;
     }
 
@@ -263,8 +272,19 @@ public class StructureController : EntityController {
         }
 
         currentHitPoints = maxHitPoints;
-        constructionComplete = true;
+        isConstructionComplete = true;
         RestoreMaterials();
         SetTeamColour();
+    }
+
+    protected override void SaveDetails(JsonWriter writer)
+    {
+        base.SaveDetails(writer);
+
+        SaveManager.SaveBoolean(writer, StructureProperties.IS_CONSTRUCTION_COMPLETE, isConstructionComplete);
+        SaveManager.SaveVector(writer, StructureProperties.SPAWN_POINT, spawnPoint);
+        SaveManager.SaveVector(writer, StructureProperties.RALLY_POINT, rallyPoint);
+        SaveManager.SaveFloat(writer, StructureProperties.BUILD_PROGRESS, currentBuildProgress);
+        SaveManager.SaveStringArray(writer, StructureProperties.BUILD_QUEUE, buildQueue.ToArray());
     }
 }

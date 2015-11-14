@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace RTS
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : Manager
     {
         public GameObject[] structures;
         private Dictionary<string, GameObject> allStructures;
@@ -18,8 +18,10 @@ namespace RTS
         public bool isMenuOpen { get; set; }
         private Dictionary<string, PlayerAccount> allPlayerAccounts = new Dictionary<string, PlayerAccount>();
         public PlayerAccount currentPlayerAccount { get; protected set; }
+        public string currentLevelName { get; set; }
+        public string currentSaveGameName { get; set; }
         public string defaultUsername = "NewPlayer";
-        public string defaultSaveFolderName = "SavedGames";
+        public string defaultSaveName = "NewGame";
 
         public struct JsonProperties
         {
@@ -45,7 +47,7 @@ namespace RTS
             InitUnits();
             InitEntities();
 
-            Load();
+            LoadPlayerAccounts();
         }
 
         private void InitStructures()
@@ -187,7 +189,7 @@ namespace RTS
                 AddPlayerAccount(username, avatarId);
 
                 CreatePlayerSaveFolder(username);
-                Save();
+                SavePlayerAccounts();
             }
 
             currentPlayerAccount = allPlayerAccounts[username];
@@ -228,16 +230,32 @@ namespace RTS
             }
         }
 
+        public string[] GetSavedGames()
+        {
+            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + currentPlayerAccount.username;
+            DirectoryInfo directory = new DirectoryInfo(path);
+            FileInfo[] files = directory.GetFiles();
+            int totalFiles = files.Length;
+
+            string[] savedGames = new string[totalFiles];
+            for (int i = 0; i < totalFiles; i++)
+            {
+                string filename = files[i].Name;
+                savedGames[i] = filename.Substring(0, filename.IndexOf("."));
+            }
+
+            return savedGames;
+        }
+
         private void CreatePlayerSaveFolder(string username)
         {
             string path = defaultSaveFolderName + Path.DirectorySeparatorChar + username;
-            Directory.CreateDirectory(path);
+            CreateDirectory(path);
         }
 
-        public void Save()
+        public void SavePlayerAccounts()
         {
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.NullValueHandling = NullValueHandling.Ignore;
+            JsonSerializer serializer = GetJsonSerializer();
 
             string path = defaultSaveFolderName + Path.DirectorySeparatorChar + JsonProperties.PLAYERS + ".json";
             using (StreamWriter stream = new StreamWriter(path))
@@ -259,7 +277,7 @@ namespace RTS
             }
         }
 
-        public void Load()
+        public void LoadPlayerAccounts()
         {
             allPlayerAccounts.Clear();
 
