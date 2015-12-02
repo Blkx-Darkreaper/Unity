@@ -459,7 +459,7 @@ public class EntityController : PersistentEntity
             ownersName = string.Format("{0}'s", owner.username);
         }
 
-        Debug.Log(string.Format("{0} {1} has been destroyed", ownersName, entityName));
+        Debug.Log(string.Format("{0} {1} has been destroyed", ownersName, name));
     }
 
     protected virtual void SetAttackTarget(EntityController target)
@@ -565,8 +565,8 @@ public class EntityController : PersistentEntity
             attackTargetsOwnersName = attackTarget.owner.username;
         }
 
-        Debug.Log(string.Format("{0} {1} fired at {2} {3}", ownersName, entityName, 
-            attackTargetsOwnersName, attackTarget.entityName));
+        Debug.Log(string.Format("{0} {1} fired at {2} {3}", ownersName, name, 
+            attackTargetsOwnersName, attackTarget.name));
     }
 
     protected virtual void AimTowardsTarget(Vector3 targetPosition)
@@ -643,7 +643,7 @@ public class EntityController : PersistentEntity
 
     protected override void SaveDetails(JsonWriter writer)
     {
-        SaveManager.SaveString(writer, EntityProperties.NAME, entityName);
+        SaveManager.SaveString(writer, EntityProperties.NAME, name);
 
         base.SaveDetails(writer);
 

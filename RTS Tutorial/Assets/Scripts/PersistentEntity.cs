@@ -5,7 +5,6 @@ using RTS;
 
 public class PersistentEntity : MonoBehaviour {
 
-    public string entityName;
     public int entityId { get; set; }
     protected bool isLoadedFromSave = false;
     protected struct Properties
@@ -48,7 +47,7 @@ public class PersistentEntity : MonoBehaviour {
     {
         writer.WriteEndObject();
 
-        Debug.Log(string.Format("Saved entity {0}, ", entityId, entityName));
+        Debug.Log(string.Format("Saved entity {0}, ", entityId, name));
     }
 
     public static void Load(JsonReader reader, GameObject gameObject)
@@ -167,12 +166,12 @@ public class PersistentEntity : MonoBehaviour {
     {
         if (loadingComplete == false)
         {
-            Debug.Log(string.Format("Failed to load {0}", entityName));
+            Debug.Log(string.Format("Failed to load {0}", name));
             GameManager.activeInstance.DestroyGameEntity(gameObject);
             return;
         }
 
         isLoadedFromSave = true;
-        Debug.Log(string.Format("Loaded {0}", entityName));
+        Debug.Log(string.Format("Loaded {0}", name));
     }
 }

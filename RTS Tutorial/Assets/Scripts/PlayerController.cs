@@ -422,7 +422,7 @@ public class PlayerController : PersistentEntity {
 	{
 		if (loadingComplete == false)
 		{
-			Debug.Log(string.Format("Failed to load {0} {1}", entityName, username));
+			Debug.Log(string.Format("Failed to load {0} {1}", name, username));
 			GameObject[] allChildren = GetComponentsInChildren<GameObject>();
 			foreach(GameObject child in allChildren) {
 				GameManager.activeInstance.DestroyGameEntity(child);
@@ -433,7 +433,7 @@ public class PlayerController : PersistentEntity {
 		}
 		
 		isLoadedFromSave = true;
-		Debug.Log(string.Format("Loaded {0} {1}", entityName, username));
+		Debug.Log(string.Format("Loaded {0} {1}", name, username));
 	}
 
     private void LoadResources(JsonReader reader)

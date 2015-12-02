@@ -178,7 +178,7 @@ namespace RTS
                 }
 
                 SetEntityName(gameObject, controller);
-                string name = controller.entityName;
+                string name = controller.name;
                 if (name.Equals(string.Empty) == true)
                 {
                     Debug.Log(string.Format("{0} {1} has no name", className, gameObject.ToString()));
@@ -263,7 +263,7 @@ namespace RTS
             PersistentEntity toCheck = allGameEntities[id];
             if (toCheck != entityToDestroy)
             {
-                Debug.Log(string.Format("{0} entity does not match registered entity with id: {1}", entityToDestroy.entityName, id));
+                Debug.Log(string.Format("{0} entity does not match registered entity with id: {1}", entityToDestroy.name, id));
                 return;
             }
 
@@ -284,22 +284,22 @@ namespace RTS
         }
 
 		private void SetEntityName(GameObject gameObject, PersistentEntity entity) {
-			if (entity.entityName == null) {
-				entity.entityName = string.Empty;
+			if (entity.name == null) {
+				entity.name = string.Empty;
 			}
 
-			if (entity.entityName.Equals(string.Empty) == false)
+			if (entity.name.Equals(string.Empty) == false)
 			{
 				return;
 			}
 
-			entity.entityName = gameObject.name;
-			if (entity.entityName.Equals(string.Empty) == false)
+			entity.name = gameObject.name;
+			if (entity.name.Equals(string.Empty) == false)
 			{
 				return;
 			}
 
-			entity.entityName = gameObject.tag;
+			entity.name = gameObject.tag;
 		}
 
 		public GameObject GetPrefab(string name) {

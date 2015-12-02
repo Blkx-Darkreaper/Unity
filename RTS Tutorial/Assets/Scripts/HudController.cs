@@ -352,7 +352,7 @@ public class HudController : MonoBehaviour
             return;
         }
 
-        string selectionName = player.selectedEntity.entityName;
+        string selectionName = player.selectedEntity.name;
         if (selectionName.Equals(string.Empty))
         {
             Debug.Log("Selected entity has no name");

@@ -97,7 +97,7 @@ public class HarvesterUnit : UnitController
                 ownersName = string.Format("{0}'s", owner.username);
             }
 
-            Debug.Log(string.Format("{0} {1} is returning to depository to offload", ownersName, entityName));
+            Debug.Log(string.Format("{0} {1} is returning to depository to offload", ownersName, name));
         }
 
         if (isDepositing == true)
@@ -126,7 +126,7 @@ public class HarvesterUnit : UnitController
                 ownersName = string.Format("{0}'s", owner.username);
             }
 
-            Debug.Log(string.Format("{0} {1} is harvesting", ownersName, entityName));
+            Debug.Log(string.Format("{0} {1} is harvesting", ownersName, name));
         }
     }
 
@@ -321,7 +321,7 @@ public class HarvesterUnit : UnitController
             ownersName = string.Format("{0}'s", owner.username);
         }
 
-        Debug.Log(string.Format("{0} {1} has stopped harvesting", ownersName, entityName));
+        Debug.Log(string.Format("{0} {1} has stopped harvesting", ownersName, name));
     }
 
     private void HarvestResource()
