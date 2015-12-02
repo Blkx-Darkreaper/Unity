@@ -24,9 +24,12 @@ public class PlayerController : PersistentEntity {
         public const string USERNAME = "Username";
         public const string IS_NPC = "IsNPC";
         public const string TEAM_COLOUR = "TeamColour";
+        public const string RESOURCES = "Resources";
+        public const string STRUCTURES = "Structures";
+        public const string UNITS = "Units";
     }
 
-    private void Awake()
+    protected override void Awake()
     {
         InitUsername();
         InitResourceLists();
@@ -137,7 +140,7 @@ public class PlayerController : PersistentEntity {
     public void StartConstruction()
     {
         isSettingConstructionPoint = false;
-        GameObject allStructures = transform.Find("Units").gameObject;
+        GameObject allStructures = transform.Find(PlayerProperties.STRUCTURES).gameObject;
         if (allStructures == null)
         {
             return;
@@ -170,13 +173,13 @@ public class PlayerController : PersistentEntity {
 
     public void SpawnUnit(string unitName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation)
     {
-        GameObject allUnits = transform.Find("Units").gameObject;
+        GameObject allUnits = transform.Find(PlayerProperties.UNITS).gameObject;
         if (allUnits == null)
         {
             return;
         }
         //Units allUnits = GetComponentInChildren<Units>();
-        GameObject unitToSpawn = (GameObject)Instantiate(GameManager.activeInstance.GetUnit(unitName), spawnPoint, startingOrientation);
+        GameObject unitToSpawn = (GameObject)Instantiate(GameManager.activeInstance.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
         unitToSpawn.transform.parent = allUnits.transform;
         Debug.Log(string.Format("Spawned {0} for player {1}", unitName, username));
 
@@ -200,13 +203,13 @@ public class PlayerController : PersistentEntity {
 
     public void SpawnUnit(string unitName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation, StructureController spawner)
     {
-        GameObject allUnits = transform.Find("Units").gameObject;
+        GameObject allUnits = transform.Find(PlayerProperties.UNITS).gameObject;
         if (allUnits == null)
         {
             return;
         }
 
-        GameObject unitToSpawn = (GameObject)Instantiate(GameManager.activeInstance.GetUnit(unitName), spawnPoint, startingOrientation);
+        GameObject unitToSpawn = (GameObject)Instantiate(GameManager.activeInstance.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
         unitToSpawn.transform.parent = allUnits.transform;
         Debug.Log(string.Format("Spawned {0} for player {1}", unitName, username));
 
@@ -233,7 +236,7 @@ public class PlayerController : PersistentEntity {
 
     public void SpawnStructure(string structureName, Vector3 buildPoint, UnitController builder, Rect playingArea)
     {
-        GameObject structureToSpawn = (GameObject)Instantiate(GameManager.activeInstance.GetStructure(structureName), 
+        GameObject structureToSpawn = (GameObject)Instantiate(GameManager.activeInstance.GetStructurePrefab(structureName), 
             buildPoint, new Quaternion());
 
         constructionSite = structureToSpawn.GetComponent<StructureController>();
@@ -282,7 +285,7 @@ public class PlayerController : PersistentEntity {
             return;
         }
 
-        camera.SavePropertyName(writer);
+        writer.WritePropertyName(JsonProperties.CAMERA);
         camera.Save(writer);
     }
 
@@ -309,15 +312,23 @@ public class PlayerController : PersistentEntity {
             return;
         }
 
-        writer.WritePropertyName("Resources");
+        writer.WritePropertyName(PlayerProperties.RESOURCES);
         
         writer.WriteStartArray();
         foreach (KeyValuePair<ResourceType, int> entry in resources)
         {
             writer.WriteStartObject();
-			string propertyName = entry.Key.ToString();
+            int index = (int)entry.Key;
+            KeyValuePair<string, string> properties = ResourceManager.PlayerResourceProperties[index];
+            
+            string propertyName = properties.Key;
 			int value = entry.Value;
             SaveManager.SaveInt(writer, propertyName, value);
+
+            propertyName = properties.Value;
+            value = resourceLimits[entry.Key];
+            SaveManager.SaveInt(writer, propertyName, value);
+
             writer.WriteEndObject();
         }
         writer.WriteEndArray();
@@ -336,7 +347,7 @@ public class PlayerController : PersistentEntity {
         {
             if (firstEntry == true)
             {
-                structure.SavePropertyName(writer);
+                writer.WritePropertyName(PlayerProperties.STRUCTURES);
                 writer.WriteStartArray();
                 firstEntry = false;
             }
@@ -360,7 +371,7 @@ public class PlayerController : PersistentEntity {
         {
             if (firstEntry == true)
             {
-                unit.SavePropertyName(writer);
+                writer.WritePropertyName(PlayerProperties.UNITS);
                 writer.WriteStartArray();
                 firstEntry = false;
             }
@@ -369,5 +380,200 @@ public class PlayerController : PersistentEntity {
         }
 
         writer.WriteEndArray();
+    }
+
+    protected override bool LoadDetails(JsonReader reader, string propertyName)
+    {
+        // Properties must be loaded in the order they were saved for loadCompleted to work properly
+        bool loadCompleted = false;
+
+        switch (propertyName)
+        {
+            case PlayerProperties.USERNAME:
+				username = LoadManager.LoadString(reader);
+                break;
+
+            case PlayerProperties.IS_NPC:
+                isNPC = LoadManager.LoadBoolean(reader);
+                break;
+
+            case PlayerProperties.TEAM_COLOUR:
+                teamColour = LoadManager.LoadColour(reader);
+                break;
+
+            case PlayerProperties.RESOURCES:
+                LoadResources(reader);
+                break;
+
+            case PlayerProperties.STRUCTURES:
+                LoadStructures(reader);
+                break;
+
+            case PlayerProperties.UNITS:
+                LoadUnits(reader);
+                loadCompleted = true;   // Last property to load
+                break;
+        }
+
+        return loadCompleted;
+    }
+
+	protected override void LoadEnd (bool loadingComplete)
+	{
+		if (loadingComplete == false)
+		{
+			Debug.Log(string.Format("Failed to load {0} {1}", entityName, username));
+			GameObject[] allChildren = GetComponentsInChildren<GameObject>();
+			foreach(GameObject child in allChildren) {
+				GameManager.activeInstance.DestroyGameEntity(child);
+			}
+
+			GameManager.activeInstance.DestroyGameEntity(gameObject);
+			return;
+		}
+		
+		isLoadedFromSave = true;
+		Debug.Log(string.Format("Loaded {0} {1}", entityName, username));
+	}
+
+    private void LoadResources(JsonReader reader)
+    {
+        if (reader == null)
+        {
+            return;
+        }
+
+        string propertyName = string.Empty;
+        while (reader.Read() == true)
+        {
+            if (reader.Value == null)
+            {
+                if (reader.TokenType != JsonToken.EndArray)
+                {
+                    continue;
+                }
+
+                return;
+            }
+
+            if (reader.TokenType == JsonToken.PropertyName)
+            {
+                propertyName = LoadManager.LoadString(reader);
+                continue;
+            }
+
+            switch (propertyName)
+            {
+                case ResourceProperties.MONEY:
+                    startingMoney = LoadManager.LoadInt(reader);
+                    break;
+
+                case ResourceProperties.MONEY_LIMIT:
+                    startingMoneyLimit = LoadManager.LoadInt(reader);
+                    break;
+
+                case ResourceProperties.POWER:
+                    startingPower = LoadManager.LoadInt(reader);
+                    break;
+
+                case ResourceProperties.POWER_LIMIT:
+                    startingPowerLimit = LoadManager.LoadInt(reader);
+                    break;
+            }
+        }
+    }
+
+    private void LoadStructures(JsonReader reader)
+    {
+        LoadPlayerOwnedEntities(reader, PlayerProperties.STRUCTURES);
+    }
+
+    private void LoadUnits(JsonReader reader)
+    {
+        LoadPlayerOwnedEntities(reader, PlayerProperties.UNITS);
+    }
+
+    private void LoadPlayerOwnedEntities(JsonReader reader, string entityType)
+    {
+        if (reader == null)
+        {
+            return;
+        }
+
+        string propertyName = string.Empty;
+        string entityName = string.Empty;
+
+        while (reader.Read() == true)
+        {
+            if (reader.Value == null)
+            {
+                if (reader.TokenType != JsonToken.EndArray)
+                {
+                    continue;
+                }
+
+                return;
+            }
+
+            if (reader.TokenType == JsonToken.PropertyName)
+            {
+                propertyName = LoadManager.LoadString(reader);
+                continue;
+            }
+
+            bool isNameProperty = propertyName.Equals(EntityController.nameProperty);
+            if (isNameProperty == false)
+            {
+                continue;
+            }
+
+            entityName = LoadManager.LoadString(reader);
+			GameObject prefab = null;
+
+			switch(entityType) {
+				case PlayerProperties.STRUCTURES:
+            	prefab = GameManager.activeInstance.GetStructurePrefab(entityName);
+				break;
+
+				case PlayerProperties.UNITS:
+				prefab = GameManager.activeInstance.GetUnitPrefab(entityName);
+				break;
+			}
+
+			if(prefab == null) {
+				Debug.Log(string.Format("{0} prefab could not be found", entityName));
+				continue;
+			}
+
+            GameObject clone = (GameObject)GameObject.Instantiate(prefab);
+            EntityController entity = clone.GetComponent<EntityController>();
+			if(entity == null) {
+				continue;
+			}
+
+            entity.Load(reader);
+            TakeOwnershipOfEntity(entity, entityType);
+            OtherEntitySetup(entity, entityType);
+        }
+    }
+
+    protected void TakeOwnershipOfEntity(EntityController entity, string entityType)
+    {
+        GameObject group = transform.Find(entityType).gameObject;
+        entity.transform.parent = group.transform;
+    }
+
+    protected void OtherEntitySetup(EntityController entity, string entityType)
+    {
+        switch (entityType)
+        {
+            case PlayerProperties.STRUCTURES:
+                StructureController structure = (StructureController)entity;
+                if (structure.isConstructionComplete == false)
+                {
+                    structure.SetTransparencyMaterial(allowedMaterial, true);
+                }
+                break;
+        }
     }
 }

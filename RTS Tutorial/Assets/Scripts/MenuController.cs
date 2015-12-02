@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using RTS;
 
@@ -76,9 +77,9 @@ public class MenuController : MonoBehaviour {
 
         float menuHeight = GetMenuHeight();
 
-        float x = Screen.width / 2 - ResourceManager.Menu.width / 2;
+        float x = Screen.width / 2 - Menu.width / 2;
         float y = Screen.height / 2 - menuHeight / 2;
-        float width = ResourceManager.Menu.width;
+        float width = Menu.width;
         float height = menuHeight;
         GUI.BeginGroup(new Rect(x, y, width, height));
 
@@ -88,17 +89,17 @@ public class MenuController : MonoBehaviour {
         GUI.Box(new Rect(x, y, width, height), string.Empty);
 
         // Header image
-        width = ResourceManager.Menu.headerWidth;
-        height = ResourceManager.Menu.headerHeight;
-        x = ResourceManager.Menu.width / 2 - width / 2;
-        y = ResourceManager.Menu.padding;
+        width = Menu.headerWidth;
+        height = Menu.headerHeight;
+        x = Menu.width / 2 - width / 2;
+        y = Menu.padding;
         GUI.DrawTexture(new Rect(x, y, width, height), headerImage);
 
         // Welcome message
-        width = ResourceManager.Menu.width - 2 * ResourceManager.Menu.padding;
-        height = ResourceManager.Menu.textHeight;
-        x = ResourceManager.Menu.width / 2 - width / 2;
-        y = 2 * ResourceManager.Menu.padding + headerImage.height;
+        width = Menu.width - 2 * Menu.padding;
+        height = Menu.textHeight;
+        x = Menu.width / 2 - width / 2;
+        y = 2 * Menu.padding + headerImage.height;
         string welcomeMessage = string.Format("Welcome {0}", GameManager.activeInstance.currentPlayerAccount.username);
         GUI.Label(new Rect(x, y, width, height), welcomeMessage);
 
@@ -114,18 +115,18 @@ public class MenuController : MonoBehaviour {
             return;
         }
 
-        x = ResourceManager.Menu.width / 2 - ResourceManager.Menu.buttonWidth / 2;
+        x = Menu.width / 2 - Menu.buttonWidth / 2;
         //y = 2 * ResourceManager.Menu.padding + headerImage.height;
-        y += ResourceManager.Menu.textHeight + ResourceManager.Menu.padding;
-        width = ResourceManager.Menu.buttonWidth;
-        height = ResourceManager.Menu.buttonHeight;
+        y += Menu.textHeight + Menu.padding;
+        width = Menu.buttonWidth;
+        height = Menu.buttonHeight;
 
         for (int i = 0; i < buttons.Length; i++)
         {
             string buttonName = buttons[i];
             bool buttonPressed = GUI.Button(new Rect(x, y, width, height), buttonName);
 
-            y += ResourceManager.Menu.buttonHeight + ResourceManager.Menu.padding;
+            y += Menu.buttonHeight + Menu.padding;
 
             if (buttonPressed == false)
             {
@@ -141,16 +142,16 @@ public class MenuController : MonoBehaviour {
     protected virtual float GetMenuHeight()
     {
         float buttonHeight = 0;
-        float paddingHeight = 2 * ResourceManager.Menu.padding;
+        float paddingHeight = 2 * Menu.padding;
         if (buttons != null)
         {
-            buttonHeight = buttons.Length * ResourceManager.Menu.buttonHeight;
-            paddingHeight += buttons.Length * ResourceManager.Menu.padding;
+            buttonHeight = buttons.Length * Menu.buttonHeight;
+            paddingHeight += buttons.Length * Menu.padding;
         }
 
-        float messageHeight = ResourceManager.Menu.textHeight + ResourceManager.Menu.padding;
+        float messageHeight = Menu.textHeight + Menu.padding;
 
-        float menuHeight = ResourceManager.Menu.headerHeight + buttonHeight + paddingHeight + messageHeight;
+        float menuHeight = Menu.headerHeight + buttonHeight + paddingHeight + messageHeight;
         return menuHeight;
     }
 
@@ -159,8 +160,26 @@ public class MenuController : MonoBehaviour {
         return 0f;
     }
 
+    protected virtual void HideCurrentMenu()
+    {
+        GetComponent<MenuController>().enabled = false;
+    }
+
     protected virtual void HandleButtonPress(string buttonName)
     {
+    }
+
+    protected void LoadMenu()
+    {
+        HideCurrentMenu();
+        LoadMenu loadMenu = GetComponent<LoadMenu>();
+        if (loadMenu == null)
+        {
+            return;
+        }
+
+        loadMenu.enabled = true;
+        loadMenu.Init();
     }
 
     protected virtual void Resume()

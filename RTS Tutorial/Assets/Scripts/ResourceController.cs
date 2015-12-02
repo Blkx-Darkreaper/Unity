@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using RTS;
 using Newtonsoft.Json;
@@ -28,8 +29,14 @@ public class ResourceController : EntityController
     protected override void Start()
     {
         base.Start();
-		currentAmount = startingAmount;
         type = ResourceType.unknown;
+
+        if (isLoadedFromSave == true)
+        {
+            return;
+        }
+
+		currentAmount = startingAmount;
     }
 
     protected override void SaveDetails(JsonWriter writer)
@@ -37,6 +44,24 @@ public class ResourceController : EntityController
         base.SaveDetails(writer);
 
         SaveManager.SaveFloat(writer, ResourceProperties.CURRENT_AMOUNT, currentAmount);
+    }
+
+    protected override bool LoadDetails(JsonReader reader, string propertyName)
+    {
+        // Properties must be loaded in the order they were saved for loadCompleted to work properly
+        bool loadCompleted = false;
+
+        base.LoadDetails(reader, propertyName);
+
+        switch (propertyName)
+        {
+            case ResourceProperties.CURRENT_AMOUNT:
+                currentAmount = LoadManager.LoadFloat(reader);
+                loadCompleted = true;   // Last property to load
+                break;
+        }
+
+        return loadCompleted;
     }
 
     public void Harvest(float amountToHarvest)

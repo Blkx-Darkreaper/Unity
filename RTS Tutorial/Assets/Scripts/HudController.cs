@@ -46,7 +46,8 @@ public class HudController : MonoBehaviour
     public Texture2D[] resourceHealthBars;
 
 
-    public void SetResourceValues(Dictionary<ResourceType, int> resourceValues, Dictionary<ResourceType, int> resourceLimits)
+    public void SetResourceValues(Dictionary<ResourceType, int> resourceValues, 
+        Dictionary<ResourceType, int> resourceLimits)
     {
         this.resourceValues = resourceValues;
         this.resourceLimits = resourceLimits;
@@ -153,9 +154,9 @@ public class HudController : MonoBehaviour
         float height = Screen.height;
         GUI.BeginGroup(new Rect(x, y, width, height));
 
-        height = ResourceManager.Menu.textHeight;
-        x = ResourceManager.Menu.textHeight;
-        y = Screen.height - x - ResourceManager.Menu.padding;
+        height = Menu.textHeight;
+        x = Menu.textHeight;
+        y = Screen.height - x - Menu.padding;
 
         x = DrawPlayerAvatar(x, y, height);
 
@@ -185,7 +186,7 @@ public class HudController : MonoBehaviour
 
         GUI.DrawTexture(new Rect(x, y, height, height), avatar);
 
-        x += height + ResourceManager.Menu.padding;
+        x += height + Menu.padding;
         return x;
     }
 

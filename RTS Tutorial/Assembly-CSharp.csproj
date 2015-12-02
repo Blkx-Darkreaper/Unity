@@ -53,6 +53,8 @@
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\HarvesterUnit.cs" />
      <Compile Include="Assets\Scripts\HudController.cs" />
+     <Compile Include="Assets\Scripts\LoadManager.cs" />
+     <Compile Include="Assets\Scripts\LoadMenu.cs" />
      <Compile Include="Assets\Scripts\MainMenu.cs" />
      <Compile Include="Assets\Scripts\Manager.cs" />
      <Compile Include="Assets\Scripts\MenuController.cs" />

@@ -58,7 +58,7 @@ public class TankUnit : UnitController {
         projectileSpawnPoint.y += 1.4f;
         projectileSpawnPoint.z += (2.1f * transform.forward.z);
 
-        GameObject gameObject = (GameObject)Instantiate(GameManager.activeInstance.GetEntity(projectileName),
+        GameObject gameObject = (GameObject)Instantiate(GameManager.activeInstance.GetEntityPrefab(projectileName),
             projectileSpawnPoint, transform.rotation);
 
         ProjectileController projectile = gameObject.GetComponent<ProjectileController>();
@@ -71,5 +71,22 @@ public class TankUnit : UnitController {
         base.SaveDetails(writer);
 
         SaveManager.SaveQuaternion(writer, TankProperties.TARGET_BEARING, targetBearing);
+    }
+
+    protected override bool LoadDetails(JsonReader reader, string propertyName)
+    {
+        base.LoadDetails(reader, propertyName);
+
+        bool loadComplete = false;
+
+        switch (propertyName)
+        {
+            case TankProperties.TARGET_BEARING:
+                targetBearing = LoadManager.LoadQuaternion(reader);
+                loadComplete = true;
+                break;
+        }
+
+        return loadComplete;
     }
 }

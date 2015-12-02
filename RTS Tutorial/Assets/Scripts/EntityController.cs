@@ -7,8 +7,6 @@ using Newtonsoft.Json;
 public class EntityController : PersistentEntity
 {
 
-    public string entityName;
-    public int entityId { get; set; }
     public Texture2D buildImage;
     public int cost, sellValue, maxHitPoints;
     [HideInInspector]
@@ -27,6 +25,7 @@ public class EntityController : PersistentEntity
     protected bool isAdvancing = false;
     protected bool isAiming = false;
     protected EntityController attackTarget = null;
+    protected int attackTargetId = -1;
     public float weaponRange = 10f;
     private const float DEFAULT_WEAPON_RANGE = 10f;
     public float weaponAimSpeed = 1f;
@@ -36,9 +35,9 @@ public class EntityController : PersistentEntity
     private float currentCooldownRemaining;
     protected struct EntityProperties
     {
-        public const string TYPE = "Type";
         public const string NAME = "Name";
         public const string ID = "Id";
+        public const string MESHES = "Meshes";
         public const string HIT_POINTS = "HitPoints";
         public const string IS_ATTACKING = "IsAttacking";
         public const string IS_ADVANCING = "IsAdvancing";
@@ -46,9 +45,12 @@ public class EntityController : PersistentEntity
         public const string COOLDOWN = "CurrentCooldown";
         public const string TARGET_ID = "TargetId";
     }
+    public static string nameProperty { get { return EntityProperties.NAME; } }
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
         selectionBounds = ResourceManager.invalidBounds;
         UpdateBounds();
 
@@ -56,20 +58,18 @@ public class EntityController : PersistentEntity
         UpdateHealthPercentage();
 
         playingArea = new Rect(0f, 0f, 0f, 0f);
-        entityId = ResourceManager.GetNextUniqueId();
     }
 
     protected virtual void Start()
     {
-        owner = GetComponentInParent<PlayerController>();
-        if (owner == null)
+        SetOwnership();
+
+        if (isLoadedFromSave == true)
         {
-            //Debug.Log(string.Format("{0} has no owner", entityName));
+            LoadAttackTarget(attackTargetId);
             return;
         }
 
-        //Debug.Log(string.Format("{0} belongs to {1}", entityName, player.username));
-        SetTeamColour();
         SetWeaponDefaults();
     }
 
@@ -104,16 +104,57 @@ public class EntityController : PersistentEntity
         DrawSelection();
     }
 
+    protected void LoadAttackTarget(int entityId)
+    {
+        if (entityId < 0)
+        {
+            return;
+        }
+
+        try
+        {
+            attackTarget = (EntityController)GameManager.activeInstance.GetGameEntityById(entityId);
+        }
+        catch
+        {
+            Debug.Log(string.Format("Failed to load Attack target"));
+        }
+    }
+
+    protected void SetOwnership()
+    {
+        owner = GetComponentInParent<PlayerController>();
+        if (owner == null)
+        {
+            //Debug.Log(string.Format("{0} has no owner", entityName));
+            return;
+        }
+
+        //Debug.Log(string.Format("{0} belongs to {1}", entityName, player.username));
+        if (isLoadedFromSave == true)
+        {
+            return;
+        }
+
+        SetTeamColour();
+    }
+
     protected void SetTeamColour()
     {
         TeamColour[] allTeamColours = GetComponentsInChildren<TeamColour>();
         foreach (TeamColour teamColour in allTeamColours)
         {
+            if (owner == null)
+            {
+                teamColour.GetComponent<Renderer>().material.color = GameManager.activeInstance.defaultColour;
+                continue;
+            }
+
             teamColour.GetComponent<Renderer>().material.color = owner.teamColour;
         }
     }
 
-    private void SetWeaponDefaults()
+    protected virtual void SetWeaponDefaults()
     {
         bool readyToAttack = IsAbleToAttack();
         if (readyToAttack == false)
@@ -244,7 +285,7 @@ public class EntityController : PersistentEntity
     public void UpdateBounds()
     {
         Bounds updatedBounds = new Bounds(transform.position, Vector3.zero);
-        GameObject meshes = transform.Find("Meshes").gameObject;
+        GameObject meshes = transform.Find(EntityProperties.MESHES).gameObject;
         Renderer[] allRenderers = meshes.GetComponentsInChildren<Renderer>();
         foreach (Renderer renderer in allRenderers)
         {
@@ -410,7 +451,7 @@ public class EntityController : PersistentEntity
 
     protected void DestroyEntity()
     {
-        Destroy(gameObject);
+        GameManager.activeInstance.DestroyGameEntity(this);
 
         string ownersName = "Neutral";
         if (owner != null)
@@ -599,13 +640,13 @@ public class EntityController : PersistentEntity
             allRenderers[i].material = oldMaterials[i];
         }
     }
-    
+
     protected override void SaveDetails(JsonWriter writer)
     {
+        SaveManager.SaveString(writer, EntityProperties.NAME, entityName);
+
         base.SaveDetails(writer);
 
-        SaveManager.SaveString(writer, EntityProperties.TYPE, name);
-        SaveManager.SaveString(writer, EntityProperties.NAME, entityName);
         SaveManager.SaveInt(writer, EntityProperties.ID, entityId);
         SaveManager.SaveInt(writer, EntityProperties.HIT_POINTS, currentHitPoints);
         SaveManager.SaveBoolean(writer, EntityProperties.IS_ATTACKING, isAttacking);
@@ -619,5 +660,61 @@ public class EntityController : PersistentEntity
         {
             SaveManager.SaveInt(writer, EntityProperties.TARGET_ID, attackTarget.entityId);
         }
+    }
+
+    protected override bool LoadDetails(JsonReader reader, string propertyName)
+    {
+        // Properties must be loaded in the order they were saved for loadCompleted to work properly
+        bool loadCompleted = false;
+
+        base.LoadDetails(reader, propertyName);
+
+        switch (propertyName)
+        {
+            case EntityProperties.ID:
+                entityId = LoadManager.LoadInt(reader);
+                break;
+
+            case EntityProperties.HIT_POINTS:
+                currentHitPoints = LoadManager.LoadInt(reader);
+                break;
+
+            case EntityProperties.IS_ATTACKING:
+                isAttacking = LoadManager.LoadBoolean(reader);
+                break;
+
+            case EntityProperties.IS_ADVANCING:
+                isAdvancing = LoadManager.LoadBoolean(reader);
+                break;
+
+            case EntityProperties.IS_AIMING:
+                isAiming = LoadManager.LoadBoolean(reader);
+                loadCompleted = true;   // Last property to load
+                break;
+
+            case EntityProperties.COOLDOWN:
+                currentCooldownRemaining = LoadManager.LoadFloat(reader);
+                loadCompleted = true;
+                break;
+
+            case EntityProperties.TARGET_ID:
+                attackTargetId = LoadManager.LoadInt(reader);
+                loadCompleted = true;
+                break;
+        }
+
+        return loadCompleted;
+    }
+
+    protected override void LoadEnd(bool loadComplete)
+    {
+        base.LoadEnd(loadComplete);
+        if (loadComplete == false)
+        {
+            return;
+        }
+
+        selectionBounds = ResourceManager.invalidBounds;
+        UpdateBounds();
     }
 }

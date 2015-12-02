@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using RTS;
 
@@ -7,10 +7,11 @@ public class PauseMenu : MenuController {
     protected const string RESUME = "Resume";
     protected const string MAIN_MENU = "Main Menu";
     protected const string SAVE = "Save Game";
+    protected const string LOAD = "Load Game";
 
     protected override void SetButtons()
     {
-        buttons = new string[] { RESUME, SAVE, MAIN_MENU };
+        buttons = new string[] { RESUME, SAVE, LOAD, MAIN_MENU };
     }
 
     protected override void HandleButtonPress(string buttonName)
@@ -25,6 +26,10 @@ public class PauseMenu : MenuController {
                 SaveMenu();
                 break;
 
+            case LOAD:
+                LoadMenu();
+                break;
+
             case MAIN_MENU:
                 Back();
                 break;
@@ -33,12 +38,12 @@ public class PauseMenu : MenuController {
 
     protected override float GetMenuHeight()
     {
-        float menuHeight = ResourceManager.Menu.headerHeight;
+        float menuHeight = Menu.headerHeight;
 
         float menuItemsHeight = GetMenuItemsHeight();
         menuHeight += menuItemsHeight;
 
-        float messageHeight = ResourceManager.Menu.textHeight + ResourceManager.Menu.padding;
+        float messageHeight = Menu.textHeight + Menu.padding;
         menuHeight += messageHeight;
 
         return menuHeight;
@@ -47,7 +52,7 @@ public class PauseMenu : MenuController {
     protected override float GetMenuItemsHeight()
     {
         int menuItems = buttons.Length;
-        float menuItemsHeight = menuItems * ResourceManager.Menu.buttonHeight + 2 * menuItems * ResourceManager.Menu.padding;
+        float menuItemsHeight = menuItems * Menu.buttonHeight + 2 * menuItems * Menu.padding;
         return menuItemsHeight;
     }
 
@@ -66,8 +71,14 @@ public class PauseMenu : MenuController {
 
     protected override void Back()
     {
-        string levelToLoad = ResourceManager.Levels.MAIN_MENU;
+        GameManager.activeInstance.ExitGame();
+        string levelToLoad = Levels.mainMenu;
         Application.LoadLevel(levelToLoad);
         Cursor.visible = true;
+    }
+
+    protected override void HideCurrentMenu()
+    {
+        GetComponent<PauseMenu>().enabled = false;
     }
 }

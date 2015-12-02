@@ -20,6 +20,17 @@ public class UnitController : EntityController
         public const string TARGET_ID = "TargetId";
     }
 
+    protected override void Start()
+    {
+        base.Start();
+
+        if(isLoadedFromSave == false) {
+            return;
+        }
+
+		LoadTargetEntityGameObject(attackTargetId);
+    }
+
     public virtual void SetSpawner(StructureController spawner)
     {
     }
@@ -29,6 +40,21 @@ public class UnitController : EntityController
         base.Update();
         TurnTowardsPoint();
         MoveToPoint();
+    }
+
+	protected void LoadTargetEntityGameObject(int entityId) {
+		if (entityId < 0) {
+			return;
+		}
+
+        try
+        {
+            targetEntityGameObject = GameManager.activeInstance.GetGameEntityById(entityId).gameObject;
+        }
+        catch
+        {
+            Debug.Log(string.Format("Failed to load target Entity GameObject"));
+        }
     }
 
     private void TurnTowardsPoint()
@@ -239,4 +265,35 @@ public class UnitController : EntityController
         }
     }
 
+    protected override bool LoadDetails(JsonReader reader, string propertyName)
+    {
+        bool loadCompete = false;
+
+        base.LoadDetails(reader, propertyName);
+
+        switch (propertyName)
+        {
+            case UnitProperties.IS_MOVING:
+                isMoving = LoadManager.LoadBoolean(reader);
+                break;
+
+            case UnitProperties.IS_TURNING:
+                isTurning = LoadManager.LoadBoolean(reader);
+                break;
+
+            case UnitProperties.WAYPOINT:
+                currentWaypoint = LoadManager.LoadVector(reader);
+                break;
+
+            case UnitProperties.TARGET_HEADING:
+                targetHeading = LoadManager.LoadQuaternion(reader);
+                break;
+
+            case UnitProperties.TARGET_ID:
+                attackTargetId = LoadManager.LoadInt(reader);
+                break;
+        }
+
+        return loadCompete;
+    }
 }

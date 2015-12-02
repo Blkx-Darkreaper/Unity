@@ -47,14 +47,16 @@ public class PlayerAccount
         writer.WriteValue(avatarId);
 
         writer.WriteEndObject();
+
+        Debug.Log(string.Format("Saved {0}'s account", username));
     }
 
-    public static void Load(JsonTextReader reader, GameManager gameManager)
+    public static void Load(JsonReader reader)
     {
         string propertyName = string.Empty, username = string.Empty;
         int avatarId = -1;
 
-        while (reader.Read())
+        while (reader.Read() == true)
         {
             if (reader.Value == null)
             {
@@ -63,24 +65,25 @@ public class PlayerAccount
                     continue;
                 }
 
-                gameManager.AddPlayerAccount(username, avatarId);
+				GameManager.activeInstance.AddPlayerAccount(username, avatarId);
+                Debug.Log(string.Format("Loaded {0}'s account", username));
                 return;
             }
 
             if (reader.TokenType == JsonToken.PropertyName)
             {
-                propertyName = (string)reader.Value;
+                propertyName = LoadManager.LoadString(reader);
                 continue;
             }
 
             switch (propertyName)
             {
                 case USERNAME_PROPERTY:
-                    username = (string)reader.Value;
+                    username = LoadManager.LoadString(reader);
                     break;
 
                 case AVATAR_PROPERTY:
-                    avatarId = (int)(System.Int64)reader.Value;
+                    avatarId = LoadManager.LoadInt(reader);
                     break;
             }
         }

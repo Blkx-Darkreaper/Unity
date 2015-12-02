@@ -52,9 +52,9 @@ public class SelectPlayerMenu : MenuController {
 
         float menuHeight = GetMenuHeight();
 
-        float x = Screen.width / 2 - ResourceManager.Menu.width / 2;
+        float x = Screen.width / 2 - Menu.width / 2;
         float y = Screen.height / 2 - menuHeight / 2;
-        float width = ResourceManager.Menu.width;
+        float width = Menu.width;
         float height = menuHeight;
         Rect rect = new Rect(x, y, width, height);
 
@@ -66,10 +66,10 @@ public class SelectPlayerMenu : MenuController {
         GUI.Box(new Rect(x, y, width, height), string.Empty);
 
         // Menu buttons
-        x = ResourceManager.Menu.width / 2 - ResourceManager.Menu.buttonWidth / 2;
-        y = menuHeight - ResourceManager.Menu.padding - ResourceManager.Menu.buttonHeight;
-        width = ResourceManager.Menu.buttonWidth;
-        height = ResourceManager.Menu.buttonHeight;
+        x = Menu.width / 2 - Menu.buttonWidth / 2;
+        y = menuHeight - Menu.padding - Menu.buttonHeight;
+        width = Menu.buttonWidth;
+        height = Menu.buttonHeight;
         bool buttonPressed = GUI.Button(new Rect(x, y, width, height), "Select");
         if (buttonPressed == true)
         {
@@ -77,10 +77,10 @@ public class SelectPlayerMenu : MenuController {
         }
 
         // Text area to enter new username
-        x = ResourceManager.Menu.padding;
-        y = menuHeight - 2 * ResourceManager.Menu.padding - ResourceManager.Menu.buttonHeight - ResourceManager.Menu.textHeight;
-        width = ResourceManager.Menu.width - 2 * ResourceManager.Menu.padding;
-        height = ResourceManager.Menu.textHeight;
+        x = Menu.padding;
+        y = menuHeight - 2 * Menu.padding - Menu.buttonHeight - Menu.textHeight;
+        width = Menu.width - 2 * Menu.padding;
+        height = Menu.textHeight;
         selectedUsername = GUI.TextField(new Rect(x, y, width, height), selectedUsername, usernameCharacterLimit);
         SelectionList.SetCurrentEntryToFirstMatch(selectedUsername);
 
@@ -112,11 +112,11 @@ public class SelectPlayerMenu : MenuController {
 
     protected void DrawSelectionList(Rect menu)
     {
-        float x = menu.x + ResourceManager.Menu.padding;
-        float y = menu.y + ResourceManager.Menu.padding;
-        float width = menu.width - 2 * ResourceManager.Menu.padding;
+        float x = menu.x + Menu.padding;
+        float y = menu.y + Menu.padding;
+        float width = menu.width - 2 * Menu.padding;
         float menuItemsHeight = GetMenuItemsHeight();
-        float height = menu.height - menuItemsHeight - ResourceManager.Menu.padding;
+        float height = menu.height - menuItemsHeight - Menu.padding;
         SelectionList.Draw(x, y, width, height, selectionSkin);
     }
 
@@ -131,10 +131,10 @@ public class SelectPlayerMenu : MenuController {
             return;
         }
 
-        float x = ResourceManager.Menu.padding;
-        float y = textY - ResourceManager.Menu.padding - ResourceManager.Menu.buttonHeight;
-        float width = ResourceManager.Menu.buttonHeight;
-        float height = ResourceManager.Menu.buttonHeight;
+        float x = Menu.padding;
+        float y = textY - Menu.padding - Menu.buttonHeight;
+        float width = Menu.buttonHeight;
+        float height = Menu.buttonHeight;
         bool buttonPressed = GUI.Button(new Rect(x, y, width, height), "<");
         if (buttonPressed == true)
         {
@@ -143,7 +143,7 @@ public class SelectPlayerMenu : MenuController {
             avatarIndex %= avatars.Length;
         }
 
-        x = ResourceManager.Menu.width - ResourceManager.Menu.padding - ResourceManager.Menu.buttonHeight;
+        x = Menu.width - Menu.padding - Menu.buttonHeight;
         buttonPressed = GUI.Button(new Rect(x, y, width, height), ">");
         if (buttonPressed == true)
         {
@@ -157,17 +157,16 @@ public class SelectPlayerMenu : MenuController {
         }
 
         Texture2D avatarImage = avatars[avatarIndex];
-        x = ResourceManager.Menu.width / 2 - avatarImage.width / 2;
-        y = textY - ResourceManager.Menu.padding - avatarImage.height;
+        x = Menu.width / 2 - avatarImage.width / 2;
+        y = textY - Menu.padding - avatarImage.height;
         width = avatarImage.width;
         height = avatarImage.height;
         GUI.DrawTexture(new Rect(x, y, width, height), avatarImage);
-
     }
 
     protected override float GetMenuHeight()
     {
-        float menuHeight = ResourceManager.Menu.buttonHeight + ResourceManager.Menu.textHeight + 3 * ResourceManager.Menu.padding;
+        float menuHeight = Menu.buttonHeight + Menu.textHeight + 3 * Menu.padding;
 
         float menuItemsHeight = GetMenuItemsHeight();
         menuHeight += menuItemsHeight;
@@ -180,14 +179,14 @@ public class SelectPlayerMenu : MenuController {
         float avatarHeight = 0;
         if (avatars.Length > 0)
         {
-            avatarHeight = avatars[avatarIndex].height + 2 * ResourceManager.Menu.padding;
+            avatarHeight = avatars[avatarIndex].height + 2 * Menu.padding;
         }
         return avatarHeight;
     }
 
     protected override float GetMenuItemsHeight()
     {
-        float menuItemsHeight = ResourceManager.Menu.buttonHeight + ResourceManager.Menu.textHeight + 3 * ResourceManager.Menu.padding;
+        float menuItemsHeight = Menu.buttonHeight + Menu.textHeight + 3 * Menu.padding;
 
         float avatarHeight = GetAvatarHeight();
         menuItemsHeight += avatarHeight;
@@ -207,5 +206,7 @@ public class SelectPlayerMenu : MenuController {
         {
             mainMenu.enabled = true;
         }
+		
+		Debug.Log(string.Format("Selected {0}'s account", selectedUsername));
     }
 }

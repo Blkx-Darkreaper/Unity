@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using RTS;
 
@@ -96,7 +96,7 @@ public class SaveMenu : MenuController
     {
         string saveName = GameManager.activeInstance.defaultSaveName;
 
-        string currentLevelName = GameManager.activeInstance.currentLevelName;
+        string currentLevelName = GameManager.activeInstance.currentGameName;
         if (currentLevelName != null)
         {
             if (!currentLevelName.Equals(string.Empty))
@@ -122,13 +122,13 @@ public class SaveMenu : MenuController
         GUI.skin = menuSkin;
 
         float menuHeight = GetMenuHeight();
-        float x = Screen.width / 2 - ResourceManager.Menu.width / 2;
+        float x = Screen.width / 2 - Menu.width / 2;
         float y = Screen.height / 2 - menuHeight / 2;
-        float width = ResourceManager.Menu.width;
+        float width = Menu.width;
         float height = menuHeight;
-        Rect groupRect = new Rect(x, y, width, height);
+        Rect box = new Rect(x, y, width, height);
 
-        GUI.BeginGroup(groupRect);
+        GUI.BeginGroup(box);
 
         //background box
         x = 0;
@@ -136,17 +136,17 @@ public class SaveMenu : MenuController
         GUI.Box(new Rect(x, y, width, height), string.Empty);
 
         //menu buttons
-        x = ResourceManager.Menu.padding;
-        y = menuHeight - ResourceManager.Menu.padding - ResourceManager.Menu.buttonHeight;
-        width = ResourceManager.Menu.buttonWidth;
-        height = ResourceManager.Menu.buttonHeight;
+        x = Menu.padding;
+        y = menuHeight - Menu.padding - Menu.buttonHeight;
+        width = Menu.buttonWidth;
+        height = Menu.buttonHeight;
         bool buttonPressed = GUI.Button(new Rect(x, y, width, height), "Save Game");
         if (buttonPressed == true)
         {
             TryToSaveGame();
         }
 
-        x += ResourceManager.Menu.buttonWidth + ResourceManager.Menu.padding;
+        x += Menu.buttonWidth + Menu.padding;
         buttonPressed = GUI.Button(new Rect(x, y, width, height), "Cancel");
         if (buttonPressed == true)
         {
@@ -154,10 +154,10 @@ public class SaveMenu : MenuController
         }
 
         //text area for player to type new name
-        x = ResourceManager.Menu.padding;
-        y = menuHeight - 2 * ResourceManager.Menu.padding - ResourceManager.Menu.buttonHeight - ResourceManager.Menu.textHeight;
-        width = ResourceManager.Menu.width - 2 * ResourceManager.Menu.padding;
-        height = ResourceManager.Menu.textHeight;
+        x = Menu.padding;
+        y = menuHeight - 2 * Menu.padding - Menu.buttonHeight - Menu.textHeight;
+        width = Menu.width - 2 * Menu.padding;
+        height = Menu.textHeight;
         saveName = GUI.TextField(new Rect(x, y, width, height), saveName, saveNameCharacterLimit);
 
         SelectionList.SetCurrentEntryToFirstMatch(saveName);
@@ -168,10 +168,10 @@ public class SaveMenu : MenuController
         string previousSelection = SelectionList.GetCurrentEntry();
         float menuItemsHeight = GetMenuItemsHeight();
 
-        x = groupRect.x + ResourceManager.Menu.padding;
-        y = groupRect.y + ResourceManager.Menu.padding;
-        width = groupRect.width - 2 * ResourceManager.Menu.padding;
-        height = groupRect.height - menuItemsHeight - ResourceManager.Menu.padding;
+        x = box.x + Menu.padding;
+        y = box.y + Menu.padding;
+        width = box.width - 2 * Menu.padding;
+        height = box.height - menuItemsHeight - Menu.padding;
         SelectionList.Draw(x, y, width, height, selectionSkin);
 
         string currentSelection = SelectionList.GetCurrentEntry();
@@ -194,7 +194,7 @@ public class SaveMenu : MenuController
 
     protected override float GetMenuItemsHeight()
     {
-        float menuItemsHeight = ResourceManager.Menu.buttonHeight + ResourceManager.Menu.textHeight + 3 * ResourceManager.Menu.padding;
+        float menuItemsHeight = Menu.buttonHeight + Menu.textHeight + 3 * Menu.padding;
         return menuItemsHeight;
     }
 

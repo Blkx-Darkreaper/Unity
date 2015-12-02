@@ -36,7 +36,7 @@ public class OreDeposit : ResourceController {
             throw new UnityException("Blocks to add must not be negative");
         }
         
-		GameObject meshes = transform.Find("Meshes").gameObject;
+		GameObject meshes = transform.Find(EntityProperties.MESHES).gameObject;
 		if (meshes == null)
 		{
 			return;
@@ -77,7 +77,7 @@ public class OreDeposit : ResourceController {
             return;
         }
 
-		GameObject meshes = transform.Find("Meshes").gameObject;
+		GameObject meshes = transform.Find(EntityProperties.MESHES).gameObject;
 		Renderer[] blocks = meshes.GetComponentsInChildren<Renderer>();
 
         int startingIndex = Mathf.Min(blocksShowing, blocksToShow);

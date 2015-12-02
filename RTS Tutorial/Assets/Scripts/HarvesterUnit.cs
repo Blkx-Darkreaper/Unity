@@ -12,8 +12,10 @@ public class HarvesterUnit : UnitController
     private bool isDepositing = false;
     private float currentLoad = 0f;
     private ResourceType harvestType;
-    private ResourceController resourceSource;
+    protected ResourceController resourceSource;
+    protected int resourceSourceId = -1;
     public StructureController resourceStore;
+    protected int resourceStoreId = -1;
     public float harvestAmount, depositAmount;
     private float currentDeposit = 0f;
     private const int MAX_HEIGHT_BUFFER = 4;
@@ -44,6 +46,14 @@ public class HarvesterUnit : UnitController
     protected override void Start()
     {
         base.Start();
+
+        if (isLoadedFromSave == true)
+        {
+            LoadResourceSource(resourceSourceId);
+            LoadResourceStore(resourceStoreId);
+            return;
+        }
+
         harvestType = ResourceType.unknown;
     }
 
@@ -120,9 +130,43 @@ public class HarvesterUnit : UnitController
         }
     }
 
+    protected void LoadResourceSource(int entityId)
+    {
+        if (entityId < 0)
+        {
+            return;
+        }
+
+        try
+        {
+            resourceSource = (ResourceController)GameManager.activeInstance.GetGameEntityById(entityId);
+        }
+        catch
+        {
+            Debug.Log(string.Format("Failed to load Resource Source"));
+        }
+    }
+
+    protected void LoadResourceStore(int entityId)
+    {
+        if (entityId < 0)
+        {
+            return;
+        }
+
+        try
+        {
+            resourceStore = (StructureController)GameManager.activeInstance.GetGameEntityById(entityId);
+        }
+        catch
+        {
+            Debug.Log(string.Format("Failed to load Resource Store"));
+        }
+    }
+
     private GameObject[] GetArms()
     {
-        GameObject meshes = transform.Find("Meshes").gameObject;
+        GameObject meshes = transform.Find(EntityProperties.MESHES).gameObject;
         Renderer[] allShapes = meshes.GetComponentsInChildren<Renderer>();
         List<GameObject> allArms = new List<GameObject>();
         foreach (Renderer shape in allShapes)
@@ -375,5 +419,49 @@ public class HarvesterUnit : UnitController
         {
             SaveManager.SaveInt(writer, HarvesterProperties.STORE_ID, resourceStore.entityId);
         }
+    }
+
+    protected override bool LoadDetails(JsonReader reader, string propertyName)
+    {
+        base.LoadDetails(reader, propertyName);
+
+        bool loadComplete = false;
+
+        switch (propertyName)
+        {
+            case HarvesterProperties.IS_HARVESTING:
+                isHarvesting = LoadManager.LoadBoolean(reader);
+                break;
+
+            case HarvesterProperties.IS_DEPOSITING:
+                isDepositing = LoadManager.LoadBoolean(reader);
+                break;
+
+            case HarvesterProperties.CURRENT_LOAD:
+                currentLoad = LoadManager.LoadFloat(reader);
+                break;
+
+            case HarvesterProperties.CURRENT_DEPOSIT:
+                currentDeposit = LoadManager.LoadFloat(reader);
+                break;
+
+            case HarvesterProperties.HARVEST_TYPE:
+                string typeName = LoadManager.LoadString(reader);
+                harvestType = ResourceManager.GetResourceType(typeName);
+                loadComplete = true;
+                break;
+
+            case HarvesterProperties.SOURCE_ID:
+                resourceSourceId = LoadManager.LoadInt(reader);
+                loadComplete = true;
+                break;
+
+            case HarvesterProperties.STORE_ID:
+                resourceStoreId = LoadManager.LoadInt(reader);
+                loadComplete = true;
+                break;
+        }
+
+        return loadComplete;
     }
 }

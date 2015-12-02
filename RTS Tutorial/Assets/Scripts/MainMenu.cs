@@ -6,6 +6,7 @@ public class MainMenu : MenuController {
 
     protected const string NEW_GAME = "Start New Game";
     protected const string CHANGE_PLAYER = "Change Player Account";
+    protected const string LOAD = "Load Game";
 
     protected void OnLevelWasLoaded()
     {
@@ -25,7 +26,7 @@ public class MainMenu : MenuController {
 
     protected override void SetButtons()
     {
-        buttons = new string[] { NEW_GAME, CHANGE_PLAYER, EXIT };
+        buttons = new string[] { NEW_GAME, LOAD, CHANGE_PLAYER, EXIT };
     }
 
     protected override void HandleKeyboardActivity()
@@ -41,6 +42,10 @@ public class MainMenu : MenuController {
                 StartNewGame();
                 break;
 
+            case LOAD:
+                LoadMenu();
+                break;
+
             case CHANGE_PLAYER:
                 ChangePlayer();
                 break;
@@ -54,7 +59,7 @@ public class MainMenu : MenuController {
     private void StartNewGame()
     {
         GameManager.activeInstance.isMenuOpen = false;
-        string levelToLoad = ResourceManager.Levels.GAME;
+        string levelToLoad = Levels.game;
         Application.LoadLevel(levelToLoad);
         Time.timeScale = 1f;
     }
@@ -66,5 +71,10 @@ public class MainMenu : MenuController {
 
         string[] allUsernames = GameManager.activeInstance.GetAllUsernames();
         SelectionList.AddAllEntries(allUsernames);
+    }
+
+    protected override void HideCurrentMenu()
+    {
+        GetComponent<MainMenu>().enabled = false;
     }
 }

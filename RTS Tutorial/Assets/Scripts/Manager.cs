@@ -8,11 +8,15 @@ public class Manager : MonoBehaviour {
 
     public static string defaultSaveFolderName = "SavedGames";
 
-    protected static JsonSerializer GetJsonSerializer()
+    protected static void SetJsonSerializerIgnoreNulls()
+    {
+        SetJsonSerializerNullValueHandling(NullValueHandling.Ignore);
+    }
+
+    private static void SetJsonSerializerNullValueHandling(NullValueHandling value)
     {
         JsonSerializer serializer = new JsonSerializer();
-        serializer.NullValueHandling = NullValueHandling.Ignore;
-        return serializer;
+        serializer.NullValueHandling = value;
     }
 
     protected static void CreateDirectory(string path)

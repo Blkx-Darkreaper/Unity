@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.IO;
@@ -9,7 +9,7 @@ public class SaveManager : Manager {
 
     public static void SaveGame(string filename)
     {
-        JsonSerializer serializer = GetJsonSerializer();
+        SetJsonSerializerIgnoreNulls();
 
         string username = GameManager.activeInstance.currentPlayerAccount.username;
         string path = defaultSaveFolderName + Path.DirectorySeparatorChar + username;
@@ -22,6 +22,36 @@ public class SaveManager : Manager {
             {
                 writer.WriteStartObject();
                 SaveGameDetails(writer);
+                writer.WriteEndObject();
+            }
+        }
+    }
+
+    public static void CreatePlayerSaveFolder(string username)
+    {
+        string path = defaultSaveFolderName + Path.DirectorySeparatorChar + username;
+        CreateDirectory(path);
+    }
+
+    public static void SavePlayerAccounts()
+    {
+        SetJsonSerializerIgnoreNulls();
+
+        string path = defaultSaveFolderName + Path.DirectorySeparatorChar + JsonProperties.GAME_DETAILS + ".json";
+        using (StreamWriter stream = new StreamWriter(path))
+        {
+            using (JsonWriter writer = new JsonTextWriter(stream))
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName(JsonProperties.GAME_DETAILS);
+                writer.WriteStartArray();
+                foreach (PlayerAccount account in GameManager.activeInstance.allPlayerAccounts.Values)
+                {
+                    account.Save(writer);
+                }
+                writer.WriteEndArray();
+
                 writer.WriteEndObject();
             }
         }
@@ -182,6 +212,7 @@ public class SaveManager : Manager {
 
         SaveEnvironment(writer);
         SaveTerrain(writer);
+        SaveCamera(writer);
         SaveResources(writer);
         SavePlayers(writer);
     }
@@ -199,7 +230,9 @@ public class SaveManager : Manager {
             return;
         }
 
-        bool firstEntry = true;
+        writer.WritePropertyName(JsonProperties.PLAYERS);
+
+        writer.WriteStartArray();
         foreach (GameObject gameObject in playerGameObjects)
         {
             PlayerController player = gameObject.GetComponent<PlayerController>();
@@ -208,16 +241,8 @@ public class SaveManager : Manager {
                 continue;
             }
 
-            if (firstEntry == true)
-            {
-                player.SavePropertyName(writer);
-                writer.WriteStartArray();
-                firstEntry = false;
-            }
-
             player.Save(writer);
         }
-
         writer.WriteEndArray();
     }
 
@@ -234,7 +259,9 @@ public class SaveManager : Manager {
             return;
         }
 
-        bool firstEntry = true;
+        writer.WritePropertyName(JsonProperties.RESOURCES);
+
+        writer.WriteStartArray();
         foreach (GameObject gameObject in resourceGameObjects)
         {
             ResourceController resource = gameObject.GetComponent<ResourceController>();
@@ -243,16 +270,8 @@ public class SaveManager : Manager {
                 continue;
             }
 
-            if (firstEntry == true)
-            {
-                resource.SavePropertyName(writer);
-                writer.WriteStartArray();
-                firstEntry = false;
-            }
-
             resource.Save(writer);
         }
-
         writer.WriteEndArray();
     }
 
@@ -266,7 +285,7 @@ public class SaveManager : Manager {
         PersistentEntity camera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<PersistentEntity>();
         if (camera != null)
         {
-            camera.SavePropertyName(writer);
+            writer.WritePropertyName(JsonProperties.CAMERA);
             camera.Save(writer);
         }
     }
@@ -281,7 +300,7 @@ public class SaveManager : Manager {
         PersistentEntity ground = GameObject.FindGameObjectWithTag(Tags.GROUND).GetComponent<PersistentEntity>();
         if (ground != null)
         {
-            ground.SavePropertyName(writer);
+            writer.WritePropertyName(JsonProperties.GROUND);
             ground.Save(writer);
         }
     }
@@ -296,7 +315,7 @@ public class SaveManager : Manager {
         PersistentEntity sun = GameObject.FindGameObjectWithTag(Tags.SUN).GetComponent<PersistentEntity>();
         if (sun != null)
         {
-            sun.SavePropertyName(writer);
+            writer.WritePropertyName(JsonProperties.SUN);
             sun.Save(writer);
         }
     }

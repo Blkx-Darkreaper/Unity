@@ -6,7 +6,8 @@ using Newtonsoft.Json;
 public class ConstructorUnit : UnitController {
 
     public int constructionSpeed;
-    private StructureController currentProject;
+    protected StructureController currentProject;
+    protected int projectId = -1;
     private bool isConstructing = false;
     private float constructionProgress = 0f;
     protected struct ConstructorProperties
@@ -20,6 +21,13 @@ public class ConstructorUnit : UnitController {
     {
         base.Start();
         actions = new string[] { "Refinery", "Factory" };
+
+        if (isLoadedFromSave == false)
+        {
+            return;
+        }
+
+        LoadCurrentProject(projectId);
     }
 
     protected override void Update()
@@ -81,7 +89,24 @@ public class ConstructorUnit : UnitController {
         base.MouseClick(hitGameObject, hitPoint, player);
     }
 
-    private void TryToSetConstructionProject(GameObject hitGameObject, PlayerController player, out bool succeeded)
+    protected void LoadCurrentProject(int entityId)
+    {
+        if (entityId < 0)
+        {
+            return;
+        }
+
+        try
+        {
+            currentProject = (StructureController)GameManager.activeInstance.GetGameEntityById(entityId);
+        }
+        catch
+        {
+            Debug.Log(string.Format("Failed to load current Project"));
+        }
+    }
+
+    protected void TryToSetConstructionProject(GameObject hitGameObject, PlayerController player, out bool succeeded)
     {
         succeeded = false;
 
@@ -175,5 +200,31 @@ public class ConstructorUnit : UnitController {
         {
             SaveManager.SaveInt(writer, ConstructorProperties.PROJECT_ID, currentProject.entityId);
         }
+    }
+
+    protected override bool LoadDetails(JsonReader reader, string propertyName)
+    {
+        base.LoadDetails(reader, propertyName);
+
+        bool loadComplete = false;
+
+        switch (propertyName)
+        {
+            case ConstructorProperties.IS_CONSTRUCTING:
+                isConstructing = LoadManager.LoadBoolean(reader);
+                break;
+
+            case ConstructorProperties.CONSTRUCTION_PROGRESS:
+                constructionProgress = LoadManager.LoadFloat(reader);
+                loadComplete = true;
+                break;
+
+            case ConstructorProperties.PROJECT_ID:
+                projectId = LoadManager.LoadInt(reader);
+                loadComplete = true;
+                break;
+        }
+
+        return loadComplete;
     }
 }

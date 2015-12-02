@@ -8,27 +8,29 @@ namespace RTS
 {
     public class GameManager : Manager
     {
+        public static GameManager activeInstance = null;
+        protected bool isLoading = false;
         public GameObject[] structures;
         private Dictionary<string, GameObject> allStructures;
         public GameObject[] units;
         private Dictionary<string, GameObject> allUnits;
+        public GameObject[] resources;
+        private Dictionary<string, GameObject> allResources;
         public GameObject[] entities;
         private Dictionary<string, GameObject> allEntities;
         public GameObject player;
         public bool isMenuOpen { get; set; }
-        private Dictionary<string, PlayerAccount> allPlayerAccounts = new Dictionary<string, PlayerAccount>();
+        public Dictionary<string, PlayerAccount> allPlayerAccounts = new Dictionary<string, PlayerAccount>();
         public PlayerAccount currentPlayerAccount { get; protected set; }
-        public string currentLevelName { get; set; }
+        public string currentGameName { get; protected set; }
+		public string currentLevelName { get; protected set; }
         public string currentSaveGameName { get; set; }
         public string defaultUsername = "NewPlayer";
         public string defaultSaveName = "NewGame";
-
-        public struct JsonProperties
-        {
-            public const string PLAYERS = "Players";
-        }
-
-        public static GameManager activeInstance = null;
+        public Color defaultColour;
+        protected int nextId = 0;
+        protected Dictionary<int, PersistentEntity> allGameEntities;
+        public int maxEntities = 1000;
 
         private void Awake()
         {
@@ -43,83 +45,285 @@ namespace RTS
                 return;
             }
 
+            allGameEntities = new Dictionary<int, PersistentEntity>();
+
             InitStructures();
             InitUnits();
+            InitResources();
             InitEntities();
 
-            LoadPlayerAccounts();
+            LoadManager.LoadGameDetails();
+        }
+
+        protected void OnLevelWasLoaded()
+        {
+            if (isLoading == false)
+            {
+                return;
+            }
+
+            string saveFileToLoad = currentGameName;
+            string levelToLoad = currentLevelName;
+            LoadManager.LoadGame(saveFileToLoad, levelToLoad);
+            isLoading = false;
         }
 
         private void InitStructures()
         {
-            allStructures = new Dictionary<string, GameObject>();
-            foreach (GameObject gameObject in structures)
-            {
-                StructureController controller = gameObject.GetComponent<StructureController>();
-                string name = controller.entityName;
-                if (name == null)
-                {
-                    name = gameObject.name;
-                    controller.entityName = name;
-                }
-                if (name.Equals(string.Empty) == true)
-                {
-                    name = gameObject.name;
-                    Debug.Log(string.Format("Structure {0} has no name", gameObject.ToString()));
-                    continue;
-                }
+            //allStructures = new Dictionary<string, GameObject>();
+            //foreach (GameObject gameObject in structures)
+            //{
+            //    StructureController controller = gameObject.GetComponent<StructureController>();
+            //    string name = controller.entityName;
+            //    if (name == null)
+            //    {
+            //        name = gameObject.name;
+            //        controller.entityName = name;
+            //    }
+            //    if (name.Equals(string.Empty) == true)
+            //    {
+            //        name = gameObject.name;
+            //        Debug.Log(string.Format("Structure {0} has no name", gameObject.ToString()));
+            //        continue;
+            //    }
 
-                allStructures.Add(name, gameObject);
-            }
+            //    allStructures.Add(name, gameObject);
+            //}
+            InitCollection<StructureController>(ref allStructures, structures, "Structure");
         }
 
         private void InitUnits()
         {
-            allUnits = new Dictionary<string, GameObject>();
-            foreach (GameObject gameObject in units)
-            {
-                UnitController controller = gameObject.GetComponent<UnitController>();
-                string name = controller.entityName;
-                if (name == null)
-                {
-                    name = gameObject.name;
-                    controller.entityName = name;
-                }
-                if (name.Equals(string.Empty) == true)
-                {
-                    name = gameObject.name;
-                    Debug.Log(string.Format("Unit {0} has no name", gameObject.ToString()));
-                    continue;
-                }
+            //allUnits = new Dictionary<string, GameObject>();
+            //foreach (GameObject gameObject in units)
+            //{
+            //    UnitController controller = gameObject.GetComponent<UnitController>();
+            //    string name = controller.entityName;
+            //    if (name == null)
+            //    {
+            //        name = gameObject.name;
+            //        controller.entityName = name;
+            //    }
+            //    if (name.Equals(string.Empty) == true)
+            //    {
+            //        name = gameObject.name;
+            //        Debug.Log(string.Format("Unit {0} has no name", gameObject.ToString()));
+            //        continue;
+            //    }
 
-                allUnits.Add(name, gameObject);
-            }
+            //    allUnits.Add(name, gameObject);
+            //}
+            InitCollection<UnitController>(ref allUnits, units, "Unit");
+        }
+
+        private void InitResources()
+        {
+            //allEntities = new Dictionary<string, GameObject>();
+            //foreach (GameObject gameObject in entities)
+            //{
+            //    ResourceController controller = gameObject.GetComponent<ResourceController>();
+            //    if (controller == null)
+            //    {
+            //        Debug.Log(string.Format("{0} gameobject has no controller", gameObject.name));
+            //        continue;
+            //    }
+
+            //    SetEntityName(gameObject, controller);
+            //    string name = controller.entityName;
+            //    if (name.Equals(string.Empty) == true)
+            //    {
+            //        Debug.Log(string.Format("Resource {0} has no name", gameObject.ToString()));
+            //        continue;
+            //    }
+
+            //    allEntities.Add(name, gameObject);
+            //}
+            InitCollection<ResourceController>(ref allResources, resources, "Resource");
         }
 
         private void InitEntities()
         {
-            allEntities = new Dictionary<string, GameObject>();
-            foreach (GameObject gameObject in entities)
+            //allEntities = new Dictionary<string, GameObject>();
+            //foreach (GameObject gameObject in entities)
+            //{
+            //    PersistentEntity controller = gameObject.GetComponent<PersistentEntity>();
+            //    if(controller == null) {
+            //        Debug.Log(string.Format("{0} gameobject has no controller", gameObject.name));
+            //        continue;
+            //    }
+
+            //    SetEntityName(gameObject, controller);
+            //    string name = controller.entityName;
+            //    if(name.Equals(string.Empty) == true) {
+            //        Debug.Log(string.Format("Entity {0} has no name", gameObject.ToString()));
+            //        continue;
+            //    }
+
+            //    allEntities.Add(name, gameObject);
+            //}
+            InitCollection<PersistentEntity>(ref allEntities, entities, "Entity");
+        }
+
+        private void InitCollection<T>(ref Dictionary<string, GameObject> collection, GameObject[] items, string className) 
+            where T : PersistentEntity
+        {
+            collection = new Dictionary<string, GameObject>();
+            foreach (GameObject gameObject in items)
             {
-                EntityController controller = gameObject.GetComponent<EntityController>();
-                string name = controller.entityName;
-                if (name == null)
+                T controller = gameObject.GetComponent<T>();
+                if (controller == null)
                 {
-                    name = gameObject.name;
-                    controller.entityName = name;
-                }
-                if (name.Equals(string.Empty) == true)
-                {
-                    name = gameObject.name;
-                    Debug.Log(string.Format("Entity {0} has no name", gameObject.ToString()));
+                    Debug.Log(string.Format("{0} gameobject has no controller", gameObject.name));
                     continue;
                 }
 
-                allEntities.Add(name, gameObject);
+                SetEntityName(gameObject, controller);
+                string name = controller.entityName;
+                if (name.Equals(string.Empty) == true)
+                {
+                    Debug.Log(string.Format("{0} {1} has no name", className, gameObject.ToString()));
+                    continue;
+                }
+
+                collection.Add(name, gameObject);
             }
         }
 
-        public GameObject GetStructure(string name)
+        public void LoadGame(string gameToLoad, string levelToLoad)
+        {
+            currentGameName = gameToLoad;
+            currentLevelName = levelToLoad;
+            isLoading = true;
+        }
+
+        public void ExitGame()
+        {
+            currentGameName = string.Empty;
+            currentLevelName = Levels.mainMenu;
+        }
+
+        public string GetProperName(string cloneName)
+        {
+            int index = cloneName.IndexOf("(Clone)");
+			if (index < 0) {
+				return cloneName;
+			}
+
+            string properName = cloneName.Substring(0, index);
+            return properName;
+        }
+
+        public void RegisterGameEntity(PersistentEntity spawnedEntity)
+        {
+            int id;
+            bool idInUse = true;
+            do{
+                id = GetNextUniqueId();
+                idInUse = allGameEntities.ContainsKey(id);
+                
+                int count = allGameEntities.Count;
+                if (count > maxEntities)
+                {
+					DestroyGameEntity(spawnedEntity);
+                    Debug.Log(string.Format("Entity limit reached"));
+                    return;
+                }
+
+            } while(idInUse == true);
+
+            spawnedEntity.entityId = id;
+            allGameEntities.Add(id, spawnedEntity);
+        }
+
+        public PersistentEntity GetGameEntityById(int id)
+        {
+            bool entityExists = allGameEntities.ContainsKey(id);
+            if (entityExists == false)
+            {
+                return null;
+            }
+
+            PersistentEntity entity = allGameEntities[id];
+            return entity;
+        }
+
+		public void DestroyGameEntity(GameObject gameObjectToDestroy) {
+            PersistentEntity entityToDestroy = gameObjectToDestroy.GetComponent<PersistentEntity>();
+			if (entityToDestroy == null) {
+				return;
+			}
+
+			DestroyGameEntity (entityToDestroy);
+		}
+
+        public void DestroyGameEntity(PersistentEntity entityToDestroy)
+        {
+            int id = entityToDestroy.entityId;
+
+            PersistentEntity toCheck = allGameEntities[id];
+            if (toCheck != entityToDestroy)
+            {
+                Debug.Log(string.Format("{0} entity does not match registered entity with id: {1}", entityToDestroy.entityName, id));
+                return;
+            }
+
+            allGameEntities.Remove(id);
+            Destroy(entityToDestroy.gameObject);
+        }
+
+        public int GetNextUniqueId()
+        {
+            int id = activeInstance.nextId;
+            activeInstance.nextId++;
+            if (activeInstance.nextId >= int.MaxValue)
+            {
+                activeInstance.nextId = 0;
+            }
+
+            return id;
+        }
+
+		private void SetEntityName(GameObject gameObject, PersistentEntity entity) {
+			if (entity.entityName == null) {
+				entity.entityName = string.Empty;
+			}
+
+			if (entity.entityName.Equals(string.Empty) == false)
+			{
+				return;
+			}
+
+			entity.entityName = gameObject.name;
+			if (entity.entityName.Equals(string.Empty) == false)
+			{
+				return;
+			}
+
+			entity.entityName = gameObject.tag;
+		}
+
+		public GameObject GetPrefab(string name) {
+			GameObject entity = GetStructurePrefab (name);
+			if (entity != null) {
+				return entity;
+			}
+
+			entity = GetUnitPrefab (name);
+			if (entity != null) {
+				return entity;
+			}
+
+            entity = GetResourcePrefab(name);
+            if (entity != null)
+            {
+                return entity;
+            }
+
+			entity = GetEntityPrefab (name);
+			return entity;
+		}
+
+        public GameObject GetStructurePrefab(string name)
         {
             bool exists = allStructures.ContainsKey(name);
             if (exists == false)
@@ -131,7 +335,7 @@ namespace RTS
             return structure;
         }
 
-        public GameObject GetUnit(string name)
+        public GameObject GetUnitPrefab(string name)
         {
             bool exists = allUnits.ContainsKey(name);
             if (exists == false)
@@ -143,7 +347,19 @@ namespace RTS
             return unit;
         }
 
-        public GameObject GetEntity(string name)
+        public GameObject GetResourcePrefab(string name)
+        {
+            bool exists = allResources.ContainsKey(name);
+            if (exists == false)
+            {
+                return null;
+            }
+
+            GameObject resource = allResources[name];
+            return resource;
+        }
+
+        public GameObject GetEntityPrefab(string name)
         {
             bool exists = allEntities.ContainsKey(name);
             if (exists == false)
@@ -155,7 +371,7 @@ namespace RTS
             return entity;
         }
 
-        public GameObject GetPlayer()
+        public GameObject GetPlayerPrefab()
         {
             return player;
         }
@@ -188,8 +404,8 @@ namespace RTS
             {
                 AddPlayerAccount(username, avatarId);
 
-                CreatePlayerSaveFolder(username);
-                SavePlayerAccounts();
+                SaveManager.CreatePlayerSaveFolder(username);
+                SaveManager.SavePlayerAccounts();
             }
 
             currentPlayerAccount = allPlayerAccounts[username];
@@ -247,105 +463,12 @@ namespace RTS
             return savedGames;
         }
 
-        private void CreatePlayerSaveFolder(string username)
-        {
-            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + username;
-            CreateDirectory(path);
-        }
-
-        public void SavePlayerAccounts()
-        {
-            JsonSerializer serializer = GetJsonSerializer();
-
-            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + JsonProperties.PLAYERS + ".json";
-            using (StreamWriter stream = new StreamWriter(path))
-            {
-                using (JsonWriter writer = new JsonTextWriter(stream))
-                {
-                    writer.WriteStartObject();
-
-                    writer.WritePropertyName(JsonProperties.PLAYERS);
-                    writer.WriteStartArray();
-                    foreach (PlayerAccount account in allPlayerAccounts.Values)
-                    {
-                        account.Save(writer);
-                    }
-                    writer.WriteEndArray();
-
-                    writer.WriteEndObject();
-                }
-            }
-        }
-
-        public void LoadPlayerAccounts()
-        {
-            allPlayerAccounts.Clear();
-
-            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + JsonProperties.PLAYERS + ".json";
-
-            bool fileNotFound = ! File.Exists(path);
-            if (fileNotFound == true)
-            {
-                return;
-            }
-
-            string input;
-            using (StreamReader stream = new StreamReader(path))
-            {
-                input = stream.ReadToEnd();
-            }
-
-            if (input == null)
-            {
-                return;
-            }
-
-            using (JsonTextReader reader = new JsonTextReader(new StringReader(input)))
-            {
-                while (reader.Read())
-                {
-                    if (reader.Value == null)
-                    {
-                        continue;
-                    }
-                    if (reader.TokenType != JsonToken.PropertyName)
-                    {
-                        continue;
-                    }
-
-                    string value = (string)reader.Value;
-                    switch (value)
-                    {
-                        case JsonProperties.PLAYERS:
-                            LoadPlayers(reader);
-                            break;
-                    }
-                }
-            }
-        }
-
-        public void LoadPlayers(JsonTextReader reader)
-        {
-            while (reader.Read())
-            {
-                if (reader.TokenType == JsonToken.StartObject)
-                {
-                    PlayerAccount.Load(reader, this);
-                }
-
-                if (reader.TokenType == JsonToken.EndArray)
-                {
-                    return;
-                }
-            }
-        }
-
         public Texture2D GetBuildIcon(string name)
         {
-            GameObject entity = GetStructure(name);
+            GameObject entity = GetStructurePrefab(name);
             if (entity == null)
             {
-                entity = GetUnit(name);
+                entity = GetUnitPrefab(name);
             }
             if (entity == null)
             {
