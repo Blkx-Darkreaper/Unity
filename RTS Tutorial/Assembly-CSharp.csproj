@@ -46,9 +46,12 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\AnimationController.cs" />
+     <Compile Include="Assets\Scripts\AvariceVictory.cs" />
      <Compile Include="Assets\Scripts\ConfirmDialogController.cs" />
+     <Compile Include="Assets\Scripts\ConquestVictory.cs" />
      <Compile Include="Assets\Scripts\ConstructorUnit.cs" />
      <Compile Include="Assets\Scripts\EntityController.cs" />
+     <Compile Include="Assets\Scripts\EscortVictory.cs" />
      <Compile Include="Assets\Scripts\FactoryStructure.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\HarvesterUnit.cs" />
@@ -68,21 +71,31 @@
      <Compile Include="Assets\Scripts\RefineryStructure.cs" />
      <Compile Include="Assets\Scripts\ResourceController.cs" />
      <Compile Include="Assets\Scripts\ResourceManager.cs" />
+     <Compile Include="Assets\Scripts\ResultsMenu.cs" />
      <Compile Include="Assets\Scripts\SaveManager.cs" />
      <Compile Include="Assets\Scripts\SaveMenu.cs" />
      <Compile Include="Assets\Scripts\SelectPlayerMenu.cs" />
      <Compile Include="Assets\Scripts\SelectionList.cs" />
      <Compile Include="Assets\Scripts\StructureController.cs" />
+     <Compile Include="Assets\Scripts\SurvivalVictory.cs" />
      <Compile Include="Assets\Scripts\TankUnit.cs" />
      <Compile Include="Assets\Scripts\TeamColour.cs" />
+     <Compile Include="Assets\Scripts\TurretStructure.cs" />
      <Compile Include="Assets\Scripts\UnitController.cs" />
      <Compile Include="Assets\Scripts\UserInput.cs" />
+     <Compile Include="Assets\Scripts\VictoryCondition.cs" />
      <None Include="Assets\Scripts\Newtonsoft.Json.xml" />
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
  <HintPath>D:/Users/Darkreaper/Git/Unity/RTS Tutorial/Assets/Scripts/Newtonsoft.Json.dll</HintPath>

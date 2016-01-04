@@ -1,16 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManager.cs">
     <Files>
-      <File FileName="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\LoadManager.cs" Line="467" Column="1" />
-      <File FileName="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs" Line="69" Column="1" />
-      <File FileName="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\PersistentEntity.cs" Line="168" Column="1" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="63" Column="1" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="116" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\PlayerController.cs" line="93" />
       <Breakpoint file="D:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\ResourceController.cs" line="49" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\RTS Tutorial\Assets\Scripts\GameManager.cs" line="61" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>

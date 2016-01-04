@@ -71,8 +71,27 @@ public class StructureController : EntityController {
         GUI.EndGroup();
     }
 
-    protected void BuildUnit(string unitName)
+    protected void AddUnitToBuildQueue(string unitName)
     {
+        GameObject unitGameObject = GameManager.activeInstance.GetUnitPrefab(unitName);
+        UnitController unit = unitGameObject.GetComponent<UnitController>();
+        if (owner != null)
+        {
+            if (unit == null)
+            {
+                return;
+            }
+
+            bool sufficientFunds = owner.HasSufficientResources(ResourceType.money, unit.cost);
+            if (sufficientFunds == false)
+            {
+                owner.InsufficientResources(ResourceType.money);
+                return;
+            }
+
+            owner.RemoveResource(ResourceType.money, unit.cost);
+        }
+
         buildQueue.Enqueue(unitName);
     }
 

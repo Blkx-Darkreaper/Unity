@@ -12,6 +12,6 @@ public class FactoryStructure : StructureController {
     public override void PerformAction(string actionToPerform)
     {
         base.PerformAction(actionToPerform);
-        BuildUnit(actionToPerform);
+        AddUnitToBuildQueue(actionToPerform);
     }
 }

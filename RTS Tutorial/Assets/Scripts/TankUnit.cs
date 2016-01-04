@@ -16,6 +16,11 @@ public class TankUnit : UnitController {
     {
         base.Update();
 
+        AimAtTarget();
+    }
+
+    protected void AimAtTarget()
+    {
         if (isAiming == false)
         {
             return;
@@ -41,9 +46,9 @@ public class TankUnit : UnitController {
         return true;
     }
 
-    protected override void AimTowardsTarget(Vector3 targetPosition)
+    protected override void GetBearingToTarget(Vector3 targetPosition)
     {
-        base.AimTowardsTarget(targetPosition);
+        base.GetBearingToTarget(targetPosition);
 
         Vector3 bearingToTarget = targetPosition - transform.position;
         targetBearing = Quaternion.LookRotation(bearingToTarget);

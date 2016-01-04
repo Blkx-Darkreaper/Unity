@@ -12,6 +12,6 @@ public class RefineryStructure : StructureController {
     public override void PerformAction(string actionToPerform)
     {
         base.PerformAction(actionToPerform);
-        BuildUnit(actionToPerform);
+        AddUnitToBuildQueue(actionToPerform);
     }
 }

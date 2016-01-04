@@ -205,10 +205,15 @@ public class UnitController : EntityController
         targetEntityGameObject = null;
     }
 
-    public virtual void SetWaypoint(Vector3 destination, GameObject target)
+    public void SetWaypoint(EntityController target)
     {
-        SetWaypoint(destination);
-        targetEntityGameObject = target;
+        if (target == null)
+        {
+            return;
+        }
+
+        SetWaypoint(target.transform.position);
+        targetEntityGameObject = target.gameObject;
     }
 
     public override void SetHoverState(GameObject entityUnderMouse)

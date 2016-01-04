@@ -19,6 +19,56 @@ public class PlayerController : PersistentEntity {
     private StructureController constructionSite;
     private UnitController constructor;
     public bool isSettingConstructionPoint { get; protected set; }
+    public bool isDead
+    {
+        get
+        {
+            bool noStructuresLeft = hasNoStructures;
+            if (noStructuresLeft == false)
+            {
+                return false;
+            }
+
+            bool noUnitsLeft = hasNoUnits;
+            return noUnitsLeft;
+        }
+    }
+    public bool hasNoStructures
+    {
+        get
+        {
+            StructureController[] allStructures = GetComponentsInChildren<StructureController>();
+            if (allStructures == null)
+            {
+                return true;
+            }
+
+            if (allStructures.Length == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
+    public bool hasNoUnits
+    {
+        get
+        {
+            UnitController[] allUnits = GetComponentsInChildren<UnitController>();
+            if (allUnits == null)
+            {
+                return true;
+            }
+
+            if (allUnits.Length == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+    }
     protected struct PlayerProperties
     {
         public const string USERNAME = "Username";
@@ -57,12 +107,12 @@ public class PlayerController : PersistentEntity {
         resources.Add(ResourceType.money, 0);
         resources.Add(ResourceType.power, 0);
 
+		resourceLimits = new Dictionary<ResourceType, int>();
+		resourceLimits.Add(ResourceType.money, startingMoneyLimit);
+		resourceLimits.Add(ResourceType.power, startingPowerLimit);
+
         AddResource(ResourceType.money, startingMoney);
         AddResource(ResourceType.power, startingPower);
-
-        resourceLimits = new Dictionary<ResourceType, int>();
-        resourceLimits.Add(ResourceType.money, startingMoneyLimit);
-        resourceLimits.Add(ResourceType.power, startingPowerLimit);
     }
 
     private void Start()
@@ -146,11 +196,24 @@ public class PlayerController : PersistentEntity {
             return;
         }
 
+        bool sufficientFunds = HasSufficientResources(ResourceType.money, constructionSite.cost);
+        if (sufficientFunds == false)
+        {
+            InsufficientResources(ResourceType.money);
+            return;
+        }
+
+        RemoveResource(ResourceType.money, constructionSite.cost);
         constructionSite.transform.parent = allStructures.transform;
         constructionSite.owner = this;
         constructionSite.SetColliders(true);
         constructor.SetSpawner(constructionSite);
         constructionSite.StartConstruction();
+    }
+
+    public void InsufficientResources(ResourceType type)
+    {
+        Debug.Log(string.Format("{0} has insufficient {1}", name, type.ToString()));
     }
 
     public void CancelConstruction()
@@ -164,11 +227,36 @@ public class PlayerController : PersistentEntity {
     public void AddResource(ResourceType type, int amountToAdd)
     {
         resources[type] += amountToAdd;
+		if (resourceLimits [type] == null) {
+			return;
+		}
+
+        resources[type] = Mathf.Clamp(resources[type], 0, resourceLimits[type]);
+    }
+
+    public bool HasSufficientResources(ResourceType type, int amountRequired)
+    {
+        int currentAmount = resources[type];
+
+        bool sufficientResources = amountRequired <= currentAmount;
+        return sufficientResources;
+    }
+
+    public void RemoveResource(ResourceType type, int amountToRemove)
+    {
+        resources[type] -= amountToRemove;
+        resources[type] = Mathf.Clamp(resources[type], 0, resourceLimits[type]);
     }
 
     public void SetResourceLimit(ResourceType type, int limit)
     {
         resourceLimits[type] = limit;
+    }
+
+    public int GetResourceAmount(ResourceType type)
+    {
+        int amount = resources[type];
+        return amount;
     }
 
     public void SpawnUnit(string unitName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation)

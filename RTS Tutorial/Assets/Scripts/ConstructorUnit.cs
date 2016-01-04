@@ -20,7 +20,7 @@ public class ConstructorUnit : UnitController {
     protected override void Start()
     {
         base.Start();
-        actions = new string[] { "Refinery", "Factory" };
+        actions = new string[] { "Refinery", "Factory", "Turret" };
 
         if (isLoadedFromSave == false)
         {
@@ -157,8 +157,14 @@ public class ConstructorUnit : UnitController {
 
     public void SetConstructionProject(StructureController project)
     {
+        if (project == null)
+        {
+            isConstructing = false;
+            return;
+        }
+
         currentProject = project;
-        SetWaypoint(currentProject.transform.position, currentProject.gameObject);
+        SetWaypoint(currentProject);
         isConstructing = true;
     }
 

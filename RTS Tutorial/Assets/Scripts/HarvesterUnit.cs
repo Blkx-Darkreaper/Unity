@@ -89,7 +89,7 @@ public class HarvesterUnit : UnitController
             isHarvesting = false;
             isDepositing = true;
             HideArms(arms);
-            SetWaypoint(resourceStore.transform.position, resourceStore.gameObject);
+            SetWaypoint(resourceStore);
 
             string ownersName = "Neutral";
             if (owner != null)
@@ -118,7 +118,7 @@ public class HarvesterUnit : UnitController
             }
 
             isHarvesting = true;
-            SetWaypoint(resourceSource.transform.position, resourceSource.gameObject);
+            SetWaypoint(resourceSource);
 
             string ownersName = "Neutral";
             if (owner != null)
@@ -301,8 +301,14 @@ public class HarvesterUnit : UnitController
 
     private void StartHarvesting(ResourceController resource)
     {
+        if (resource == null)
+        {
+            isHarvesting = false;
+            return;
+        }
+
         resourceSource = resource;
-        SetWaypoint(resource.transform.position, resource.gameObject);
+        SetWaypoint(resource);
         ResourceType depositType = resource.type;
         if (harvestType != depositType)
         {

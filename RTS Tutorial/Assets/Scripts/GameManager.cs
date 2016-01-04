@@ -19,6 +19,7 @@ namespace RTS
         public GameObject[] entities;
         private Dictionary<string, GameObject> allEntities;
         public GameObject player;
+        protected VictoryCondition[] victoryConditions;
         public bool isMenuOpen { get; set; }
         public Dictionary<string, PlayerAccount> allPlayerAccounts = new Dictionary<string, PlayerAccount>();
         public PlayerAccount currentPlayerAccount { get; protected set; }
@@ -66,6 +67,68 @@ namespace RTS
             string levelToLoad = currentLevelName;
             LoadManager.LoadGame(saveFileToLoad, levelToLoad);
             isLoading = false;
+            LoadDetails();
+            Time.timeScale = 1f;
+            isMenuOpen = false;
+        }
+
+        protected void Update()
+        {
+            if (victoryConditions == null)
+            {
+                return;
+            }
+
+            foreach (VictoryCondition winCondition in victoryConditions)
+            {
+                bool gameFinished = winCondition.IsGameOver();
+                if (gameFinished == false)
+                {
+                    continue;
+                }
+
+                Debug.Log(string.Format("Win condition {0} met"));
+                PlayerController winner = winCondition.GetWinningPlayer();
+                ResultsMenu resultsScreen = winner.hud.GetComponent<ResultsMenu>();
+                if (resultsScreen == null)
+                {
+                    return;
+                }
+
+                resultsScreen.Victory(winCondition);
+                resultsScreen.enabled = true;
+                Time.timeScale = 0f;
+                Cursor.visible = true;
+                isMenuOpen = true;
+                winner.hud.enabled = false;
+            }
+        }
+
+        protected void LoadDetails()
+        {
+            GameObject[] playerObjects = GameObject.FindGameObjectsWithTag(Tags.PLAYER);
+            List<PlayerController> activePlayers = new List<PlayerController>();
+            foreach (GameObject gameObject in playerObjects)
+            {
+                PlayerController player = gameObject.GetComponent<PlayerController>();
+                if (player == null)
+                {
+                    continue;
+                }
+
+                activePlayers.Add(player);
+            }
+
+            victoryConditions = GameObject.FindObjectsOfType(typeof(VictoryCondition)) as VictoryCondition[];
+            if (victoryConditions == null)
+            {
+                return;
+            }
+
+            foreach (VictoryCondition winCondition in victoryConditions)
+            {
+                winCondition.activePlayers = activePlayers.ToArray();
+            }
         }
 
         private void InitStructures()
@@ -192,6 +255,11 @@ namespace RTS
         public void LoadGame(string gameToLoad, string levelToLoad)
         {
             currentGameName = gameToLoad;
+            LoadLevel(levelToLoad);
+        }
+
+        public void LoadLevel(string levelToLoad)
+        {
             currentLevelName = levelToLoad;
             isLoading = true;
         }

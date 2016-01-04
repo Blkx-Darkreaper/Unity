@@ -100,6 +100,10 @@ public class EntityController : PersistentEntity
         {
             return;
         }
+        if (GameManager.activeInstance.isMenuOpen)
+        {
+            return;
+        }
 
         DrawSelection();
     }
@@ -516,7 +520,7 @@ public class EntityController : PersistentEntity
         bool targetInSights = IsTargetInSights(targetPosition);
         if (targetInSights == false)
         {
-            AimTowardsTarget(targetPosition);
+            GetBearingToTarget(targetPosition);
             return;
         }
 
@@ -569,7 +573,7 @@ public class EntityController : PersistentEntity
             attackTargetsOwnersName, attackTarget.name));
     }
 
-    protected virtual void AimTowardsTarget(Vector3 targetPosition)
+    protected virtual void GetBearingToTarget(Vector3 targetPosition)
     {
         isAiming = true;
     }
