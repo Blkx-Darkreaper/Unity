@@ -11,7 +11,8 @@ public class Player : Entity {
 
     [HideInInspector]
     public Hud PlayerHud;
-    public Color teamColour;
+    public Raider raider;
+    public BuildCursor cursor;
     public EntityController selectedEntity { get; set; }
     public int startingMoney, startingMoneyLimit, startingPower, startingPowerLimit;
     private Dictionary<ResourceType, int> resources, resourceLimits;

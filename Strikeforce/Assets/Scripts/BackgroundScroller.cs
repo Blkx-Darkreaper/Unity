@@ -12,7 +12,7 @@ public class BackgroundScroller : MonoBehaviour {
     }
 
 	public void Update () {
-        float displacementChange = Mathf.Repeat(Time.time * -scrollSpeed, transform.localScale.y);
-        transform.position = startPosition + Vector3.forward * displacementChange;
+        	float displacementChange = Mathf.Repeat(Time.time * -scrollSpeed, transform.localScale.y);
+        	transform.position = startPosition + Vector3.forward * displacementChange;
 	}
 }

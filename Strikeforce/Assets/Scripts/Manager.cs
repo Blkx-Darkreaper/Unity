@@ -2,9 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 using Newtonsoft.Json;
-using RTS;
+using Strikeforce;
 
-public class Manager : MonoBehaviour {
+public class Manager : NetworkBehaviour {
 
     public static string defaultSaveFolderName = "SavedGames";
 

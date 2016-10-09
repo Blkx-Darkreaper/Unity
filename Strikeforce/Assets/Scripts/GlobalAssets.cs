@@ -86,7 +86,7 @@ namespace Strikeforce
         public const string scrollWheel = "Mouse ScrollWheel";
     }
 
-    public static class ResourceManager
+    public static class GlobalAssets
     {
         private static Vector3 invalidPositionValue = new Vector3(-99999f, -99999f, -99999f);
         public static Vector3 invalidPoint { get { return invalidPositionValue; } }

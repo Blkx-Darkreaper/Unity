@@ -1,5 +1,5 @@
 using UnityEngine;
 using Strikeforce;
 
-public class Effect : Entity {
+public class Aircraft : Vehicle {
 }
