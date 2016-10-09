@@ -3,7 +3,7 @@ using System.Collections;
 using Newtonsoft.Json;
 using Strikeforce;
 
-public class Entity : MonoBehaviour {
+public class Entity : Network Behaviour {
 
     public int entityId { get; set; }
     protected bool isLoadedFromSave = false;

@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
-using RTS;
+using Strikeforce;
 using Newtonsoft.Json;
 
-public class PlayerAccount
+public class PlayerAccount : NetworkBehaviour
 {
     private const string USERNAME_PROPERTY = "Username";
     private const string AVATAR_PROPERTY = "Avatar";

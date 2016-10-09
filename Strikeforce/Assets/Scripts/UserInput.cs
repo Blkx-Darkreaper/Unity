@@ -2,7 +2,7 @@
 using System.Collections;
 using Strikeforce;
 
-public class UserInput : MonoBehaviour
+public class UserInput : NetworkBehaviour
 {
     private PlayerController player;
 
@@ -18,6 +18,9 @@ public class UserInput : MonoBehaviour
         {
             return;
         }
+	if(isLocalPlayer == false) {
+		return;
+	}
 
         UpdateCamera();
         RespondToMouseActivity();
