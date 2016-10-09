@@ -34,17 +34,23 @@ namespace Strikeforce
 
     public enum ResourceType
     {
-        money, power, ore, unknown
+        money, fuel, rockets, missiles, bombs, materiel, unknown
     }
 
     public struct ResourceProperties
     {
         public const string MONEY = "Money";
         public const string MONEY_LIMIT = "MoneyLimit";
-        public const string POWER = "Power";
-        public const string POWER_LIMIT = "PowerLimit";
-        public const string ORE = "Ore";
-        public const string ORE_LIMIT = "OreLimit";
+        public const string FUEL = "Fuel";
+        public const string FUEL_LIMIT = "FuelLimit";
+        public const string ROCKETS = "Rockets";
+        public const string ROCKETS_LIMIT = "RocketsLimit";
+	public const string MISSILES = "Missiles";
+	public const string MISSILES_LIMIT = "MissilesLimit";
+	public const string BOMBS = "Bombs";
+	public const string BOMBS_LIMIT = "BombsLimit";
+	public const string MATERIEL = "Materiel";
+	public const string MATERIEL_LIMIT = "MaterielLimit";
         public const string UNKNOWN = "Unknown";
     }
 
@@ -126,11 +132,20 @@ namespace Strikeforce
                 case ResourceProperties.MONEY:
                     return ResourceType.money;
 
-                case ResourceProperties.POWER:
-                    return ResourceType.power;
+                case ResourceProperties.FUEL:
+                    return ResourceType.fuel;
 
-                case ResourceProperties.ORE:
-                    return ResourceType.ore;
+                case ResourceProperties.ROCKETS:
+                    return ResourceType.rockets;
+
+		case ResourceProperties.MISSILES:
+			return ResourceType.missiles;
+
+		case ResourceProperties.BOMBS:
+			return ResourceType.bombs;
+
+		case ResourceProperties.MATERIEL:
+			return ResourceType.materiel;
 
                 default:
                     return ResourceType.unknown;

@@ -4,7 +4,6 @@ using System.Collections;
 using Strikeforce;
 
 public class MenuController : MonoBehaviour {
-
     public GUISkin menuSkin;
     public Texture2D headerImage;
     protected PlayerController player;

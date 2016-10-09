@@ -4,26 +4,15 @@ using Newtonsoft.Json;
 using Strikeforce;
 
 public class Entity: Network Behaviour {
-
-	public int entityId {
-		get;
-		set;
-	}
-	public static string nameProperty {
-		get {
-			return EntityProperties.NAME;
-		}
-	}
+	public int entityId { get; set; }
+	public static string nameProperty { get { return EntityProperties.NAME; } }
 	protected bool isLoadedFromSave = false;
 	protected struct Properties {
 		public const string POSITION = "Position";
 		public const string ROTATION = "Rotation";
 		public const string SCALE = "Scale";
 	}
-	public Rect playingArea {
-		get;
-		set;
-	}
+	public Rect playingArea { get; set; }
 	protected struct EntityProperties {
 		public const string NAME = "Name";
 		public const string ID = "Id";

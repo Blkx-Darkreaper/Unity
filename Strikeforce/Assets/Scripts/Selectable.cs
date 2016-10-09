@@ -2,68 +2,26 @@ using UnityEngine;
 using Strikeforce;
 
 public class Selectable: Entity {
-	public Texture2D BuildImage {
-		get;
-		set;
-	}
-	public float BuildTime {
-		get;
-		set;
-	}
-	public int Cost {
-		get;
-		set;
-	}
-	public int SellValue {
-		get;
-		set;
-	}
-	public Bounds SelectionBounds {
-		get;
-		protected set;
-	}
-	public Player Owner {
-		get;
-		set;
-	}
-	public string[] Actions {
-		get;
-		set;
-	}
+	public Texture2D BuildImage { get; set; }
+	public float BuildTime { get; set; }
+	public int Cost { get; set; }
+	public int SellValue { get; set; }
+	public Bounds SelectionBounds { get; protected set; }
+	public Player Owner { get; set; }
+	public string[] Actions { get; set; }
 	public float AttackRange = 10f;
 	private float DEFAULT_ATTACK_RANGE = 10f;
 	public float WeaponAimSpeed = 1f;
 	private float DEFAULT_WEAPON_AIM_SPEED = 1f;
 	public float WeaponCooldown = 1f;
 	private float DEFAULT_WEAPON_COOLDOWN = 1f;
-	protected float currentCooldownRemaining {
-		get;
-		set;
-	}
-	protected bool isSelected {
-		get;
-		set;
-	}
-	protected bool isAttacking {
-		get;
-		set;
-	}
-	protected bool isAdvancing {
-		get;
-		set;
-	}
-	protected bool isAiming {
-		get;
-		set;
-	}
-	protected Entity actionTarget {
-		get;
-		set;
-	}
-	protected int actionTargetId {
-		get;
-		set;
-	}
+	protected float currentCooldownRemaining { get; set; }
+	protected bool isSelected { get; set; }
+	protected bool isAttacking { get; set; }
+	protected bool isAdvancing { get; set; }
+	protected bool isAiming { get; set; }
+	protected Entity actionTarget { get; set; }
+	protected int actionTargetId { get; set; }
 	protected struct SelectableProperties {
 		public const string IS_ATTACKING = "IsAttacking";
 		public const string IS_ADVANCING = "IsAdvancing";
@@ -71,10 +29,7 @@ public class Selectable: Entity {
 		public const string COOLDOWN = "CurrentCooldown";
 		public const string TARGET_ID = "TargetId";
 	}
-	private List < Material > oldMaterials {
-		get;
-		set;
-	}
+	private List < Material > oldMaterials { get; set; }
 
 	protected override void Awake() {
 		base.Awake();

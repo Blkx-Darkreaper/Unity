@@ -2,7 +2,6 @@
 using System.Collections;
 
 public class MenuManager : MonoBehaviour {
-
     public MenuController currentMenu;
 
     public void Start()

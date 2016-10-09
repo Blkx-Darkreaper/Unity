@@ -6,7 +6,6 @@ using Strikeforce;
 
 public class Hud : MonoBehaviour
 {
-
     public GUISkin resourceSkin, ordersSkin, selectionBoxSkin, playerDetailsSkin;
     [HideInInspector]
     public GUISkin mouseCursorSkin;
@@ -21,7 +20,7 @@ public class Hud : MonoBehaviour
     private const int BUTTON_PADDING = 7;
     private const int SCROLL_BAR_WIDTH = 22;
 
-    private PlayerController player;
+    private Player player;
 
     [HideInInspector]
     public Texture2D activeCursor;

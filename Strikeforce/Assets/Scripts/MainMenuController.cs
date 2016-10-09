@@ -3,7 +3,6 @@ using System.Collections;
 using Strikeforce;
 
 public class MainMenuController : MenuController {
-
     protected const string NEW_GAME = "Start New Game";
     protected const string CHANGE_PLAYER = "Change Player Account";
     protected const string LOAD = "Load Game";

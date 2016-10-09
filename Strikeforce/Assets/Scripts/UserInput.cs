@@ -4,7 +4,7 @@ using Strikeforce;
 
 public class UserInput : NetworkBehaviour
 {
-    private PlayerController player;
+    private Player player;
 
     private void Start()
     {

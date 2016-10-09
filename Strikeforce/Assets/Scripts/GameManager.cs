@@ -22,29 +22,14 @@ namespace Strikeforce {
 		GameObject > allEntities;
 		public GameObject player;
 		protected VictoryCondition[] victoryConditions;
-		public bool isMenuOpen {
-			get;
-			set;
-		}
+		public bool isMenuOpen { get; set; }
 		public Dictionary < string,
 		PlayerAccount > allPlayerAccounts = new Dictionary < string,
 		PlayerAccount > ();
-		public PlayerAccount currentPlayerAccount {
-			get;
-			protected set;
-		}
-		public string currentGameName {
-			get;
-			protected set;
-		}
-		public string currentLevelName {
-			get;
-			protected set;
-		}
-		public string currentSaveGameName {
-			get;
-			set;
-		}
+		public PlayerAccount currentPlayerAccount { get; protected set; }
+		public string currentGameName { get; protected set; }
+		public string currentLevelName { get; protected set; }
+		public string currentSaveGameName { get; set; }
 		public string defaultUsername = "NewPlayer";
 		public string defaultSaveName = "NewGame";
 		public Color defaultColour;

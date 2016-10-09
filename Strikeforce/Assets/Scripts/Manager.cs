@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using Strikeforce;
 
 public class Manager : NetworkBehaviour {
-
     public static string defaultSaveFolderName = "SavedGames";
 
     protected static void SetJsonSerializerIgnoreNulls()

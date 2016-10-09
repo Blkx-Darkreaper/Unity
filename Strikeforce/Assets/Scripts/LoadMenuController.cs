@@ -3,7 +3,6 @@ using System.Collections;
 using Strikeforce;
 
 public class LoadMenuController : MenuController {
-
 	public GUISkin selectionSkin;
 
 	protected override void Start() {
