@@ -4,8 +4,12 @@ using Strikeforce;
 
 public class MainMenuController : MenuController {
     protected const string NEW_GAME = "Start New Game";
+    protected const string MATCHMAKING = "Matchmaking";
+    protected const string PROFILE = "Profile";
     protected const string CHANGE_PLAYER = "Change Player Account";
     protected const string LOAD = "Load Game";
+    protected const string OPTIONS = "Options";
+    protected const string EXIT = "Exit"
 
     protected void OnLevelWasLoaded()
     {
