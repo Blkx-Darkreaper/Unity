@@ -1,81 +1,115 @@
 using UnityEngine;
-using Strikeforce;
+using Newtonsoft.Json;
 
-public class Destructible: Selectable {
-	public int MaxHitPoints { get; set; } 
-	[HideInInspector]
-	public int CurrentHitPoints { get; set; }
-	protected float healthPercentage { get; set; }
-	protected GUIStyle healthStyle { get; set; }
-	private const int HEALTH_BAR_VERTICAL_OFFSET;
-	private const int HEALTH_BAR_HEIGHT;
-	protected struct DestructibleProperties {
-		public const string HIT_POINTS = "HitPoints";
-	}
+namespace Strikeforce
+{
+    public class Destructible : Selectable
+    {
+        public int MaxHitPoints { get; set; }
+        [HideInInspector]
+        public int CurrentHitPoints { get; set; }
+        protected float healthPercentage { get; set; }
+        protected GUIStyle healthStyle { get; set; }
+        private const int HEALTH_BAR_VERTICAL_OFFSET = 7;
+        private const int HEALTH_BAR_HEIGHT = 5;
+        protected struct DestructibleProperties
+        {
+            public const string HIT_POINTS = "HitPoints";
+        }
 
-	protected override Awake() {
-		base.Awake();
+        protected override void Awake()
+        {
+            base.Awake();
 
-		CurrentHitPoints = MaxHitPoints;
-		UpdateHealthPercentage();
-	}
+            CurrentHitPoints = MaxHitPoints;
+            UpdateHealthPercentage();
+        }
 
-	protected void DrawHealthBar(Rect selectionBox) {
-		DrawHealthBarWithLabel(selectionBox, string.Empty);
-	}
+        protected void DrawHealthBar(Rect selectionBox)
+        {
+            DrawHealthBarWithLabel(selectionBox, string.Empty);
+        }
 
-	protected void DrawHealthBarWithLabel(Rect selectionBox, string label) {
-		healthStyle.padding.top = -20;
-		healthStyle.fontStyle = FontStyle.Bold;
+        protected void DrawHealthBarWithLabel(Rect selectionBox, string label)
+        {
+            healthStyle.padding.top = -20;
+            healthStyle.fontStyle = FontStyle.Bold;
 
-		float x = selectionBox.x;
-		float y = selectionBox.y - HEALTH_BAR_VERTICAL_OFFSET;
-		float width = selectionBox.width * healthPercentage;
-		float height = HEALTH_BAR_HEIGHT;
-		GUI.Label(new Rect(x, y, width, height), label, healthStyle);
-	}
+            float x = selectionBox.x;
+            float y = selectionBox.y - HEALTH_BAR_VERTICAL_OFFSET;
+            float width = selectionBox.width * healthPercentage;
+            float height = HEALTH_BAR_HEIGHT;
+            GUI.Label(new Rect(x, y, width, height), label, healthStyle);
+        }
 
-	protected virtual void UpdateHealthPercentage() {
-		UpdateHealthPercentage(0.65f, 0.35f);
-	}
+        protected override void DrawSelectionBox(Rect selectionBox)
+        {
+            base.DrawSelectionBox(selectionBox);
 
-	protected virtual void UpdateHealthPercentage(float healthyThreshold, float damagedThreshold) {
-		if (maxHitPoints == 0) {
-			healthPercentage = 0f;
-			return;
-		}
+            UpdateHealthPercentage();
+            DrawHealthBar(selectionBox);
+        }
 
-		healthPercentage = (float) currentHitPoints / (float) maxHitPoints;
+        protected virtual void UpdateHealthPercentage()
+        {
+            UpdateHealthPercentage(0.65f, 0.35f);
+        }
 
-		if (healthPercentage > healthyThreshold) {
-			healthStyle.normal.background = ResourceManager.HealthBarTextures.healthy;
-			return;
-		}
-		if (healthPercentage > damagedThreshold) {
-			healthStyle.normal.background = ResourceManager.HealthBarTextures.damaged;
-			return;
-		}
+        protected virtual void UpdateHealthPercentage(float healthyThreshold, float damagedThreshold)
+        {
+            if (MaxHitPoints == 0)
+            {
+                healthPercentage = 0f;
+                return;
+            }
 
-		healthStyle.normal.background = ResourceManager.HealthBarTextures.critical;
-	}
+            healthPercentage = (float)CurrentHitPoints / (float)MaxHitPoints;
 
-	public void TakeDamage(int damage) {
-		currentHitPoints -= damage;
-		if (currentHitPoints > 0) {
-			return;
-		}
+            if (healthPercentage > healthyThreshold)
+            {
+                healthStyle.normal.background = GlobalAssets.HealthBarTextures.healthy;
+                return;
+            }
+            if (healthPercentage > damagedThreshold)
+            {
+                healthStyle.normal.background = GlobalAssets.HealthBarTextures.damaged;
+                return;
+            }
 
-		DestroyEntity();
-	}
+            healthStyle.normal.background = GlobalAssets.HealthBarTextures.critical;
+        }
 
-	protected void DestroyEntity() {
-		GameManager.activeInstance.DestroyGameEntity(this);
+        public void TakeDamage(int damage)
+        {
+            CurrentHitPoints -= damage;
+            if (CurrentHitPoints > 0)
+            {
+                return;
+            }
 
-		string ownersName = "Neutral";
-		if (owner != null) {
-			ownersName = string.Format("{0}'s", owner.username);
-		}
+            DestroyEntity();
+        }
 
-		Debug.Log(string.Format("{0} {1} has been destroyed", ownersName, name));
-	}
+        protected void DestroyEntity()
+        {
+            GameManager.ActiveInstance.DestroyGameEntity(this);
+
+            string ownersName = "Neutral";
+            if (Owner != null)
+            {
+                ownersName = string.Format("{0}'s", Owner.Username);
+            }
+
+            Debug.Log(string.Format("{0} {1} has been destroyed", ownersName, name));
+        }
+
+        protected override void SaveDetails(JsonWriter writer)
+        {
+            SaveManager.SaveString(writer, EntityProperties.NAME, name);
+
+            base.SaveDetails(writer);
+
+            SaveManager.SaveInt(writer, DestructibleProperties.HIT_POINTS, CurrentHitPoints);
+        }
+    }
 }

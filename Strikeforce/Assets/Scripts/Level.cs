@@ -1,5 +1,9 @@
 using UnityEngine;
 using System.Collections;
 
-public class Level : MonoBehaviour {
+namespace Strikeforce
+{
+    public class Level : MonoBehaviour
+    {
+    }
 }

@@ -1,5 +1,8 @@
 using UnityEngine;
-using Strikeforce;
 
-public class Explosion : Effect {
+namespace Strikeforce
+{
+    public class Explosion : Effect
+    {
+    }
 }

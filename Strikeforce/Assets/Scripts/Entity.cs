@@ -1,238 +1,236 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 using Newtonsoft.Json;
-using Strikeforce;
 
-public class Entity: Network Behaviour {
-	public int entityId { get; set; }
-	public static string nameProperty { get { return EntityProperties.NAME; } }
-	protected bool isLoadedFromSave = false;
-	protected struct Properties {
-		public const string POSITION = "Position";
-		public const string ROTATION = "Rotation";
-		public const string SCALE = "Scale";
-	}
-	public Rect playingArea { get; set; }
-	protected struct EntityProperties {
-		public const string NAME = "Name";
-		public const string ID = "Id";
-		public const string MESHES = "Meshes";
-	}
+namespace Strikeforce
+{
+    public class Entity : NetworkBehaviour
+    {
+        public int entityId { get; set; }
+        public static string nameProperty { get { return EntityProperties.NAME; } }
+        protected bool isLoadedFromSave = false;
+        public float MoveSpeed, TurnSpeed;
+        protected bool isMoving, isTurning;
+        private Vector3 currentWaypoint;
+        private Quaternion targetHeading;
+        private GameObject targetEntityGameObject;
+        protected struct UnitProperties
+        {
+            public const string IS_MOVING = "IsMoving";
+            public const string IS_TURNING = "IsTurning";
+            public const string WAYPOINT = "Waypoint";
+            public const string TARGET_HEADING = "TargetHeading";
+            public const string TARGET_ID = "TargetId";
+        }
+        protected struct Properties
+        {
+            public const string POSITION = "Position";
+            public const string ROTATION = "Rotation";
+            public const string SCALE = "Scale";
+        }
+        public Rect playingArea { get; set; }
 
-	protected virtual void Awake() {
-		GameManager.activeInstance.RegisterGameEntity(this);
+        protected virtual void Awake()
+        {
+            GameManager.ActiveInstance.RegisterGameEntity(this);
 
-		playingArea = new Rect(0f, 0f, 0f, 0f);
-	}
+            playingArea = new Rect(0f, 0f, 0f, 0f);
+        }
 
-	public void SetColliders(bool enabled) {
-		Collider[] allColliders = GetComponentsInChildren < Collider > ();
-		foreach(Collider collider in allColliders) {
-			collider.enabled = enabled;
-		}
-	}
+        public void SetColliders(bool enabled)
+        {
+            Collider[] allColliders = GetComponentsInChildren<Collider>();
+            foreach (Collider collider in allColliders)
+            {
+                collider.enabled = enabled;
+            }
+        }
 
-	protected override void SaveDetails(JsonWriter writer) {
-		SaveManager.SaveString(writer, EntityProperties.NAME, name);
+        public virtual void SetWaypoint(Vector3 destination)
+        {
+            currentWaypoint = destination;
+            isTurning = true;
+            isMoving = false;
+            targetEntityGameObject = null;
+        }
 
-		base.SaveDetails(writer);
+        public virtual void SetWaypoint(Entity target)
+        {
+            if (target == null)
+            {
+                return;
+            }
 
-		SaveManager.SaveInt(writer, EntityProperties.ID, entityId);
-		SaveManager.SaveInt(writer, EntityProperties.HIT_POINTS, currentHitPoints);
-		SaveManager.SaveBoolean(writer, EntityProperties.IS_ATTACKING, isAttacking);
-		SaveManager.SaveBoolean(writer, EntityProperties.IS_ADVANCING, isAdvancing);
-		SaveManager.SaveBoolean(writer, EntityProperties.IS_AIMING, isAiming);
-		if (currentCooldownRemaining > 0) {
-			SaveManager.SaveFloat(writer, EntityProperties.COOLDOWN, currentCooldownRemaining);
-		}
-		if (attackTarget != null) {
-			SaveManager.SaveInt(writer, EntityProperties.TARGET_ID, attackTarget.entityId);
-		}
-	}
+            SetWaypoint(target.transform.position);
+            targetEntityGameObject = target.gameObject;
+        }
 
-	protected override bool LoadDetails(JsonReader reader, string propertyName) {
-		// Properties must be loaded in the order they were saved for loadCompleted to work properly
-		bool loadCompleted = false;
+        public void Save(JsonWriter writer)
+        {
+            if (writer == null)
+            {
+                return;
+            }
 
-		base.LoadDetails(reader, propertyName);
+            SaveStart(writer);
+            SaveDetails(writer);
+            SaveEnd(writer);
+        }
 
-		switch (propertyName) {
-		case EntityProperties.ID:
-			entityId = LoadManager.LoadInt(reader);
-			break;
+        protected virtual void SaveStart(JsonWriter writer)
+        {
+            writer.WriteStartObject();
+        }
 
-		case EntityProperties.HIT_POINTS:
-			currentHitPoints = LoadManager.LoadInt(reader);
-			break;
+        protected virtual void SaveDetails(JsonWriter writer)
+        {
+            SaveManager.SaveString(writer, EntityProperties.NAME, name);
 
-		case EntityProperties.IS_ATTACKING:
-			isAttacking = LoadManager.LoadBoolean(reader);
-			break;
+            SaveManager.SaveVector(writer, Properties.POSITION, transform.position);
+            SaveManager.SaveQuaternion(writer, Properties.ROTATION, transform.rotation);
+            SaveManager.SaveVector(writer, Properties.SCALE, transform.localScale);
 
-		case EntityProperties.IS_ADVANCING:
-			isAdvancing = LoadManager.LoadBoolean(reader);
-			break;
+            SaveManager.SaveInt(writer, EntityProperties.ID, entityId); // Last property to save
+            //SaveManager.SaveString(writer, EntityProperties.MESHES, 
+        }
 
-		case EntityProperties.IS_AIMING:
-			isAiming = LoadManager.LoadBoolean(reader);
-			loadCompleted = true; // Last property to load
-			break;
+        protected virtual void SaveEnd(JsonWriter writer)
+        {
+            writer.WriteEndObject();
 
-		case EntityProperties.COOLDOWN:
-			currentCooldownRemaining = LoadManager.LoadFloat(reader);
-			loadCompleted = true;
-			break;
+            Debug.Log(string.Format("Saved entity {0}, ", entityId, name));
+        }
 
-		case EntityProperties.TARGET_ID:
-			attackTargetId = LoadManager.LoadInt(reader);
-			loadCompleted = true;
-			break;
-		}
+        public static void Load(JsonReader reader, GameObject gameObject)
+        {
+            if (reader == null)
+            {
+                return;
+            }
+            if (gameObject == null)
+            {
+                return;
+            }
 
-		return loadCompleted;
-	}
+            Entity entity = gameObject.GetComponent<Entity>();
+            if (entity == null)
+            {
+                return;
+            }
 
-	protected override void LoadEnd(bool loadComplete) {
-		base.LoadEnd(loadComplete);
-		if (loadComplete == false) {
-			return;
-		}
+            bool loadingComplete = false;
 
-		selectionBounds = ResourceManager.invalidBounds;
-		UpdateBounds();
-	}
+            while (reader.Read() == true)
+            {
+                if (reader.Value == null)
+                {
+                    if (reader.TokenType != JsonToken.EndObject)
+                    {
+                        continue;
+                    }
 
-	public void Save(JsonWriter writer) {
-		if (writer == null) {
-			return;
-		}
+                    entity.LoadEnd(loadingComplete);
+                    return;
+                }
 
-		SaveStart(writer);
-		SaveDetails(writer);
-		SaveEnd(writer);
-	}
+                if (reader.TokenType != JsonToken.PropertyName)
+                {
+                    continue;
+                }
+                //            if (reader.TokenType != JsonToken.StartObject || reader.TokenType != JsonToken.StartArray)
+                //            {
+                //                continue;
+                //            }
 
-	protected virtual void SaveStart(JsonWriter writer) {
-		writer.WriteStartObject();
-	}
+                string propertyName = LoadManager.LoadString(reader);
+                reader.Read();
 
-	protected virtual void SaveDetails(JsonWriter writer) {
-		SaveManager.SaveVector(writer, Properties.POSITION, transform.position);
-		SaveManager.SaveQuaternion(writer, Properties.ROTATION, transform.rotation);
-		SaveManager.SaveVector(writer, Properties.SCALE, transform.localScale); // Last property to save
-	}
+                loadingComplete = entity.LoadDetails(reader, propertyName);
+            }
 
-	protected virtual void SaveEnd(JsonWriter writer) {
-		writer.WriteEndObject();
+            entity.LoadEnd(loadingComplete);
+        }
 
-		Debug.Log(string.Format("Saved entity {0}, ", entityId, name));
-	}
+        public void Load(JsonReader reader)
+        {
+            if (reader == null)
+            {
+                return;
+            }
 
-	public static void Load(JsonReader reader, GameObject gameObject) {
-		if (reader == null) {
-			return;
-		}
-		if (gameObject == null) {
-			return;
-		}
+            bool loadingComplete = false;
 
-		PersistentEntity entity = gameObject.GetComponent < PersistentEntity > ();
-		if (entity == null) {
-			return;
-		}
+            while (reader.Read() == true)
+            {
+                if (reader.Value == null)
+                {
+                    if (reader.TokenType != JsonToken.EndObject)
+                    {
+                        continue;
+                    }
 
-		bool loadingComplete = false;
+                    LoadEnd(loadingComplete);
+                    return;
+                }
 
-		while (reader.Read() == true) {
-			if (reader.Value == null) {
-				if (reader.TokenType != JsonToken.EndObject) {
-					continue;
-				}
+                if (reader.TokenType != JsonToken.PropertyName)
+                {
+                    continue;
+                }
 
-				entity.LoadEnd(loadingComplete);
-				return;
-			}
+                string propertyName = LoadManager.LoadString(reader);
+                reader.Read();
 
-			if (reader.TokenType != JsonToken.PropertyName) {
-				continue;
-			}
-			//            if (reader.TokenType != JsonToken.StartObject || reader.TokenType != JsonToken.StartArray)
-			//            {
-			//                continue;
-			//            }
+                loadingComplete = LoadDetails(reader, propertyName);
+            }
 
-			string propertyName = LoadManager.LoadString(reader);
-			reader.Read();
+            LoadEnd(loadingComplete);
+        }
 
-			loadingComplete = entity.LoadDetails(reader, propertyName);
-		}
+        protected virtual bool LoadDetails(JsonReader reader, string propertyName)
+        {
+            // Properties must be loaded in the order they were saved for loadCompleted to work properly
+            bool loadCompleted = false;
 
-		entity.LoadEnd(loadingComplete);
-	}
+            switch (propertyName)
+            {
+                case EntityProperties.NAME:
+                    name = LoadManager.LoadString(reader);
+                    break;
 
-	public void Load(JsonReader reader) {
-		if (reader == null) {
-			return;
-		}
+                case Properties.POSITION:
+                    transform.position = LoadManager.LoadVector(reader);
+                    break;
 
-		bool loadingComplete = false;
+                case Properties.ROTATION:
+                    transform.rotation = LoadManager.LoadQuaternion(reader);
+                    break;
 
-		while (reader.Read() == true) {
-			if (reader.Value == null) {
-				if (reader.TokenType != JsonToken.EndObject) {
-					continue;
-				}
+                case Properties.SCALE:
+                    transform.localScale = LoadManager.LoadVector(reader);
+                    break;
 
-				LoadEnd(loadingComplete);
-				return;
-			}
+                case EntityProperties.ID:
+                    this.entityId = LoadManager.LoadInt(reader);
+                    loadCompleted = true;   // Last property to load
+                    break;
+            }
 
-			if (reader.TokenType != JsonToken.PropertyName) {
-				continue;
-			}
-			//            if (reader.TokenType != JsonToken.StartObject || reader.TokenType != JsonToken.StartArray)
-			//            {
-			//                continue;
-			//            }
-			string propertyName = LoadManager.LoadString(reader);
-			reader.Read();
+            return loadCompleted;
+        }
 
-			loadingComplete = LoadDetails(reader, propertyName);
-		}
+        protected virtual void LoadEnd(bool loadingComplete)
+        {
+            if (loadingComplete == false)
+            {
+                Debug.Log(string.Format("Failed to load {0}", name));
+                GameManager.ActiveInstance.DestroyGameEntity(gameObject);
+                return;
+            }
 
-		LoadEnd(loadingComplete);
-	}
-
-	protected virtual bool LoadDetails(JsonReader reader, string propertyName) {
-		// Properties must be loaded in the order they were saved for loadCompleted to work properly
-		bool loadCompleted = false;
-
-		switch (propertyName) {
-		case Properties.POSITION:
-			transform.position = LoadManager.LoadVector(reader);
-			break;
-
-		case Properties.ROTATION:
-			transform.rotation = LoadManager.LoadQuaternion(reader);
-			break;
-
-		case Properties.SCALE:
-			transform.localScale = LoadManager.LoadVector(reader);
-			loadCompleted = true; // Last property to load
-			break;
-		}
-
-		return loadCompleted;
-	}
-
-	protected virtual void LoadEnd(bool loadingComplete) {
-		if (loadingComplete == false) {
-			Debug.Log(string.Format("Failed to load {0}", name));
-			GameManager.activeInstance.DestroyGameEntity(gameObject);
-			return;
-		}
-
-		isLoadedFromSave = true;
-		Debug.Log(string.Format("Loaded {0}", name));
-	}
+            isLoadedFromSave = true;
+            Debug.Log(string.Format("Loaded {0}", name));
+        }
+    }
 }

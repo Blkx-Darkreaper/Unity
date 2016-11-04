@@ -1,5 +1,8 @@
 using UnityEngine;
-using Strikeforce;
 
-public class BuildCursor : MonoBehaviour {
+namespace Strikeforce
+{
+    public class BuildCursor : MonoBehaviour
+    {
+    }
 }

@@ -1,23 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RallyPoint : MonoBehaviour {
-
-    public void Enable()
+namespace Strikeforce
+{
+    public class RallyPoint : MonoBehaviour
     {
-        Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
-        foreach (Renderer renderer in allRenderers)
+        public void Enable()
         {
-            renderer.enabled = true;
+            Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in allRenderers)
+            {
+                renderer.enabled = true;
+            }
         }
-    }
 
-    public void Disable()
-    {
-        Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
-        foreach (Renderer renderer in allRenderers)
+        public void Disable()
         {
-            renderer.enabled = false;
+            Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in allRenderers)
+            {
+                renderer.enabled = false;
+            }
         }
     }
 }

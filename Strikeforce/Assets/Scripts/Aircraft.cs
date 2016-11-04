@@ -1,5 +1,9 @@
 using UnityEngine;
 using Strikeforce;
 
-public class Aircraft : Vehicle {
+namespace Strikeforce
+{
+    public class Aircraft : Vehicle
+    {
+    }
 }

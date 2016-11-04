@@ -1,22 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MenuManager : MonoBehaviour {
-    public MenuController currentMenu;
-
-    public void Start()
+namespace Strikeforce
+{
+    public class MenuManager : MonoBehaviour
     {
-        ShowMenu(currentMenu);
-    }
+        public Menu currentMenu;
 
-    public void ShowMenu(MenuController menu)
-    {
-        if (currentMenu != null)
+        public void Start()
         {
-            currentMenu.IsOpen = false;
+            ShowMenu(currentMenu);
         }
 
-        currentMenu = menu;
-        currentMenu.IsOpen = true;
+        public void ShowMenu(Menu menu)
+        {
+            if (currentMenu != null)
+            {
+                currentMenu.IsOpen = false;
+            }
+
+            currentMenu = menu;
+            currentMenu.IsOpen = true;
+        }
     }
 }

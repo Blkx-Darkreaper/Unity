@@ -1,19 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
-
-public struct Tags
-{
-    public const string BOUNDARY = "Boundary";
-    public const string PLAYER = "Player";
-    public const string GAMECONTROLLER = "GameController";
-    public const string ENEMY = "Enemy";
-}
+using Strikeforce;
 
 public class DestroyOnContact : MonoBehaviour {
 
-    public GameObject explosion;
-    public GameObject playerExplosion;
-    private GameController gameController;
+    public GameObject Explosion;
+    public GameObject PlayerExplosion;
+    private GameManager gameManager;
     public int pointsValue;
 
     public void Start()
@@ -25,7 +18,7 @@ public class DestroyOnContact : MonoBehaviour {
             return;
         }
 
-        gameController = gameControllerObject.GetComponent<GameController>();
+        gameManager = gameControllerObject.GetComponent<GameManager>();
     }
 
     public void OnTriggerEnter(Collider other)
@@ -40,9 +33,9 @@ public class DestroyOnContact : MonoBehaviour {
         }
 
         Debug.Log(string.Format("{0} destroyed by collision with {1}", this.name, other.name));
-        if (explosion != null)
+        if (Explosion != null)
         {
-            Instantiate(explosion, transform.position, transform.rotation);
+            Instantiate(Explosion, transform.position, transform.rotation);
         }
         
         Destroy(other.gameObject);
@@ -50,11 +43,11 @@ public class DestroyOnContact : MonoBehaviour {
 
         if (other.CompareTag(Tags.PLAYER) == false)
         {
-            gameController.AddPointsToScore(pointsValue);
+            //gameManager.AddPointsToScore(pointsValue);
             return;
         }
 
-        Instantiate(playerExplosion, other.transform.position, other.transform.rotation);
-        gameController.GameOver();
+        Instantiate(PlayerExplosion, other.transform.position, other.transform.rotation);
+        gameManager.GameOver();
     }
 }

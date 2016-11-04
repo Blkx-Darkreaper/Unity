@@ -1,5 +1,8 @@
 using UnityEngine;
-using Strikeforce;
 
-public class Raider : Aircraft {
+namespace Strikeforce
+{
+    public class Raider : Aircraft
+    {
+    }
 }

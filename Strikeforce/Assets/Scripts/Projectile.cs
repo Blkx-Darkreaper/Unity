@@ -1,15 +1,19 @@
 using UnityEngine;
-using Strikeforce;
 
-public class Projectile : Destructible {
-	public float Velocity { get; set; }
-	public int Damage { get; set; }
-	public float CurrentRangeToTarget { get; set; }
-	public Entity Target { get; set; }
+namespace Strikeforce
+{
+    public class Projectile : Destructible
+    {
+        public int Damage { get; set; }
+        public float CurrentRangeToTarget { get; set; }
+        public Entity Target { get; set; }
 
-	protected void Update() { }
+        protected override void Update() { }
 
-	protected bool HasHitTarget(Entity target) { }
+        protected bool HasHitTarget(Entity target) {
+            return false;
+        }
 
-	private void DealDamageToTarget(Entity target) { }
+        private void DealDamageToTarget(Entity target) { }
+    }
 }

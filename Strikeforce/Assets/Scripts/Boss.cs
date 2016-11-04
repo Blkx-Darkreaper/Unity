@@ -1,5 +1,8 @@
 using UnityEngine;
-using Strikeforce;
 
-public class Boss : Headquarters {
+namespace Strikeforce
+{
+    public class Boss : Headquarters
+    {
+    }
 }

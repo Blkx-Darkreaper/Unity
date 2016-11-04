@@ -1,5 +1,8 @@
 using UnityEngine;
-using Strikeforce;
 
-public class Ordnance : Projectile {
+namespace Strikeforce
+{
+    public class Ordnance : Projectile
+    {
+    }
 }

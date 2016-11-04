@@ -1,8 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Strikeforce;
 using Newtonsoft.Json;
 
-public class Decoy : Structure {
+namespace Strikeforce
+{
+    public class Decoy : Structure
+    {
 
+    }
 }

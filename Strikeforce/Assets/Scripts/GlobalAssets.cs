@@ -8,10 +8,13 @@ namespace Strikeforce
     {
         public const string PLAYER = "Player";
         public const string GROUND = "Ground";
+        public const string BOUNDARY = "Boundary";
         public const string STRUCTURE = "Structure";
         public const string UNIT = "Unit";
+        public const string ENEMY = "Enemy";
         public const string SUN = "Sun";
         public const string MAIN_CAMERA = "MainCamera";
+        public const string GAMECONTROLLER = "GameController";
         public const string RESOURCE = "Resource";
     }
 
@@ -45,32 +48,33 @@ namespace Strikeforce
         public const string FUEL_LIMIT = "FuelLimit";
         public const string ROCKETS = "Rockets";
         public const string ROCKETS_LIMIT = "RocketsLimit";
-	public const string MISSILES = "Missiles";
-	public const string MISSILES_LIMIT = "MissilesLimit";
-	public const string BOMBS = "Bombs";
-	public const string BOMBS_LIMIT = "BombsLimit";
-	public const string MATERIEL = "Materiel";
-	public const string MATERIEL_LIMIT = "MaterielLimit";
+        public const string MISSILES = "Missiles";
+        public const string MISSILES_LIMIT = "MissilesLimit";
+        public const string BOMBS = "Bombs";
+        public const string BOMBS_LIMIT = "BombsLimit";
+        public const string MATERIEL = "Materiel";
+        public const string MATERIEL_LIMIT = "MaterielLimit";
         public const string UNKNOWN = "Unknown";
     }
 
-    public struct Menu
+    public struct MenuAttributes
     {
-        public static float width { get { return headerWidth + 2 * buttonHeight + 4 * padding; } }
-        public static float padding = 10f;
-        public static float textHeight = 25f;
-        public static float headerWidth = 256f;
-        public static float headerHeight = 32f;
-        public static float buttonWidth { get { return (width - 3 * padding) / 2; } }
-        public static float buttonHeight = 40f;
+        public static float Width { get { return HeaderWidth + 2 * ButtonHeight + 4 * Padding; } }
+        public static float Padding = 10f;
+        public static float TextHeight = 25f;
+        public static float HeaderWidth = 256f;
+        public static float HeaderHeight = 32f;
+        public static float ButtonWidth { get { return (Width - 3 * Padding) / 2; } }
+        public static float ButtonHeight = 40f;
+        public static float pauseMenuHeight = 20f;
     }
 
     public struct Levels
     {
-	public static string Lobby = "lobby";
-        public static string mainMenu = "mainMenu";
-        public static string game = "map";
-        public static string loadTest = "blankTest";
+        public static string Lobby = "lobby";
+        public static string MainMenu = "mainMenu";
+        public static string Game = "map";
+        public static string LoadTest = "blankTest";
     }
 
     public struct JsonProperties
@@ -85,6 +89,13 @@ namespace Strikeforce
         //public const string UNITS = "Units";
     }
 
+    public struct EntityProperties
+    {
+        public const string NAME = "Name";
+        public const string ID = "Id";
+        public const string MESHES = "Meshes";
+    }
+
     public struct KeyMappings
     {
         public const string mouseXAxis = "Mouse X";
@@ -95,18 +106,22 @@ namespace Strikeforce
     public static class GlobalAssets
     {
         private static Vector3 invalidPositionValue = new Vector3(-99999f, -99999f, -99999f);
-        public static Vector3 invalidPoint { get { return invalidPositionValue; } }
-        public static GUISkin selectionBoxSkin { get; set; }
+        public static Vector3 InvalidPoint { get { return invalidPositionValue; } }
+        public static GUISkin SelectionBoxSkin { get; set; }
         private static Bounds invalidBoundsValue = new Bounds(new Vector3(-99999f, -99999f, -99999f), Vector3.zero);
-        public static Bounds invalidBounds { get { return invalidBoundsValue; } }
-        public static int buildSpeed { get { return 2; } }
+        public static Bounds InvalidBounds { get { return invalidBoundsValue; } }
+        public static int BuildSpeed { get { return 2; } }
         private static Dictionary<ResourceType, Texture2D> resourceHealthBarTextures;
         private static Dictionary<int, Texture2D> playerAvatars;
         public static KeyValuePair<string, string>[] PlayerResourceProperties = new KeyValuePair<string, string>[] 
         { 
-		new KeyValuePair<string, string>(ResourceProperties.MONEY, ResourceProperties.MONEY_LIMIT),
-        	new KeyValuePair<string, string>(ResourceProperties.POWER, ResourceProperties.POWER_LIMIT)
-	};
+		    new KeyValuePair<string, string>(ResourceProperties.MONEY, ResourceProperties.MONEY_LIMIT),
+        	new KeyValuePair<string, string>(ResourceProperties.FUEL, ResourceProperties.FUEL_LIMIT),
+            new KeyValuePair<string, string>(ResourceProperties.ROCKETS, ResourceProperties.ROCKETS_LIMIT),
+            new KeyValuePair<string, string>(ResourceProperties.MISSILES, ResourceProperties.MISSILES_LIMIT),
+            new KeyValuePair<string, string>(ResourceProperties.BOMBS, ResourceProperties.BOMBS_LIMIT),
+            new KeyValuePair<string, string>(ResourceProperties.MATERIEL, ResourceProperties.MATERIEL_LIMIT)
+	    };
 
         public struct Camera
         {
@@ -138,14 +153,14 @@ namespace Strikeforce
                 case ResourceProperties.ROCKETS:
                     return ResourceType.rockets;
 
-		case ResourceProperties.MISSILES:
-			return ResourceType.missiles;
+                case ResourceProperties.MISSILES:
+                    return ResourceType.missiles;
 
-		case ResourceProperties.BOMBS:
-			return ResourceType.bombs;
+                case ResourceProperties.BOMBS:
+                    return ResourceType.bombs;
 
-		case ResourceProperties.MATERIEL:
-			return ResourceType.materiel;
+                case ResourceProperties.MATERIEL:
+                    return ResourceType.materiel;
 
                 default:
                     return ResourceType.unknown;
@@ -174,8 +189,24 @@ namespace Strikeforce
             {
                 switch (resourceHealthBar.name)
                 {
-                    case "ore":
-                        resourceHealthBarTextures.Add(ResourceType.ore, resourceHealthBar);
+                    case ResourceProperties.FUEL:
+                        resourceHealthBarTextures.Add(ResourceType.fuel, resourceHealthBar);
+                        break;
+
+                    case ResourceProperties.ROCKETS:
+                        resourceHealthBarTextures.Add(ResourceType.rockets, resourceHealthBar);
+                        break;
+
+                    case ResourceProperties.MISSILES:
+                        resourceHealthBarTextures.Add(ResourceType.missiles, resourceHealthBar);
+                        break;
+
+                    case ResourceProperties.BOMBS:
+                        resourceHealthBarTextures.Add(ResourceType.bombs, resourceHealthBar);
+                        break;
+
+                    case ResourceProperties.MATERIEL:
+                        resourceHealthBarTextures.Add(ResourceType.materiel, resourceHealthBar);
                         break;
                 }
             }
@@ -199,7 +230,7 @@ namespace Strikeforce
         public static int GetAvatarIndex(string avatarName)
         {
             int index = 0;
-            foreach(Texture2D avatar in playerAvatars.Values)
+            foreach (Texture2D avatar in playerAvatars.Values)
             {
                 bool match = avatarName.Equals(avatar.name);
                 if (match == false)
@@ -217,7 +248,7 @@ namespace Strikeforce
         public static void SetAvatars(Texture2D[] images)
         {
             playerAvatars = new Dictionary<int, Texture2D>();
-            for (int i = 0; i < images.Length; i++ )
+            for (int i = 0; i < images.Length; i++)
             {
                 Texture2D avatar = images[i];
                 playerAvatars.Add(i, avatar);
