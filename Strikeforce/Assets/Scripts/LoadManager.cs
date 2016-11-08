@@ -12,7 +12,7 @@ namespace Strikeforce
 
         public static void LoadGame(string filename, string levelName)
         {
-            string username = GameManager.ActiveInstance.currentPlayerAccount.username;
+            string username = GameManager.ActiveInstance.currentPlayerAccount.Username;
             string path = defaultSaveFolderName + Path.DirectorySeparatorChar + username + Path.DirectorySeparatorChar + filename + ".json";
             bool fileExists = File.Exists(path);
             if (fileExists == false)

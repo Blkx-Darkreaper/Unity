@@ -6,16 +6,21 @@ namespace Strikeforce
 {
     public class UserInput : NetworkBehaviour
     {
-        private Player player;
+        protected Player player;
 
         private void Start()
         {
             player = GetComponent<Player>();
-            Debug.Log(string.Format("Player: {0}", player.Username));
+            Debug.Log(string.Format("User: {0}", player.Username));
         }
 
         private void Update()
         {
+            if (player == null)
+            {
+                return;
+            }
+
             if (player.IsNPC == true)
             {
                 return;

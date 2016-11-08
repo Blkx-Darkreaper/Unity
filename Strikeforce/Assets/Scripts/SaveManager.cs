@@ -12,7 +12,7 @@ namespace Strikeforce
         {
             SetJsonSerializerIgnoreNulls();
 
-            string username = GameManager.ActiveInstance.currentPlayerAccount.username;
+            string username = GameManager.ActiveInstance.currentPlayerAccount.Username;
             string path = defaultSaveFolderName + Path.DirectorySeparatorChar + username;
             CreateDirectory(path);
 

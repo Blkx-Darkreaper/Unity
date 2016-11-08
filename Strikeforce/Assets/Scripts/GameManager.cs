@@ -523,13 +523,13 @@ namespace Strikeforce
                     Debug.Log(string.Format("No account for {0}", username));
                     continue;
                 }
-                Debug.Log(string.Format("Username: {0}, Account Username: {1}, Account avatar id: {2}", username, account.username, account.avatarId));
+                Debug.Log(string.Format("Username: {0}, Account Username: {1}, Account avatar id: {2}", username, account.Username, account.AvatarId));
             }
         }
 
         public string[] GetSavedGames()
         {
-            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + currentPlayerAccount.username;
+            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + currentPlayerAccount.Username;
             DirectoryInfo directory = new DirectoryInfo(path);
             FileInfo[] files = directory.GetFiles();
             int totalFiles = files.Length;

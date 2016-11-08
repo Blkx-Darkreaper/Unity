@@ -10,8 +10,9 @@ namespace Strikeforce
     {
         private const string USERNAME_PROPERTY = "Username";
         private const string AVATAR_PROPERTY = "Avatar";
-        public string username { get; protected set; }
-        public int avatarId { get; protected set; }
+        public string Username { get; protected set; }
+        public int AvatarId { get; protected set; }
+        public Player player;
 
         public PlayerAccount(string username, int avatarId)
         {
@@ -25,8 +26,8 @@ namespace Strikeforce
                 }
             }
 
-            this.username = username;
-            this.avatarId = avatarId;
+            this.Username = username;
+            this.AvatarId = avatarId;
         }
 
         private string GetDefaultUsername()
@@ -44,13 +45,13 @@ namespace Strikeforce
             writer.WriteStartObject();
 
             writer.WritePropertyName(USERNAME_PROPERTY);
-            writer.WriteValue(username);
+            writer.WriteValue(Username);
             writer.WritePropertyName(AVATAR_PROPERTY);
-            writer.WriteValue(avatarId);
+            writer.WriteValue(AvatarId);
 
             writer.WriteEndObject();
 
-            Debug.Log(string.Format("Saved {0}'s account", username));
+            Debug.Log(string.Format("Saved {0}'s account", Username));
         }
 
         public static void Load(JsonReader reader)

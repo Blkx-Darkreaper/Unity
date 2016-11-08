@@ -12,7 +12,7 @@ namespace Strikeforce
             ShowMenu(currentMenu);
         }
 
-        public void ShowMenu(Menu menu)
+        public virtual void ShowMenu(Menu menu)
         {
             if (currentMenu != null)
             {

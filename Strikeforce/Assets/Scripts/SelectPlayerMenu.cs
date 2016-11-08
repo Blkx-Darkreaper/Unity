@@ -107,8 +107,8 @@ namespace Strikeforce
                 return;
             }
 
-            selectedUsername = account.username;
-            avatarIndex = account.avatarId;
+            selectedUsername = account.Username;
+            avatarIndex = account.AvatarId;
         }
 
         protected void DrawSelectionList(Rect menu)

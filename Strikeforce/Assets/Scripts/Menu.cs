@@ -7,10 +7,21 @@ namespace Strikeforce
     {
         public GUISkin MenuSkin;
         public Texture2D HeaderImage;
-        public bool IsOpen;
+        public bool IsOpen { get { return animator.GetBool("IsOpen"); } set { animator.SetBool("IsOpen", value); } }
+        protected Animator animator;
+        protected CanvasGroup canvasGroup;
         protected Player player;
         protected string[] buttons;
         protected const string EXIT = "Quit Game";
+
+        protected virtual void Awake()
+        {
+            animator = GetComponent<Animator>();
+            canvasGroup = GetComponent<CanvasGroup>();
+
+            RectTransform rect = GetComponent<RectTransform>();
+            rect.offsetMax = rect.offsetMin = new Vector2(0, 0);
+        }
 
         protected virtual void Start()
         {
@@ -21,12 +32,20 @@ namespace Strikeforce
 
         protected void Update()
         {
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Open"))
+            {
+                canvasGroup.blocksRaycasts = canvasGroup.interactable = false;
+                return;
+            }
+
+            canvasGroup.blocksRaycasts = canvasGroup.interactable = true;
+
             HandleKeyboardActivity();
         }
 
         protected virtual void OnGUI()
         {
-            DrawMenu();
+            //DrawMenu();
         }
 
         protected virtual void SetButtons()
@@ -45,7 +64,7 @@ namespace Strikeforce
                 return;
             }
 
-            string username = GameManager.ActiveInstance.currentPlayerAccount.username;
+            string username = GameManager.ActiveInstance.currentPlayerAccount.Username;
             SetUsername(username);
         }
 
@@ -101,7 +120,7 @@ namespace Strikeforce
             height = MenuAttributes.TextHeight;
             x = MenuAttributes.Width / 2 - width / 2;
             y = 2 * MenuAttributes.Padding + HeaderImage.height;
-            string welcomeMessage = string.Format("Welcome {0}", GameManager.ActiveInstance.currentPlayerAccount.username);
+            string welcomeMessage = string.Format("Welcome {0}", GameManager.ActiveInstance.currentPlayerAccount.Username);
             GUI.Label(new Rect(x, y, width, height), welcomeMessage);
 
             // Menu buttons

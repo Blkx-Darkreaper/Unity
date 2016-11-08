@@ -67,7 +67,7 @@ namespace Strikeforce
 
         private void SetPlayerUsername()
         {
-            string username = GameManager.ActiveInstance.currentPlayerAccount.username;
+            string username = GameManager.ActiveInstance.currentPlayerAccount.Username;
             if (player.IsNPC == true)
             {
                 return;
@@ -189,7 +189,7 @@ namespace Strikeforce
 
         private float DrawPlayerAvatar(float x, float y, float height)
         {
-            int avatarId = GameManager.ActiveInstance.currentPlayerAccount.avatarId;
+            int avatarId = GameManager.ActiveInstance.currentPlayerAccount.AvatarId;
             Texture2D avatar = GlobalAssets.GetAvatar(avatarId);
             if (avatar == null)
             {
