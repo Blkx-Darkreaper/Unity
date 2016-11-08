@@ -50,7 +50,6 @@ namespace Strikeforce
 
             InitStructures();
             InitUnits();
-            InitResources();
             InitEntities();
 
             LoadManager.LoadGameDetails();
@@ -133,97 +132,16 @@ namespace Strikeforce
 
         private void InitStructures()
         {
-            //allStructures = new Dictionary<string, GameObject>();
-            //foreach (GameObject gameObject in structures)
-            //{
-            //    StructureController controller = gameObject.GetComponent<StructureController>();
-            //    string name = controller.entityName;
-            //    if (name == null)
-            //    {
-            //        name = gameObject.name;
-            //        controller.entityName = name;
-            //    }
-            //    if (name.Equals(string.Empty) == true)
-            //    {
-            //        name = gameObject.name;
-            //        Debug.Log(string.Format("Structure {0} has no name", gameObject.ToString()));
-            //        continue;
-            //    }
-
-            //    allStructures.Add(name, gameObject);
-            //}
             InitCollection<Structure>(ref allStructures, Structures, "Structure");
         }
 
         private void InitUnits()
         {
-            //allUnits = new Dictionary<string, GameObject>();
-            //foreach (GameObject gameObject in units)
-            //{
-            //    UnitController controller = gameObject.GetComponent<UnitController>();
-            //    string name = controller.entityName;
-            //    if (name == null)
-            //    {
-            //        name = gameObject.name;
-            //        controller.entityName = name;
-            //    }
-            //    if (name.Equals(string.Empty) == true)
-            //    {
-            //        name = gameObject.name;
-            //        Debug.Log(string.Format("Unit {0} has no name", gameObject.ToString()));
-            //        continue;
-            //    }
-
-            //    allUnits.Add(name, gameObject);
-            //}
             InitCollection<Selectable>(ref allUnits, Units, "Unit");
-        }
-
-        private void InitResources()
-        {
-            //allEntities = new Dictionary<string, GameObject>();
-            //foreach (GameObject gameObject in entities)
-            //{
-            //    ResourceController controller = gameObject.GetComponent<ResourceController>();
-            //    if (controller == null)
-            //    {
-            //        Debug.Log(string.Format("{0} gameobject has no controller", gameObject.name));
-            //        continue;
-            //    }
-
-            //    SetEntityName(gameObject, controller);
-            //    string name = controller.entityName;
-            //    if (name.Equals(string.Empty) == true)
-            //    {
-            //        Debug.Log(string.Format("Resource {0} has no name", gameObject.ToString()));
-            //        continue;
-            //    }
-
-            //    allEntities.Add(name, gameObject);
-            //}
-            InitCollection<Resource>(ref allResources, resources, "Resource");
         }
 
         private void InitEntities()
         {
-            //allEntities = new Dictionary<string, GameObject>();
-            //foreach (GameObject gameObject in entities)
-            //{
-            //    PersistentEntity controller = gameObject.GetComponent<PersistentEntity>();
-            //    if(controller == null) {
-            //        Debug.Log(string.Format("{0} gameobject has no controller", gameObject.name));
-            //        continue;
-            //    }
-
-            //    SetEntityName(gameObject, controller);
-            //    string name = controller.entityName;
-            //    if(name.Equals(string.Empty) == true) {
-            //        Debug.Log(string.Format("Entity {0} has no name", gameObject.ToString()));
-            //        continue;
-            //    }
-
-            //    allEntities.Add(name, gameObject);
-            //}
             InitCollection<Entity>(ref allEntities, Entities, "Entity");
         }
 

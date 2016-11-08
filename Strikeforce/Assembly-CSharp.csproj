@@ -68,6 +68,7 @@
      <Compile Include="Assets\Scripts\Effect.cs" />
      <Compile Include="Assets\Scripts\EndGameMenu.cs" />
      <Compile Include="Assets\Scripts\Entity.cs" />
+     <Compile Include="Assets\Scripts\Equipment.cs" />
      <Compile Include="Assets\Scripts\Explosion.cs" />
      <Compile Include="Assets\Scripts\FactionColour.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
@@ -76,6 +77,7 @@
      <Compile Include="Assets\Scripts\Headquarters.cs" />
      <Compile Include="Assets\Scripts\Hud.cs" />
      <Compile Include="Assets\Scripts\Infrastructure.cs" />
+     <Compile Include="Assets\Scripts\Inventory.cs" />
      <Compile Include="Assets\Scripts\Level.cs" />
      <Compile Include="Assets\Scripts\LoadManager.cs" />
      <Compile Include="Assets\Scripts\LoadMenu.cs" />
@@ -94,7 +96,6 @@
      <Compile Include="Assets\Scripts\RaidMenu.cs" />
      <Compile Include="Assets\Scripts\Raider.cs" />
      <Compile Include="Assets\Scripts\RallyPoint.cs" />
-     <Compile Include="Assets\Scripts\Resource.cs" />
      <Compile Include="Assets\Scripts\ResultsMenu.cs" />
      <Compile Include="Assets\Scripts\SaveManager.cs" />
      <Compile Include="Assets\Scripts\SelectPlayerMenu.cs" />
@@ -119,17 +120,11 @@
      <Compile Include="Assets\Scripts\~QuitApplication.cs" />
      <Compile Include="Assets\Scripts\~RandomRotator.cs" />
      <None Include="Assets\Scripts\Newtonsoft.Json.xml" />
- <Reference Include="UnityEngine.Advertisements">
- <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
  <HintPath>D:/Users/Darkreaper/Git/Unity/Strikeforce/Assets/Scripts/Newtonsoft.Json.dll</HintPath>

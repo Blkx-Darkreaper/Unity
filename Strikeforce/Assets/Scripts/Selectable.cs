@@ -272,16 +272,6 @@ namespace Strikeforce
                 return;
             }
 
-            Resource hitResource = hitGameObject.GetComponentInParent<Resource>();
-            if (hitResource != null)
-            {
-                bool resourceDepleted = hitResource.isEmpty;
-                if (resourceDepleted == true)
-                {
-                    return;
-                }
-            }
-
             bool readyToAttack = IsAbleToAttack();
             if (readyToAttack == false)
             {

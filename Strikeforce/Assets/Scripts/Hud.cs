@@ -33,7 +33,6 @@ namespace Strikeforce
 
         public Texture2D[] ResourceIcons;
         private Dictionary<ResourceType, Texture2D> allResources;
-        private Dictionary<ResourceType, int> resourceValues, resourceLimits;
 
         private Selectable previousSelection = null;
         private float sliderValue;
@@ -45,21 +44,12 @@ namespace Strikeforce
         public Texture2D HealthyTexture, DamagedTexture, CriticalTexture;
         public Texture2D[] ResourceHealthBars;
 
-        public void SetResourceValues(Dictionary<ResourceType, int> resourceValues,
-            Dictionary<ResourceType, int> resourceLimits)
-        {
-            this.resourceValues = resourceValues;
-            this.resourceLimits = resourceLimits;
-        }
-
         private void Start()
         {
             player = GetComponentInParent<Player>();
             StoreSelectionBoxTextures(SelectionBoxSkin, HealthyTexture, DamagedTexture, CriticalTexture);
             StoreResourceHealthBarTextures();
             SetCursorState(CursorState.select);
-            resourceValues = new Dictionary<ResourceType, int>();
-            resourceLimits = new Dictionary<ResourceType, int>();
             InitResources();
             buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_PADDING;
             SetPlayerUsername();
@@ -127,13 +117,6 @@ namespace Strikeforce
                     default:
                         break;
                 }
-            }
-
-            ResourceType[] allTypes = (ResourceType[])Enum.GetValues(typeof(ResourceType));
-            foreach (ResourceType type in allTypes)
-            {
-                resourceValues.Add(type, 0);
-                resourceLimits.Add(type, 0);
             }
         }
 
@@ -675,8 +658,8 @@ namespace Strikeforce
         private void DrawResourceIcon(ResourceType type, int iconLeft, int textLeft, int topEdge)
         {
             Texture2D icon = allResources[type];
-            int value = resourceValues[type];
-            int maxValue = resourceLimits[type];
+            int value = player.inventory.GetResourceAmount(type);
+            int maxValue = player.inventory.GetMaxResourceAmount(type);
             string text = string.Format("{0} / {1}", value, maxValue);
             GUI.DrawTexture(new Rect(iconLeft, topEdge, ICON_WIDTH, ICON_HEIGHT), icon);
             GUI.Label(new Rect(textLeft, topEdge, TEXT_WIDTH, TEXT_HEIGHT), text);

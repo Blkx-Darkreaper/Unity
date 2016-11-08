@@ -83,14 +83,14 @@ namespace Strikeforce
                     return;
                 }
 
-                bool sufficientFunds = Owner.HasSufficientResources(ResourceType.money, unit.Cost);
+                bool sufficientFunds = Owner.inventory.HasSufficientResources(ResourceType.money, unit.Cost);
                 if (sufficientFunds == false)
                 {
-                    Owner.InsufficientResources(ResourceType.money);
+                    Owner.inventory.InsufficientResources(ResourceType.money);
                     return;
                 }
 
-                Owner.RemoveResource(ResourceType.money, unit.Cost);
+                Owner.inventory.RemoveResource(ResourceType.money, unit.Cost);
             }
 
             buildQueue.Enqueue(unitName);
@@ -265,7 +265,7 @@ namespace Strikeforce
                 return;
             }
 
-            Owner.AddResource(ResourceType.money, SellValue);
+            Owner.inventory.AddResource(ResourceType.money, SellValue);
 
             if (isSelected == true)
             {

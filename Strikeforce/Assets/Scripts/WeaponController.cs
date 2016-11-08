@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Strikeforce
 {
-    public class Weapon : MonoBehaviour
+    public class Weapon : Equipment
     {
         public Transform shotSpawn;
         public float attackDelay;

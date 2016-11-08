@@ -265,7 +265,7 @@ namespace Strikeforce
             writer.WriteStartArray();
             foreach (GameObject gameObject in resourceGameObjects)
             {
-                Resource resource = gameObject.GetComponent<Resource>();
+                Resources resource = gameObject.GetComponent<Resources>();
                 if (resource == null)
                 {
                     continue;
