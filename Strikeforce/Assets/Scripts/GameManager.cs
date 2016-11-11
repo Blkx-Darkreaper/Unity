@@ -14,20 +14,15 @@ namespace Strikeforce
         private Dictionary<string, GameObject> allStructures;
         public GameObject[] Units;
         private Dictionary<string, GameObject> allUnits;
-        public GameObject[] resources;
-        private Dictionary<string, GameObject> allResources;
         public GameObject[] Entities;
         private Dictionary<string, GameObject> allEntities;
         public GameObject Player;
         protected VictoryCondition[] victoryConditions;
         public bool IsMenuOpen { get; set; }
-        public Dictionary<string, PlayerAccount> AllPlayerAccounts = new Dictionary<string, PlayerAccount>();
-        public PlayerAccount currentPlayerAccount { get; protected set; }
+        public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
+        public Profile CurrentPlayerAccount { get; protected set; }
         public string CurrentGameName { get; protected set; }
         public string CurrentLevelName { get; protected set; }
-        public string CurrentSaveGameName { get; set; }
-        public string DefaultUsername = "NewPlayer";
-        public string DefaultSaveName = "NewGame";
         public Color DefaultColour;
         protected int nextId = 0;
         protected Dictionary<int, Entity> allGameEntities;
@@ -51,8 +46,6 @@ namespace Strikeforce
             InitStructures();
             InitUnits();
             InitEntities();
-
-            LoadManager.LoadGameDetails();
         }
 
         protected void OnLevelWasLoaded()
@@ -62,9 +55,6 @@ namespace Strikeforce
                 return;
             }
 
-            string saveFileToLoad = CurrentGameName;
-            string levelToLoad = CurrentLevelName;
-            LoadManager.LoadGame(saveFileToLoad, levelToLoad);
             isLoading = false;
             LoadDetails();
             Time.timeScale = 1f;
@@ -87,8 +77,8 @@ namespace Strikeforce
                 }
 
                 Debug.Log(string.Format("Win condition {0} met"));
-                Player winner = winCondition.GetWinningPlayer();
-                EndGameMenu resultsScreen = winner.PlayerHud.GetComponent<EndGameMenu>();
+                Profile winner = winCondition.GetWinningPlayer();
+                EndGameMenu resultsScreen = winner.Player.PlayerHud.GetComponent<EndGameMenu>();
                 if (resultsScreen == null)
                 {
                     return;
@@ -99,17 +89,17 @@ namespace Strikeforce
                 Time.timeScale = 0f;
                 Cursor.visible = true;
                 IsMenuOpen = true;
-                winner.PlayerHud.enabled = false;
+                winner.Player.PlayerHud.enabled = false;
             }
         }
 
         protected void LoadDetails()
         {
             GameObject[] playerObjects = GameObject.FindGameObjectsWithTag(Tags.PLAYER);
-            List<Player> activePlayers = new List<Player>();
+            List<Profile> activePlayers = new List<Profile>();
             foreach (GameObject gameObject in playerObjects)
             {
-                Player player = gameObject.GetComponent<Player>();
+                Profile player = gameObject.GetComponent<Profile>();
                 if (player == null)
                 {
                     continue;
@@ -313,12 +303,6 @@ namespace Strikeforce
                 return entity;
             }
 
-            entity = GetResourcePrefab(name);
-            if (entity != null)
-            {
-                return entity;
-            }
-
             entity = GetEntityPrefab(name);
             return entity;
         }
@@ -347,18 +331,6 @@ namespace Strikeforce
             return unit;
         }
 
-        public GameObject GetResourcePrefab(string name)
-        {
-            bool exists = allResources.ContainsKey(name);
-            if (exists == false)
-            {
-                return null;
-            }
-
-            GameObject resource = allResources[name];
-            return resource;
-        }
-
         public GameObject GetEntityPrefab(string name)
         {
             bool exists = allEntities.ContainsKey(name);
@@ -376,16 +348,11 @@ namespace Strikeforce
             return Player;
         }
 
-        public string[] GetAllUsernames()
-        {
-            int count = AllPlayerAccounts.Count;
-            string[] allUsernames = new string[count];
-            AllPlayerAccounts.Keys.CopyTo(allUsernames, 0);
-
-            return allUsernames;
+        public string[] GetAllPlayerNames() {
+            return GlobalAssets.GetAllUsernames(AllPlayerAccounts);
         }
 
-        public PlayerAccount GetPlayerAccount(string username)
+        public Profile GetPlayerAccount(string username)
         {
             bool accountExists = AllPlayerAccounts.ContainsKey(username);
             if (accountExists == false)
@@ -393,7 +360,7 @@ namespace Strikeforce
                 return null;
             }
 
-            PlayerAccount account = AllPlayerAccounts[username];
+            Profile account = AllPlayerAccounts[username];
             return account;
         }
 
@@ -403,12 +370,9 @@ namespace Strikeforce
             if (playerExists == false)
             {
                 AddPlayerAccount(username, avatarId);
-
-                SaveManager.CreatePlayerSaveFolder(username);
-                SaveManager.SavePlayerAccounts();
             }
 
-            currentPlayerAccount = AllPlayerAccounts[username];
+            CurrentPlayerAccount = AllPlayerAccounts[username];
         }
 
         public void AddPlayerAccount(string username, int avatarId)
@@ -420,13 +384,13 @@ namespace Strikeforce
                 return;
             }
 
-            PlayerAccount accountToAdd = new PlayerAccount(username, avatarId);
+            Profile accountToAdd = new Profile(username, avatarId);
             AllPlayerAccounts.Add(username, accountToAdd);
         }
 
         private void VerifyAccounts()
         {
-            string[] allUsernames = GetAllUsernames();
+            string[] allUsernames = GetAllPlayerNames();
             int count = AllPlayerAccounts.Count;
             if (allUsernames.Length != count)
             {
@@ -435,7 +399,7 @@ namespace Strikeforce
 
             foreach (string username in allUsernames)
             {
-                PlayerAccount account = GetPlayerAccount(username);
+                Profile account = GetPlayerAccount(username);
                 if (account == null)
                 {
                     Debug.Log(string.Format("No account for {0}", username));
@@ -443,23 +407,6 @@ namespace Strikeforce
                 }
                 Debug.Log(string.Format("Username: {0}, Account Username: {1}, Account avatar id: {2}", username, account.Username, account.AvatarId));
             }
-        }
-
-        public string[] GetSavedGames()
-        {
-            string path = defaultSaveFolderName + Path.DirectorySeparatorChar + currentPlayerAccount.Username;
-            DirectoryInfo directory = new DirectoryInfo(path);
-            FileInfo[] files = directory.GetFiles();
-            int totalFiles = files.Length;
-
-            string[] savedGames = new string[totalFiles];
-            for (int i = 0; i < totalFiles; i++)
-            {
-                string filename = files[i].Name;
-                savedGames[i] = filename.Substring(0, filename.IndexOf("."));
-            }
-
-            return savedGames;
         }
 
         public Texture2D GetBuildIcon(string name)

@@ -5,32 +5,32 @@ namespace Strikeforce
 {
     public class MainMenu : Menu
     {
-        protected const string NEW_GAME = "Start New Game";
-        protected const string MATCHMAKING = "Matchmaking";
         protected const string PROFILE = "Profile";
-        protected const string CHANGE_PLAYER = "Change Player Account";
-        protected const string LOAD = "Load Game";
+        public Menu ProfileMenu;
+        protected const string MATCHMAKING = "Matchmaking";
+        public Menu MatchmakingMenu;
         protected const string OPTIONS = "Options";
+        public Menu OptionsMenu;
 
         protected void OnLevelWasLoaded()
         {
-            Cursor.visible = true;
-            PlayerAccount currentAccount = GameManager.ActiveInstance.currentPlayerAccount;
-            if (currentAccount == null)
-            {
-                GetComponent<MainMenu>().enabled = false;
-                GetComponent<SelectPlayerMenu>().enabled = true;
-            }
-            else
-            {
-                GetComponent<MainMenu>().enabled = true;
-                GetComponent<SelectPlayerMenu>().enabled = false;
-            }
+            //Cursor.visible = true;
+            //Profile currentAccount = GameManager.ActiveInstance.CurrentPlayerAccount;
+            //if (currentAccount == null)
+            //{
+            //    GetComponent<MainMenu>().enabled = false;
+            //    GetComponent<ProfileMenu>().enabled = true;
+            //}
+            //else
+            //{
+            //    GetComponent<MainMenu>().enabled = true;
+            //    GetComponent<ProfileMenu>().enabled = false;
+            //}
         }
 
-        protected override void SetButtons()
+        protected override void SetButtonNames()
         {
-            buttons = new string[] { NEW_GAME, LOAD, CHANGE_PLAYER, EXIT };
+            buttons = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
         }
 
         protected override void HandleKeyboardActivity()
@@ -42,16 +42,16 @@ namespace Strikeforce
         {
             switch (buttonName)
             {
-                case NEW_GAME:
-                    StartNewGame();
+                case PROFILE:
+                    Profile();
                     break;
 
-                case LOAD:
-                    LoadMenu();
+                case MATCHMAKING:
+                    Matchmaking();
                     break;
 
-                case CHANGE_PLAYER:
-                    ChangePlayer();
+                case OPTIONS:
+                    Options();
                     break;
 
                 case EXIT:
@@ -60,24 +60,40 @@ namespace Strikeforce
             }
         }
 
-        private void StartNewGame()
+        private void Profile()
         {
-            GameManager.ActiveInstance.IsMenuOpen = false;
-            string levelToLoad = Levels.Game;
-            Application.LoadLevel(levelToLoad);
-            Time.timeScale = 1f;
+            if (menuManager == null)
+            {
+                Debug.LogError(string.Format("Menu manager hasn't been loaded."));
+                return;
+            }
+
+            menuManager.ShowMenu(ProfileMenu);
         }
 
-        private void ChangePlayer()
+        protected void Matchmaking()
         {
-            GetComponent<MainMenu>().enabled = false;
-            GetComponent<SelectPlayerMenu>().enabled = true;
+            if (menuManager == null)
+            {
+                Debug.LogError(string.Format("Menu manager hasn't been loaded."));
+                return;
+            }
 
-            string[] allUsernames = GameManager.ActiveInstance.GetAllUsernames();
-            SelectionList.AddAllEntries(allUsernames);
+            menuManager.ShowMenu(MatchmakingMenu);
         }
 
-        protected override void HideCurrentMenu()
+        protected void Options()
+        {
+            if (menuManager == null)
+            {
+                Debug.LogError(string.Format("Menu manager hasn't been loaded."));
+                return;
+            }
+
+            menuManager.ShowMenu(OptionsMenu);
+        }
+
+        public override void HideMenu()
         {
             GetComponent<MainMenu>().enabled = false;
         }

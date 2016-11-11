@@ -6,8 +6,8 @@ namespace Strikeforce
 {
     public abstract class VictoryCondition : MonoBehaviour
     {
-        public Player[] activePlayers { get; set; }
-        protected List<Player> winningPlayers { get; set; }
+        public Profile[] activePlayers { get; set; }
+        protected List<Profile> winningPlayers { get; set; }
 
         public virtual bool IsGameOver()
         {
@@ -20,9 +20,9 @@ namespace Strikeforce
                 return true;
             }
 
-            winningPlayers = new List<Player>();
+            winningPlayers = new List<Profile>();
 
-            foreach (Player player in activePlayers)
+            foreach (Profile player in activePlayers)
             {
                 bool conditionsMet = HasPlayerMetWinConditions(player);
                 if (conditionsMet == false)
@@ -37,7 +37,7 @@ namespace Strikeforce
             return false;
         }
 
-        public Player GetWinningPlayer()
+        public Profile GetWinningPlayer()
         {
             if (winningPlayers == null)
             {
@@ -48,11 +48,11 @@ namespace Strikeforce
                 return null;
             }
 
-            Player winner = winningPlayers[0];
+            Profile winner = winningPlayers[0];
             return winner;
         }
 
-        public Player[] GetWinningTeam()
+        public Profile[] GetWinningTeam()
         {
             if (winningPlayers == null)
             {
@@ -68,6 +68,6 @@ namespace Strikeforce
 
         public abstract string GetDescription();
 
-        public abstract bool HasPlayerMetWinConditions(Player player);
+        public abstract bool HasPlayerMetWinConditions(Profile player);
     }
 }

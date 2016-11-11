@@ -7,14 +7,14 @@ namespace Strikeforce
     public class UserInput : NetworkBehaviour
     {
         protected Player player;
+        public Profile profile;
 
-        private void Start()
+        protected void Start()
         {
-            player = GetComponent<Player>();
-            Debug.Log(string.Format("User: {0}", player.Username));
+            Debug.Log(string.Format("User: {0}", profile.Username));
         }
 
-        private void Update()
+        protected void Update()
         {
             if (player == null)
             {
@@ -30,18 +30,18 @@ namespace Strikeforce
                 return;
             }
 
-            UpdateCamera();
-            RespondToMouseActivity();
             RespondToKeyboardActivity();
+            RespondToMouseActivity();
+            UpdateCamera();
         }
 
-        private void UpdateCamera()
+        protected void UpdateCamera()
         {
             MoveCamera();
             RotateCamera();
         }
 
-        private void MoveCamera()
+        protected void MoveCamera()
         {
             bool altKeyPressed = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
             if (altKeyPressed == true)
@@ -89,7 +89,7 @@ namespace Strikeforce
             Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * GlobalAssets.Camera.scrollSpeed);
         }
 
-        private float getHorizontalScrollRate(float x)
+        protected float getHorizontalScrollRate(float x)
         {
             float scrollRate = 0;
             int boundaryWidth = GlobalAssets.Camera.scrollArea;
@@ -112,7 +112,7 @@ namespace Strikeforce
             return scrollRate;
         }
 
-        private float getVerticalScrollRate(float y)
+        protected float getVerticalScrollRate(float y)
         {
             float scrollRate = 0;
             int boundaryWidth = GlobalAssets.Camera.scrollArea;
@@ -135,16 +135,16 @@ namespace Strikeforce
             return scrollRate;
         }
 
-        private float getCameraZoomRate()
+        protected float getCameraZoomRate()
         {
             // Away from ground is positive
-            float scrollwheelInput = Input.GetAxis(KeyMappings.scrollWheel);
+            float scrollwheelInput = Input.GetAxis(KeyMappings.SCROLL_WHEEL);
             float zoomRate = -GlobalAssets.Camera.scrollSpeed * scrollwheelInput;
 
             return zoomRate;
         }
 
-        private void RotateCamera()
+        protected void RotateCamera()
         {
             Vector3 origin = Camera.main.transform.eulerAngles;
             Vector3 destination = origin;
@@ -164,10 +164,10 @@ namespace Strikeforce
 
             float rotationAmount = GlobalAssets.Camera.rotationAmount;
 
-            float horizontalInput = Input.GetAxis(KeyMappings.mouseYAxis);
+            float horizontalInput = Input.GetAxis(KeyMappings.MOUSE_Y_AXIS);
             destination.x -= horizontalInput * rotationAmount;
 
-            float verticalInput = Input.GetAxis(KeyMappings.mouseXAxis);
+            float verticalInput = Input.GetAxis(KeyMappings.MOUSE_X_AXIS);
             destination.y += verticalInput * rotationAmount;
 
             if (destination == origin)
@@ -217,7 +217,7 @@ namespace Strikeforce
             return hit.point;
         }
 
-        private void RespondToMouseActivity()
+        protected void RespondToMouseActivity()
         {
             if (Input.GetMouseButton(0) == true)
             {
@@ -231,7 +231,7 @@ namespace Strikeforce
             MouseOver();
         }
 
-        private void MouseOver()
+        protected void MouseOver()
         {
             bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
             if (mouseInBounds == false)
@@ -239,11 +239,11 @@ namespace Strikeforce
                 return;
             }
 
-            if (player.IsSettingConstructionPoint == true)
-            {
-                player.SetConstructionPoint();
-                return;
-            }
+            //if (player.IsSettingConstructionPoint == true)
+            //{
+            //    player.SetConstructionPoint();
+            //    return;
+            //}
 
             GameObject entityUnderMouse = GetHitGameObject();
             if (entityUnderMouse == null)
@@ -286,7 +286,7 @@ namespace Strikeforce
                     return;
                 }
 
-                bool playerOwnsEntity = owner.Username == player.Username;
+                bool playerOwnsEntity = owner.PlayerId == player.PlayerId;
                 if (playerOwnsEntity == false)
                 {
                     return;
@@ -296,7 +296,7 @@ namespace Strikeforce
             }
         }
 
-        private void LeftMouseClick()
+        protected void LeftMouseClick()
         {
             bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
             if (mouseInBounds == false)
@@ -304,18 +304,18 @@ namespace Strikeforce
                 return;
             }
 
-            bool settingBuildPoint = player.IsSettingConstructionPoint;
-            if (settingBuildPoint == true)
-            {
-                bool validBuildPoint = player.IsConstructionSiteValid();
-                if (validBuildPoint == false)
-                {
-                    return;
-                }
+            //bool settingBuildPoint = player.IsSettingConstructionPoint;
+            //if (settingBuildPoint == true)
+            //{
+            //    bool validBuildPoint = player.IsConstructionSiteValid();
+            //    if (validBuildPoint == false)
+            //    {
+            //        return;
+            //    }
 
-                player.StartConstruction();
-                return;
-            }
+            //    player.StartConstruction();
+            //    return;
+            //}
 
             GameObject hitEntity = GetHitGameObject();
             if (hitEntity == null)
@@ -351,13 +351,13 @@ namespace Strikeforce
             }
         }
 
-        private void SelectEntity(Selectable entityToSelect)
+        protected void SelectEntity(Selectable entityToSelect)
         {
             player.SelectedEntity = entityToSelect;
             entityToSelect.SetSelection(true);
         }
 
-        private void RightMouseClick()
+        protected void RightMouseClick()
         {
             bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
             if (mouseInBounds == false)
@@ -378,7 +378,7 @@ namespace Strikeforce
             bool settingConstructionSite = player.IsSettingConstructionPoint;
             if (settingConstructionSite == true)
             {
-                player.CancelConstruction();
+                //player.CancelConstruction();
             }
             else
             {
@@ -386,21 +386,31 @@ namespace Strikeforce
             }
         }
 
-        private void Deselect()
+        protected void Deselect()
         {
             player.SelectedEntity.SetSelection(false);
             player.SelectedEntity = null;
         }
 
-        private void RespondToKeyboardActivity()
+        protected void RespondToKeyboardActivity()
         {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
+            var x = Input.GetAxis(Axis.HORIZONTAL) * 0.1f;
+            var z = Input.GetAxis(Axis.VERTICAL) * 0.1f;
+
+            transform.Translate(x, 0, z);
+
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 OpenPauseMenu();
             }
         }
 
-        private void OpenPauseMenu()
+        protected void OpenPauseMenu()
         {
             Time.timeScale = 0f;
             GetComponentInChildren<PauseMenu>().enabled = true;

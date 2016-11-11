@@ -21,7 +21,7 @@ namespace Strikeforce
         private const int BUTTON_PADDING = 7;
         private const int SCROLL_BAR_WIDTH = 22;
 
-        private Player player;
+        private Profile account;
 
         [HideInInspector]
         public Texture2D ActiveCursor;
@@ -46,24 +46,12 @@ namespace Strikeforce
 
         private void Start()
         {
-            player = GetComponentInParent<Player>();
+            account = GetComponentInParent<Profile>();
             StoreSelectionBoxTextures(SelectionBoxSkin, HealthyTexture, DamagedTexture, CriticalTexture);
             StoreResourceHealthBarTextures();
             SetCursorState(CursorState.select);
             InitResources();
             buildAreaHeight = Screen.height - RESOURCE_BAR_HEIGHT - SELECTION_NAME_HEIGHT - 2 * BUTTON_PADDING;
-            SetPlayerUsername();
-        }
-
-        private void SetPlayerUsername()
-        {
-            string username = GameManager.ActiveInstance.currentPlayerAccount.Username;
-            if (player.IsNPC == true)
-            {
-                return;
-            }
-
-            player.Username = username;
         }
 
         private void StoreSelectionBoxTextures(GUISkin skin, Texture2D healthyTexture, Texture2D damagedTexture, Texture2D criticalTexture)
@@ -122,12 +110,12 @@ namespace Strikeforce
 
         private void OnGUI()
         {
-            if (player == null)
+            if (account.Player == null)
             {
                 Debug.Log(string.Format("Player is null"));
                 return;
             }
-            if (player.IsNPC == true)
+            if (account.Player.IsNPC == true)
             {
                 //Debug.Log(string.Format("Non-Human player"));
                 return;
@@ -157,7 +145,7 @@ namespace Strikeforce
 
             float minWidth = 0, maxWidth = 0;
 
-            string username = player.Username;
+            string username = account.Username;
             //string currentPlayerUsername = GameManager.activeInstance.currentPlayerAccount.username;
             //if (currentPlayerUsername.Equals(username) == false)
             //{
@@ -172,7 +160,7 @@ namespace Strikeforce
 
         private float DrawPlayerAvatar(float x, float y, float height)
         {
-            int avatarId = GameManager.ActiveInstance.currentPlayerAccount.AvatarId;
+            int avatarId = GameManager.ActiveInstance.CurrentPlayerAccount.AvatarId;
             Texture2D avatar = GlobalAssets.GetAvatar(avatarId);
             if (avatar == null)
             {
@@ -197,7 +185,7 @@ namespace Strikeforce
                 drawCustomCursor = true;
             }
             //drawCustomCursor = drawCustomCursor && MouseOnScreen();
-            if (player.IsSettingConstructionPoint == true)
+            if (account.Player.IsSettingConstructionPoint == true)
             {
                 Cursor.visible = false;
                 return;
@@ -342,12 +330,12 @@ namespace Strikeforce
 
         private void DrawSelectedNameInOrdersBar()
         {
-            if (player.SelectedEntity == null)
+            if (account.Player.SelectedEntity == null)
             {
                 return;
             }
 
-            string selectionName = player.SelectedEntity.name;
+            string selectionName = account.Player.SelectedEntity.name;
             if (selectionName.Equals(string.Empty))
             {
                 Debug.Log("Selected entity has no name");
@@ -364,25 +352,25 @@ namespace Strikeforce
 
         private void DrawAvailableActions()
         {
-            if (player == null)
+            if (account.Player == null)
             {
                 return;
             }
-            if (player.SelectedEntity == null)
+            if (account.Player.SelectedEntity == null)
             {
                 return;
             }
 
-            bool ownedByPlayer = player.SelectedEntity.IsOwnedByPlayer(player);
+            bool ownedByPlayer = account.Player.SelectedEntity.IsOwnedByPlayer(account.Player);
             if (ownedByPlayer == false)
             {
                 return;
             }
 
             ResetSlider();
-            string[] allActions = player.SelectedEntity.Actions;
+            string[] allActions = account.Player.SelectedEntity.Actions;
             DrawActions(allActions);
-            previousSelection = player.SelectedEntity;
+            previousSelection = account.Player.SelectedEntity;
         }
 
         private void DrawActions(string[] actionsToDraw)
@@ -429,12 +417,12 @@ namespace Strikeforce
                     continue;
                 }
 
-                if (player.SelectedEntity == null)
+                if (account.Player.SelectedEntity == null)
                 {
                     continue;
                 }
 
-                player.SelectedEntity.PerformAction(action);
+                account.Player.SelectedEntity.PerformAction(action);
             }
 
             GUI.EndGroup();
@@ -446,7 +434,7 @@ namespace Strikeforce
             {
                 return;
             }
-            if (previousSelection == player.SelectedEntity)
+            if (previousSelection == account.Player.SelectedEntity)
             {
                 return;
             }
@@ -528,11 +516,11 @@ namespace Strikeforce
 
         private void DrawStandardStructureOptions(Structure structure)
         {
-            if (player == null)
+            if (account.Player == null)
             {
                 return;
             }
-            if (player.SelectedEntity == null)
+            if (account.Player.SelectedEntity == null)
             {
                 return;
             }
@@ -648,7 +636,7 @@ namespace Strikeforce
             {
                 pauseMenu.enabled = true;
             }
-            UserInput userInput = player.GetComponent<UserInput>();
+            UserInput userInput = account.Player.GetComponent<UserInput>();
             if (userInput != null)
             {
                 userInput.enabled = false;
@@ -658,8 +646,8 @@ namespace Strikeforce
         private void DrawResourceIcon(ResourceType type, int iconLeft, int textLeft, int topEdge)
         {
             Texture2D icon = allResources[type];
-            int value = player.inventory.GetResourceAmount(type);
-            int maxValue = player.inventory.GetMaxResourceAmount(type);
+            int value = account.Player.inventory.GetResourceAmount(type);
+            int maxValue = account.Player.inventory.GetMaxResourceAmount(type);
             string text = string.Format("{0} / {1}", value, maxValue);
             GUI.DrawTexture(new Rect(iconLeft, topEdge, ICON_WIDTH, ICON_HEIGHT), icon);
             GUI.Label(new Rect(textLeft, topEdge, TEXT_WIDTH, TEXT_HEIGHT), text);

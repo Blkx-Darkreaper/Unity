@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Strikeforce
 {
@@ -16,6 +17,8 @@ namespace Strikeforce
         public const string MAIN_CAMERA = "MainCamera";
         public const string GAMECONTROLLER = "GameController";
         public const string RESOURCE = "Resource";
+        public const string HEADER = "Header";
+        public const string BUTTON = "Button";
     }
 
     public enum CursorState
@@ -98,13 +101,20 @@ namespace Strikeforce
 
     public struct KeyMappings
     {
-        public const string mouseXAxis = "Mouse X";
-        public const string mouseYAxis = "Mouse Y";
-        public const string scrollWheel = "Mouse ScrollWheel";
+        public const string MOUSE_X_AXIS = "Mouse X";
+        public const string MOUSE_Y_AXIS = "Mouse Y";
+        public const string SCROLL_WHEEL = "Mouse ScrollWheel";
+    }
+
+    public struct Axis
+    {
+        public const string HORIZONTAL = "Horizontal";
+        public const string VERTICAL = "Vertical";
     }
 
     public static class GlobalAssets
     {
+        public static string DefaultUsername = "NewPlayer";
         private static Vector3 invalidPositionValue = new Vector3(-99999f, -99999f, -99999f);
         public static Vector3 InvalidPoint { get { return invalidPositionValue; } }
         public static GUISkin SelectionBoxSkin { get; set; }
@@ -253,6 +263,80 @@ namespace Strikeforce
                 Texture2D avatar = images[i];
                 playerAvatars.Add(i, avatar);
             }
+        }
+
+        public static GameObject GetChildGameObjectWithName(GameObject parent, string nameToFind)
+        {
+			if (parent == null) {
+				return null;
+			}
+
+            foreach (Transform child in parent.transform)
+            {
+                string childName = child.gameObject.name;
+                if (!childName.Equals(nameToFind))
+                {
+                    continue;
+                }
+
+                return child.gameObject;
+            }
+
+            return null;
+        }
+
+        public static GameObject GetChildGameObjectWithTag(GameObject parent, string tagToFind)
+        {
+			if (parent == null) {
+				return null;
+			}
+
+            foreach (Transform child in parent.transform)
+            {
+                string childTag = child.gameObject.tag;
+                if (!childTag.Equals(tagToFind))
+                {
+                    continue;
+                }
+
+                return child.gameObject;
+            }
+
+            return null;
+        }
+
+        public static string ReadTextFile(string filename)
+        {
+            string text = string.Empty;
+            bool fileExists = File.Exists(filename);
+            if (fileExists == false)
+            {
+                return text;
+            }
+
+            using (StreamReader inputFile = new StreamReader(filename))
+            {
+                text += inputFile.ReadToEnd();
+            }
+
+            return text;
+        }
+
+        public static void WriteTextFile(string filename, string text)
+        {
+            using (StreamWriter outputFile = new StreamWriter(filename))
+            {
+                outputFile.WriteLine(text);
+            }
+        }
+
+        public static string[] GetAllUsernames(Dictionary<string, Profile> playerAccounts)
+        {
+            int count = playerAccounts.Count;
+            string[] allUsernames = new string[count];
+            playerAccounts.Keys.CopyTo(allUsernames, 0);
+
+            return allUsernames;
         }
     }
 }

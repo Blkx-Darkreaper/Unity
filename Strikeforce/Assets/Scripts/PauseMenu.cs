@@ -6,11 +6,11 @@ namespace Strikeforce
     public class PauseMenu : Menu
     {
         public GUISkin PauseMenuSkin;
+        protected const string RESUME = "Resume";
 
-        protected override void Start()
+        protected override void SetButtonNames()
         {
-            base.Start();
-            buttons = new string[] { "Resume", "Exit" };
+            buttons = new string[] { RESUME, EXIT };
         }
 
         protected override void OnGUI()

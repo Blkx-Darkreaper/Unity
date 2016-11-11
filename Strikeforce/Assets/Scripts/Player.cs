@@ -7,7 +7,7 @@ namespace Strikeforce
 {
     public class Player : Entity
     {
-        public string Username;
+        public int PlayerId { get { return this.playerControllerId; } }
         public bool IsNPC;
         [HideInInspector]
         public Hud PlayerHud;
@@ -31,12 +31,6 @@ namespace Strikeforce
         protected override void Awake()
         {
             inventory = new Inventory();
-
-            PlayerAccount account = GetComponent<PlayerAccount>();
-            if (account != null)
-            {
-                Username = account.Username;
-            }
         }
 
         protected void Start()
@@ -124,7 +118,7 @@ namespace Strikeforce
             //Units allUnits = GetComponentInChildren<Units>();
             GameObject unitToSpawn = (GameObject)Instantiate(GameManager.ActiveInstance.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
             unitToSpawn.transform.parent = allUnits.transform;
-            Debug.Log(string.Format("Spawned {0} for player {1}", unitName, Username));
+            Debug.Log(string.Format("Spawned {0} for player {1}", unitName, PlayerId));
 
             if (rallyPoint == GlobalAssets.InvalidPoint)
             {
@@ -154,7 +148,7 @@ namespace Strikeforce
 
             GameObject unitToSpawn = (GameObject)Instantiate(GameManager.ActiveInstance.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
             unitToSpawn.transform.parent = allUnits.transform;
-            Debug.Log(string.Format("Spawned {0} for player {1}", unitName, Username));
+            Debug.Log(string.Format("Spawned {0} for player {1}", unitName, PlayerId.ToString()));
 
             if (rallyPoint == GlobalAssets.InvalidPoint)
             {

@@ -1,0 +1,17 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\MatchmakingMenu.cs">
+    <Files>
+      <File FileName="Assets\Scripts\MatchmakingMenu.cs" Line="27" Column="22" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\GlobalAssets.cs" line="282" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\ProfileStorage.cs" line="33" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="..\RTS Tutorial\Assets\Scripts\OreDeposit.cs" line="37" offsetX="702" offsetY="756" expression="transform.Find(&quot;Meshes&quot;).gameObject" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+</Properties>

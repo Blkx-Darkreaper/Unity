@@ -288,7 +288,7 @@ namespace Strikeforce
             Player hitEntityOwner = hitEntity.Owner;
             if (hitEntityOwner != null)
             {
-                bool samePlayer = Owner.Username.Equals(hitEntityOwner.Username);
+                bool samePlayer = Owner.PlayerId == hitEntityOwner.PlayerId;
                 if (samePlayer == true)
                 {
                     ChangeSelection(hitEntity, player);
@@ -360,7 +360,7 @@ namespace Strikeforce
             Player entityOwner = entityUnderMouse.Owner;
             if (entityOwner != null)
             {
-                bool samePlayer = Owner.Username.Equals(entityOwner.Username);
+                bool samePlayer = Owner.PlayerId == entityOwner.PlayerId;
                 if (samePlayer == true)
                 {
                     return;
@@ -466,7 +466,7 @@ namespace Strikeforce
             string attackTargetsOwnersName = ownersName;
             if (Owner != null)
             {
-                ownersName = Owner.Username;
+                ownersName = Owner.PlayerId.ToString();
             }
 
             Selectable attackTarget = target as Selectable;
@@ -478,7 +478,7 @@ namespace Strikeforce
 
             if (attackTarget.Owner != null)
             {
-                attackTargetsOwnersName = attackTarget.Owner.Username;
+                attackTargetsOwnersName = attackTarget.Owner.PlayerId.ToString();
             }
 
             Debug.Log(string.Format("{0} {1} fired at {2} {3}", ownersName, name, attackTargetsOwnersName, attackTarget.name));
@@ -545,24 +545,6 @@ namespace Strikeforce
             {
                 allRenderers[i].material = oldMaterials[i];
             }
-        }
-
-        protected override void SaveDetails(JsonWriter writer) { }
-
-        protected override bool LoadDetails(JsonReader reader, string propertyName) {
-            return true;
-        }
-
-        protected override void LoadEnd(bool loadComplete)
-        {
-            base.LoadEnd(loadComplete);
-            if (loadComplete == false)
-            {
-                return;
-            }
-
-            SelectionBounds = GlobalAssets.InvalidBounds;
-            UpdateBounds();
         }
     }
 }

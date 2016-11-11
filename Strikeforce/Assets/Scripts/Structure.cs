@@ -296,49 +296,5 @@ namespace Strikeforce
             RestoreMaterials();
             SetTeamColour();
         }
-
-        protected override void SaveDetails(JsonWriter writer)
-        {
-            base.SaveDetails(writer);
-
-            SaveManager.SaveBoolean(writer, StructureProperties.IS_CONSTRUCTION_COMPLETE, IsConstructionComplete);
-            SaveManager.SaveVector(writer, StructureProperties.SPAWN_POINT, spawnPoint);
-            SaveManager.SaveVector(writer, StructureProperties.RALLY_POINT, rallyPoint);
-            SaveManager.SaveFloat(writer, StructureProperties.BUILD_PROGRESS, currentBuildProgress);
-            SaveManager.SaveStringArray(writer, StructureProperties.BUILD_QUEUE, buildQueue.ToArray());
-        }
-
-        protected override bool LoadDetails(JsonReader reader, string propertyName)
-        {
-            bool loadComplete = false;
-
-            base.LoadDetails(reader, propertyName);
-
-            switch (propertyName)
-            {
-                case StructureProperties.IS_CONSTRUCTION_COMPLETE:
-                    IsConstructionComplete = LoadManager.LoadBoolean(reader);
-                    break;
-
-                case StructureProperties.SPAWN_POINT:
-                    spawnPoint = LoadManager.LoadVector(reader);
-                    break;
-
-                case StructureProperties.RALLY_POINT:
-                    rallyPoint = LoadManager.LoadVector(reader);
-                    break;
-
-                case StructureProperties.BUILD_PROGRESS:
-                    currentBuildProgress = LoadManager.LoadFloat(reader);
-                    break;
-
-                case StructureProperties.BUILD_QUEUE:
-                    buildQueue = new Queue<string>(LoadManager.LoadStringArray(reader));
-                    loadComplete = true;    // last property to load
-                    break;
-            }
-
-            return loadComplete;
-        }
     }
 }

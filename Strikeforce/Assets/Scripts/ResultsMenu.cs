@@ -5,7 +5,7 @@ namespace Strikeforce
 {
     public class ResultsMenuController : Menu
     {
-        protected Player winner;
+        protected Profile winner;
         protected VictoryCondition metWinCondition { get; set; }
         protected struct Message
         {

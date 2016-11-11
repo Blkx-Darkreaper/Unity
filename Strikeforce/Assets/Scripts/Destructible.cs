@@ -97,19 +97,10 @@ namespace Strikeforce
             string ownersName = "Neutral";
             if (Owner != null)
             {
-                ownersName = string.Format("{0}'s", Owner.Username);
+                ownersName = string.Format("{0}'s", Owner.PlayerId.ToString());
             }
 
             Debug.Log(string.Format("{0} {1} has been destroyed", ownersName, name));
-        }
-
-        protected override void SaveDetails(JsonWriter writer)
-        {
-            SaveManager.SaveString(writer, EntityProperties.NAME, name);
-
-            base.SaveDetails(writer);
-
-            SaveManager.SaveInt(writer, DestructibleProperties.HIT_POINTS, CurrentHitPoints);
         }
     }
 }

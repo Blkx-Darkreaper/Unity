@@ -1,38 +1,52 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 namespace Strikeforce
 {
     public class Menu : MonoBehaviour
     {
+        public bool IsDrawingMenu;
+        public Menu PreviousMenu;
         public GUISkin MenuSkin;
+        public string MenuName;
         public Texture2D HeaderImage;
-        public bool IsOpen { get { return animator.GetBool("IsOpen"); } set { animator.SetBool("IsOpen", value); } }
+        public GameObject ButtonPrefab;
+        public const string MENU_OPEN = "MenuOpen";
+        public const string IS_OPENING_MENU = "IsOpeningMenu";
+        public bool IsOpeningMenu { get { return animator.GetBool(IS_OPENING_MENU); } set { animator.SetBool(IS_OPENING_MENU, value); } }
+		public bool IsMenuOpen { get { return animator.GetCurrentAnimatorStateInfo (0).IsName (MENU_OPEN); } }
+        protected MenuManager menuManager;
         protected Animator animator;
         protected CanvasGroup canvasGroup;
-        protected Player player;
         protected string[] buttons;
         protected const string EXIT = "Quit Game";
 
         protected virtual void Awake()
         {
+            menuManager = GetComponentInParent<MenuManager>();
+
             animator = GetComponent<Animator>();
             canvasGroup = GetComponent<CanvasGroup>();
 
             RectTransform rect = GetComponent<RectTransform>();
-            rect.offsetMax = rect.offsetMin = new Vector2(0, 0);
+            if (rect != null)
+            {
+                rect.offsetMax = rect.offsetMin = new Vector2(0, 0);
+            }
+
+            SetButtonNames();
+            SetMenuButtons();
         }
 
         protected virtual void Start()
         {
-            player = transform.root.GetComponent<Player>();
-            SetButtons();
-            SetUsername();
+            //account = transform.root.GetComponent<PlayerAccount>();
         }
 
         protected void Update()
         {
-            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Open"))
+            if (IsMenuOpen == false)
             {
                 canvasGroup.blocksRaycasts = canvasGroup.interactable = false;
                 return;
@@ -45,42 +59,71 @@ namespace Strikeforce
 
         protected virtual void OnGUI()
         {
-            //DrawMenu();
+            if (IsMenuOpen == false)
+            {
+                return;
+            }
+
+            if (IsDrawingMenu == false)
+            {
+                return;
+            }
+
+            DrawMenu();
         }
 
-        protected virtual void SetButtons()
+        protected virtual void SetButtonNames()
         {
-            buttons = new string[] { };
+            buttons = new string[] { EXIT };
         }
 
-        protected virtual void SetUsername()
+        protected virtual void SetMenuButtons()
         {
-            if (GameManager.ActiveInstance == null)
-            {
-                return;
-            }
-            if (GameManager.ActiveInstance.currentPlayerAccount == null)
+            if (IsDrawingMenu == true)
             {
                 return;
             }
 
-            string username = GameManager.ActiveInstance.currentPlayerAccount.Username;
-            SetUsername(username);
+            SetHeaderText();
+
+            if (ButtonPrefab == null)
+            {
+                return;
+            }
+
+            // Get the button group
+            VerticalLayoutGroup buttonGroup = GetComponentInChildren<VerticalLayoutGroup>();
+
+            foreach (string buttonName in buttons)
+            {
+                GameObject buttonObject = Instantiate(ButtonPrefab) as GameObject;
+                buttonObject.transform.SetParent(buttonGroup.transform);
+                buttonObject.GetComponentInChildren<Text>().text = buttonName;
+                //buttonObject.transform.rotation = buttonGroup.transform.rotation;
+                buttonObject.transform.localRotation = buttonGroup.transform.localRotation;
+                buttonObject.transform.localScale = buttonGroup.transform.localScale;
+
+                Button button = buttonObject.GetComponent<Button>();
+                button.name = buttonName;
+                button.onClick.AddListener(() => { HandleButtonPress(button); });
+            }
         }
 
-        protected virtual void SetUsername(string username)
+        private void SetHeaderText()
         {
-            if (player == null)
-            {
-                return;
-            }
-            bool alreadySet = !player.Username.Equals(string.Empty);
-            if (alreadySet == true)
+            GameObject header = GameObject.FindGameObjectWithTag(Tags.HEADER);
+            if (header == null)
             {
                 return;
             }
 
-            player.Username = username;
+            Text displayText = header.GetComponentInChildren<Text>();
+            if (displayText == null)
+            {
+                return;
+            }
+
+            displayText.text = MenuName;
         }
 
         protected virtual void HandleKeyboardActivity()
@@ -116,12 +159,12 @@ namespace Strikeforce
             GUI.DrawTexture(new Rect(x, y, width, height), HeaderImage);
 
             // Welcome message
-            width = MenuAttributes.Width - 2 * MenuAttributes.Padding;
-            height = MenuAttributes.TextHeight;
-            x = MenuAttributes.Width / 2 - width / 2;
-            y = 2 * MenuAttributes.Padding + HeaderImage.height;
-            string welcomeMessage = string.Format("Welcome {0}", GameManager.ActiveInstance.currentPlayerAccount.Username);
-            GUI.Label(new Rect(x, y, width, height), welcomeMessage);
+            //width = MenuAttributes.Width - 2 * MenuAttributes.Padding;
+            //height = MenuAttributes.TextHeight;
+            //x = MenuAttributes.Width / 2 - width / 2;
+            //y = 2 * MenuAttributes.Padding + HeaderImage.height;
+            //string welcomeMessage = string.Format("Welcome {0}", GameManager.ActiveInstance.CurrentPlayerAccount.Username);
+            //GUI.Label(new Rect(x, y, width, height), welcomeMessage);
 
             // Menu buttons
             if (buttons == null)
@@ -180,53 +223,69 @@ namespace Strikeforce
             return 0f;
         }
 
-        protected virtual void HideCurrentMenu()
+        protected void HandleButtonPress(Button button)
         {
-            GetComponent<Menu>().enabled = false;
+            string buttonName = button.name;
+            HandleButtonPress(buttonName);
         }
 
         protected virtual void HandleButtonPress(string buttonName)
         {
+            switch (buttonName)
+            {
+                case EXIT:
+                    ExitGame();
+                    break;
+            }
         }
 
-        protected void LoadMenu()
+        protected virtual void Pause()
         {
-            HideCurrentMenu();
-            LoadMenu loadMenu = GetComponent<LoadMenu>();
-            if (loadMenu == null)
-            {
-                return;
-            }
-
-            loadMenu.enabled = true;
-            loadMenu.Init();
+            Time.timeScale = 0f;
+            Cursor.visible = true;
+            IsOpeningMenu = true;
         }
 
         protected virtual void Resume()
         {
             Time.timeScale = 1f;
-            GetComponent<PauseMenu>().enabled = false;
-            if (player != null)
-            {
-                player.GetComponent<UserInput>().enabled = true;
-            }
-            Cursor.visible = false;
-            GameManager.ActiveInstance.IsMenuOpen = false;
+            //Cursor.visible = false;
+            IsOpeningMenu = false;
+            //GameManager.ActiveInstance.IsMenuOpen = false;
         }
 
         protected virtual void Back()
         {
         }
 
+        public virtual void ShowMenu()
+        {
+            GetComponent<Menu>().enabled = true;
+        }
+
+        public virtual void HideMenu()
+        {
+            GetComponent<Menu>().enabled = false;
+        }
+
+        public virtual void ToggleMenu()
+        {
+            Menu menu = GetComponent<Menu>();
+
+            bool enabled = menu.enabled;
+            menu.enabled = !enabled;
+        }
+
         protected virtual void ExitGame()
         {
-            string playerName = "Unknown player";
-            if (player != null)
+            string username = "Unknown player";
+            Profile profile = ProfileManager.ActiveInstance.CurrentProfile;
+            if (profile != null)
             {
-                playerName = player.Username;
+                username = profile.Username;
             }
 
-            Debug.Log(string.Format("{0} has left the game", playerName));
+            Debug.Log(string.Format("{0} has left the game", username));
             Application.Quit();
         }
     }
