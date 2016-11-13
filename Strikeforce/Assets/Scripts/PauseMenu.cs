@@ -10,7 +10,7 @@ namespace Strikeforce
 
         protected override void SetButtonNames()
         {
-            buttons = new string[] { RESUME, EXIT };
+            buttonNames = new string[] { RESUME, EXIT };
         }
 
         protected override void OnGUI()
@@ -42,9 +42,9 @@ namespace Strikeforce
             width = MenuAttributes.ButtonWidth;
             height = MenuAttributes.ButtonHeight;
 
-            for (int i = 0; i < buttons.Length; i++)
+            for (int i = 0; i < buttonNames.Length; i++)
             {
-                string buttonName = buttons[i];
+                string buttonName = buttonNames[i];
                 bool buttonPressed = GUI.Button(new Rect(x, y, width, height), buttonName);
 
                 y += MenuAttributes.ButtonHeight + MenuAttributes.Padding;

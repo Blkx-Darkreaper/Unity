@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Strikeforce
 {
@@ -19,7 +20,8 @@ namespace Strikeforce
         protected MenuManager menuManager;
         protected Animator animator;
         protected CanvasGroup canvasGroup;
-        protected string[] buttons;
+        protected string[] buttonNames;
+        protected Dictionary<string, Button> allButtons;
         protected const string EXIT = "Quit Game";
 
         protected virtual void Awake()
@@ -74,7 +76,7 @@ namespace Strikeforce
 
         protected virtual void SetButtonNames()
         {
-            buttons = new string[] { EXIT };
+            buttonNames = new string[] { EXIT };
         }
 
         protected virtual void SetMenuButtons()
@@ -93,8 +95,9 @@ namespace Strikeforce
 
             // Get the button group
             VerticalLayoutGroup buttonGroup = GetComponentInChildren<VerticalLayoutGroup>();
+            allButtons = new Dictionary<string, Button>();
 
-            foreach (string buttonName in buttons)
+            foreach (string buttonName in buttonNames)
             {
                 GameObject buttonObject = Instantiate(ButtonPrefab) as GameObject;
                 buttonObject.transform.SetParent(buttonGroup.transform);
@@ -106,6 +109,7 @@ namespace Strikeforce
                 Button button = buttonObject.GetComponent<Button>();
                 button.name = buttonName;
                 button.onClick.AddListener(() => { HandleButtonPress(button); });
+                allButtons.Add(buttonName, button);
             }
         }
 
@@ -167,12 +171,12 @@ namespace Strikeforce
             //GUI.Label(new Rect(x, y, width, height), welcomeMessage);
 
             // Menu buttons
-            if (buttons == null)
+            if (buttonNames == null)
             {
                 GUI.EndGroup();
                 return;
             }
-            if (buttons.Length == 0)
+            if (buttonNames.Length == 0)
             {
                 GUI.EndGroup();
                 return;
@@ -184,9 +188,9 @@ namespace Strikeforce
             width = MenuAttributes.ButtonWidth;
             height = MenuAttributes.ButtonHeight;
 
-            for (int i = 0; i < buttons.Length; i++)
+            for (int i = 0; i < buttonNames.Length; i++)
             {
-                string buttonName = buttons[i];
+                string buttonName = buttonNames[i];
                 bool buttonPressed = GUI.Button(new Rect(x, y, width, height), buttonName);
 
                 y += MenuAttributes.ButtonHeight + MenuAttributes.Padding;
@@ -206,10 +210,10 @@ namespace Strikeforce
         {
             float buttonHeight = 0;
             float paddingHeight = 2 * MenuAttributes.Padding;
-            if (buttons != null)
+            if (buttonNames != null)
             {
-                buttonHeight = buttons.Length * MenuAttributes.ButtonHeight;
-                paddingHeight += buttons.Length * MenuAttributes.Padding;
+                buttonHeight = buttonNames.Length * MenuAttributes.ButtonHeight;
+                paddingHeight += buttonNames.Length * MenuAttributes.Padding;
             }
 
             float messageHeight = MenuAttributes.TextHeight + MenuAttributes.Padding;
@@ -225,6 +229,12 @@ namespace Strikeforce
 
         protected void HandleButtonPress(Button button)
         {
+            bool buttonEnabled = button.interactable;
+            if (buttonEnabled == false)
+            {
+                return;
+            }
+
             string buttonName = button.name;
             HandleButtonPress(buttonName);
         }
@@ -258,12 +268,12 @@ namespace Strikeforce
         {
         }
 
-        public virtual void ShowMenu()
+        public virtual void EnableMenu()
         {
             GetComponent<Menu>().enabled = true;
         }
 
-        public virtual void HideMenu()
+        public virtual void DisableMenu()
         {
             GetComponent<Menu>().enabled = false;
         }
@@ -274,6 +284,16 @@ namespace Strikeforce
 
             bool enabled = menu.enabled;
             menu.enabled = !enabled;
+        }
+
+        public virtual void ShowMenu()
+        {
+            this.IsOpeningMenu = true;
+        }
+
+        public virtual void HideMenu()
+        {
+            this.IsOpeningMenu = false;
         }
 
         protected virtual void ExitGame()

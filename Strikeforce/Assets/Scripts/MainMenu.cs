@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 namespace Strikeforce
@@ -11,6 +12,49 @@ namespace Strikeforce
         public Menu MatchmakingMenu;
         protected const string OPTIONS = "Options";
         public Menu OptionsMenu;
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            DisableMatchmaking();
+            EnableMatchmaking();
+        }
+
+        protected void EnableMatchmaking()
+        {
+            if (ProfileManager.ActiveInstance == null)
+            {
+                return;
+            }
+
+            bool profileSelected = ProfileManager.ActiveInstance.CurrentProfile != null;
+            if (profileSelected == false)
+            {
+                return;
+            }
+
+            Button matchmakingButton = allButtons[MATCHMAKING];
+            matchmakingButton.interactable = true;
+        }
+
+        protected void DisableMatchmaking()
+        {
+            Button matchmakingButton = allButtons[MATCHMAKING];
+            if (matchmakingButton == null)
+            {
+                return;
+            }
+
+            matchmakingButton.interactable = false;
+        }
+
+        public override void ShowMenu()
+        {
+            base.ShowMenu();
+
+            EnableMatchmaking();
+        }
 
         protected void OnLevelWasLoaded()
         {
@@ -30,7 +74,7 @@ namespace Strikeforce
 
         protected override void SetButtonNames()
         {
-            buttons = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
+            buttonNames = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
         }
 
         protected override void HandleKeyboardActivity()
@@ -93,7 +137,7 @@ namespace Strikeforce
             menuManager.ShowMenu(OptionsMenu);
         }
 
-        public override void HideMenu()
+        public override void DisableMenu()
         {
             GetComponent<MainMenu>().enabled = false;
         }

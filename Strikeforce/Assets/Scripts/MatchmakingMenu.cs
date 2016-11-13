@@ -9,7 +9,7 @@ namespace Strikeforce
 
         protected override void SetButtonNames()
         {
-            buttons = new string[] { TEST };
+            buttonNames = new string[] { TEST };
         }
 
         protected override void HandleButtonPress(string buttonName)

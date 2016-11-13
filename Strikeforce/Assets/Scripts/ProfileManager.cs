@@ -31,6 +31,8 @@ namespace Strikeforce
 
         public void LoadProfiles()
         {
+            CurrentProfile = null;
+
             string fullPath = string.Format("{0}/{1}", Application.dataPath, ProfileSaveFile);
             string json = GlobalAssets.ReadTextFile(fullPath);
             if (json.Equals(string.Empty) == true)

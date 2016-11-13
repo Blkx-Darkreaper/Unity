@@ -16,11 +16,11 @@ namespace Strikeforce
         {
             if (currentMenu != null)
             {
-                currentMenu.IsOpeningMenu = false;
+                currentMenu.HideMenu();
             }
 
             currentMenu = menu;
-            currentMenu.IsOpeningMenu = true;
+            currentMenu.ShowMenu();
         }
     }
 }
