@@ -1,7 +1,7 @@
 using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Strikeforce
 {
@@ -9,14 +9,16 @@ namespace Strikeforce
     {
         public int PlayerId { get { return this.playerControllerId; } }
         public bool IsNPC;
-        [HideInInspector]
-        public Hud PlayerHud;
-        public BuildCursor Cursor;
+        [HideInInspector]  protected Camera mainCamera;
+        [HideInInspector] public Hud PlayerHud;
+        [HideInInspector] public BuildCursor Cursor;
+        [HideInInspector] public Raider CurrentRaider;
+        [HideInInspector] protected bool isInBuildMode = true;
+        [HideInInspector] public Inventory CurrentInventory;
         public Selectable SelectedEntity { get; set; }
         public bool IsSettingConstructionPoint;
         public Material NotAllowedMaterial, AllowedMaterial;
         public Color Colour;
-        public Inventory inventory;
 
         protected struct PlayerProperties
         {
@@ -30,13 +32,57 @@ namespace Strikeforce
 
         protected override void Awake()
         {
-            inventory = new Inventory();
+            Profile profile = ProfileManager.ActiveInstance.CurrentProfile;
+            if (profile != null)
+            {
+                profile.Player = this;
+            }
+
+            // Get the main camera
+            mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
+
+            SpawnRaider();
+            CurrentInventory = GetComponent<Inventory>();
+        }
+
+        protected void SpawnRaider()
+        {
+            GameObject raiderObject = Instantiate(
+                NetworkManager.singleton.spawnPrefabs[3], 
+                Vector3.zero, 
+                Quaternion.identity) as GameObject;
+
+            CurrentRaider = raiderObject.GetComponent<Raider>();
+            //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
+
+            Vector3 raiderPosition = raiderObject.transform.position;
+
+            Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 20, raiderPosition.z);
+            mainCamera.transform.position = overheadView;
+            mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
+        }
+
+        public override void OnStartLocalPlayer()
+        {
+            //CurrentRaider.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
         }
 
         protected void Start()
         {
             PlayerHud = GetComponentInChildren<Hud>();
             IsSettingConstructionPoint = false;
+        }
+
+        public void MovePlayer(float x, float y, float z)
+        {
+            if (isInBuildMode == true)
+            {
+                Cursor.transform.Translate(x, 0, z);
+            }
+            else
+            {
+                CurrentRaider.transform.Translate(x, 0, z);
+            }
         }
 
         public bool IsConstructionSiteValid(Structure constructionSite)
@@ -197,26 +243,10 @@ namespace Strikeforce
         //    constructionSite.transform.position = constructionPosition;
         //}
 
-        private Entity GetCamera()
-        {
-            foreach (Entity entity in GetComponentsInChildren<Entity>())
-            {
-                bool tagMatch = entity.CompareTag(Tags.MAIN_CAMERA);
-                if (tagMatch == false)
-                {
-                    continue;
-                }
-
-                return entity;
-            }
-
-            return null;
-        }
-
-        protected void TakeOwnershipOfEntity(Entity entity, string entityType)
+        protected void TakeOwnershipOfEntity(Selectable selectable, string entityType)
         {
             GameObject group = transform.Find(entityType).gameObject;
-            entity.transform.parent = group.transform;
+            selectable.transform.parent = group.transform;
         }
 
         protected void OtherEntitySetup(Entity entity, string entityType)

@@ -1,13 +1,12 @@
 using UnityEngine;
-using Newtonsoft.Json;
+using UnityEngine.Networking;
 
 namespace Strikeforce
 {
     public class Destructible : Selectable
     {
-        public int MaxHitPoints { get; set; }
-        [HideInInspector]
-        public int CurrentHitPoints { get; set; }
+        public int MaxHitPoints;
+        [HideInInspector] [SyncVar] public int CurrentHitPoints;
         protected float healthPercentage { get; set; }
         protected GUIStyle healthStyle { get; set; }
         private const int HEALTH_BAR_VERTICAL_OFFSET = 7;
@@ -21,9 +20,16 @@ namespace Strikeforce
         {
             base.Awake();
 
+            healthStyle = new GUIStyle();
             CurrentHitPoints = MaxHitPoints;
-            UpdateHealthPercentage();
         }
+
+		protected override void Start ()
+		{
+			base.Start();
+
+			UpdateHealthPercentage();
+		}
 
         protected void DrawHealthBar(Rect selectionBox)
         {
@@ -67,21 +73,35 @@ namespace Strikeforce
 
             if (healthPercentage > healthyThreshold)
             {
-                healthStyle.normal.background = GlobalAssets.HealthBarTextures.healthy;
+                healthStyle.normal.background = GlobalAssets.HealthBarTextures.Healthy;
                 return;
             }
             if (healthPercentage > damagedThreshold)
             {
-                healthStyle.normal.background = GlobalAssets.HealthBarTextures.damaged;
+                healthStyle.normal.background = GlobalAssets.HealthBarTextures.Damaged;
                 return;
             }
 
-            healthStyle.normal.background = GlobalAssets.HealthBarTextures.critical;
+            healthStyle.normal.background = GlobalAssets.HealthBarTextures.Critical;
         }
 
-        public void TakeDamage(int damage)
+        public virtual void TakeDamage(int damage)
         {
+            if (isServer == false)
+            {
+                return;
+            }
+
             CurrentHitPoints -= damage;
+
+            string ownersName = "Neutral";
+            if (Owner != null)
+            {
+                ownersName = string.Format("{0}'s", Owner.PlayerId.ToString());
+            }
+
+            Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, damage));
+
             if (CurrentHitPoints > 0)
             {
                 return;
@@ -90,7 +110,7 @@ namespace Strikeforce
             DestroyEntity();
         }
 
-        protected void DestroyEntity()
+        protected virtual void DestroyEntity()
         {
             GameManager.ActiveInstance.DestroyGameEntity(this);
 

@@ -112,6 +112,7 @@ namespace Strikeforce
         {
             Profile.SetCurrentProfile(CurrentProfile, profile);
             CurrentProfile = profile;
+            SaveProfiles();
 
             UserInput userInput = GetComponent<UserInput>();
             if (userInput == null)
@@ -124,7 +125,7 @@ namespace Strikeforce
 
         public Profile CreateProfile(string username, int avatarId)
         {
-            Profile profile = new Profile(username, avatarId);
+            Profile profile = new Profile(username, avatarId, false);
             AllProfiles.Add(username, profile);
 
             SaveProfiles();

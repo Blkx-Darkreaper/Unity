@@ -1,38 +1,94 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Strikeforce
 {
     public class UserInput : NetworkBehaviour
     {
-        protected Player player;
         public Profile profile;
+        protected KeyMap keyBinds;
+        public struct KeyMap
+        {
+            public KeyCode Action1;
+            public KeyCode Action2;
+            public KeyCode Special1;
+            public KeyCode Special2;
+            public KeyCode LeftTrigger;
+            public KeyCode RightTrigger;
+            public KeyCode Menu;
+            public KeyCode Back;
+            public AxisBind LeftStick;
+            public AxisBind RightStick;
+        }
+        public struct AxisBind
+        {
+            public KeyCode Up;
+            public KeyCode Down;
+            public KeyCode Left;
+            public KeyCode Right;
+        }
+        public struct Axis
+        {
+            public const string HORIZONTAL = "Horizontal";
+            public const string VERTICAL = "Vertical";
+        }
+
+        protected void Awake()
+        {
+            InitKeyBinds();
+        }
+
+        protected void InitKeyBinds()
+        {
+            keyBinds = new KeyMap();
+            keyBinds.Action1 = KeyCode.A;
+            keyBinds.Action2 = KeyCode.S;
+            keyBinds.Special1 = KeyCode.D;
+            keyBinds.Special2 = KeyCode.F;
+            keyBinds.LeftTrigger =KeyCode.E;
+            keyBinds.RightTrigger = KeyCode.R;
+            keyBinds.Menu = KeyCode.Escape;
+            keyBinds.Back = KeyCode.Backspace;
+
+            keyBinds.LeftStick.Up = KeyCode.UpArrow;
+            keyBinds.LeftStick.Down = KeyCode.DownArrow;
+            keyBinds.LeftStick.Left = KeyCode.LeftArrow;
+            keyBinds.LeftStick.Right = KeyCode.RightArrow;
+
+            keyBinds.RightStick.Up = KeyCode.Keypad8;
+            keyBinds.RightStick.Down = KeyCode.Keypad2;
+            keyBinds.RightStick.Left = KeyCode.Keypad4;
+            keyBinds.RightStick.Right = KeyCode.Keypad6;
+        }
 
         protected void Start()
         {
+            profile = ProfileManager.ActiveInstance.CurrentProfile;
+            if (profile == null)
+            {
+                return;
+            }
+
             Debug.Log(string.Format("User: {0}", profile.Username));
         }
 
+        //public override void OnStartLocalPlayer()
+        //{
+        //    GetComponent<MeshRenderer>().material.color = Color.red;
+        //}
+
         protected void Update()
         {
-            if (player == null)
-            {
-                return;
-            }
-
-            if (player.IsNPC == true)
-            {
-                return;
-            }
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
+            //if (isLocalPlayer == false)
+            //{
+            //    return;
+            //}
 
             RespondToKeyboardActivity();
-            RespondToMouseActivity();
-            UpdateCamera();
+            //RespondToMouseActivity();
+            //UpdateCamera();
         }
 
         protected void UpdateCamera()
@@ -76,23 +132,23 @@ namespace Strikeforce
 
             destination = new Vector3(
                 destination.x,
-                destination.y = Mathf.Clamp(destination.y, GlobalAssets.Camera.minHeight, GlobalAssets.Camera.maxHeight),
+                destination.y = Mathf.Clamp(destination.y, GlobalAssets.Camera.MinHeight, GlobalAssets.Camera.MaxHeight),
                 destination.z
             );
 
             if (destination == origin)
             {
-                player.PlayerHud.SetCursorState(CursorState.select);
+                //player.PlayerHud.SetCursorState(CursorState.select);
                 return;
             }
 
-            Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * GlobalAssets.Camera.scrollSpeed);
+            Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * GlobalAssets.Camera.ScrollSpeed);
         }
 
         protected float getHorizontalScrollRate(float x)
         {
             float scrollRate = 0;
-            int boundaryWidth = GlobalAssets.Camera.scrollArea;
+            int boundaryWidth = GlobalAssets.Camera.ScrollArea;
             int screenWidth = Screen.width;
 
             int leftBoundary = boundaryWidth;
@@ -100,13 +156,13 @@ namespace Strikeforce
 
             if (x >= 0 && x < leftBoundary)
             {
-                scrollRate = -GlobalAssets.Camera.scrollSpeed;
-                player.PlayerHud.SetCursorState(CursorState.panLeft);
+                scrollRate = -GlobalAssets.Camera.ScrollSpeed;
+                //player.PlayerHud.SetCursorState(CursorState.panLeft);
             }
             else if (x <= screenWidth && x > rightBoundary)
             {
-                scrollRate = GlobalAssets.Camera.scrollSpeed;
-                player.PlayerHud.SetCursorState(CursorState.panRight);
+                scrollRate = GlobalAssets.Camera.ScrollSpeed;
+                //player.PlayerHud.SetCursorState(CursorState.panRight);
             }
 
             return scrollRate;
@@ -115,7 +171,7 @@ namespace Strikeforce
         protected float getVerticalScrollRate(float y)
         {
             float scrollRate = 0;
-            int boundaryWidth = GlobalAssets.Camera.scrollArea;
+            int boundaryWidth = GlobalAssets.Camera.ScrollArea;
             int screenHeight = Screen.height;
 
             int bottomBoundary = boundaryWidth;
@@ -123,13 +179,13 @@ namespace Strikeforce
 
             if (y >= 0 && y < bottomBoundary)
             {
-                scrollRate = -GlobalAssets.Camera.scrollSpeed;
-                player.PlayerHud.SetCursorState(CursorState.panDown);
+                scrollRate = -GlobalAssets.Camera.ScrollSpeed;
+                //player.PlayerHud.SetCursorState(CursorState.panDown);
             }
             else if (y <= screenHeight && y > topBoundary)
             {
-                scrollRate = GlobalAssets.Camera.scrollSpeed;
-                player.PlayerHud.SetCursorState(CursorState.panUp);
+                scrollRate = GlobalAssets.Camera.ScrollSpeed;
+                //player.PlayerHud.SetCursorState(CursorState.panUp);
             }
 
             return scrollRate;
@@ -139,7 +195,7 @@ namespace Strikeforce
         {
             // Away from ground is positive
             float scrollwheelInput = Input.GetAxis(KeyMappings.SCROLL_WHEEL);
-            float zoomRate = -GlobalAssets.Camera.scrollSpeed * scrollwheelInput;
+            float zoomRate = -GlobalAssets.Camera.ScrollSpeed * scrollwheelInput;
 
             return zoomRate;
         }
@@ -162,7 +218,7 @@ namespace Strikeforce
                 return;
             }
 
-            float rotationAmount = GlobalAssets.Camera.rotationAmount;
+            float rotationAmount = GlobalAssets.Camera.RotationAmount;
 
             float horizontalInput = Input.GetAxis(KeyMappings.MOUSE_Y_AXIS);
             destination.x -= horizontalInput * rotationAmount;
@@ -175,7 +231,7 @@ namespace Strikeforce
                 return;
             }
 
-            Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * GlobalAssets.Camera.rotationSpeed);
+            Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * GlobalAssets.Camera.RotationSpeed);
         }
 
         public static GameObject GetHitGameObject()
@@ -233,6 +289,12 @@ namespace Strikeforce
 
         protected void MouseOver()
         {
+            Player player = profile.Player;
+            if (player == null)
+            {
+                return;
+            }
+
             bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
             if (mouseInBounds == false)
             {
@@ -298,6 +360,12 @@ namespace Strikeforce
 
         protected void LeftMouseClick()
         {
+            Player player = profile.Player;
+            if (player == null)
+            {
+                return;
+            }
+
             bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
             if (mouseInBounds == false)
             {
@@ -353,12 +421,24 @@ namespace Strikeforce
 
         protected void SelectEntity(Selectable entityToSelect)
         {
+            Player player = profile.Player;
+            if (player == null)
+            {
+                return;
+            }
+
             player.SelectedEntity = entityToSelect;
             entityToSelect.SetSelection(true);
         }
 
         protected void RightMouseClick()
         {
+            Player player = profile.Player;
+            if (player == null)
+            {
+                return;
+            }
+
             bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
             if (mouseInBounds == false)
             {
@@ -388,26 +468,85 @@ namespace Strikeforce
 
         protected void Deselect()
         {
+            Player player = profile.Player;
+            if (player == null)
+            {
+                return;
+            }
+
             player.SelectedEntity.SetSelection(false);
             player.SelectedEntity = null;
         }
 
         protected void RespondToKeyboardActivity()
         {
-            if (isLocalPlayer == false)
+            //if (isLocalPlayer == false)
+            //{
+            //    return;
+            //}
+
+            MovePlayer();
+
+            if (Input.GetKeyDown(keyBinds.Menu))
+            {
+                OpenPauseMenu();
+            }
+
+            if (Input.GetKeyDown(keyBinds.Action1))
+            {
+                // Command function is called from the client, but invoked on the server
+                CmdFire();
+            }
+        }
+
+        protected void MovePlayer()
+        {
+            Player player = profile.Player;
+            if (player == null)
+            {
+                return;
+            }
+            Raider raider = player.CurrentRaider;
+            if (raider == null)
             {
                 return;
             }
 
-            var x = Input.GetAxis(Axis.HORIZONTAL) * 0.1f;
-            var z = Input.GetAxis(Axis.VERTICAL) * 0.1f;
+            float x = Input.GetAxis(Axis.HORIZONTAL) * 0.1f;
+            float z = Input.GetAxis(Axis.VERTICAL) * 0.1f;
 
-            transform.Translate(x, 0, z);
+            raider.transform.Translate(x, 0, z);    //testing
+            //profile.Player.MovePlayer(x, 0, z);
+        }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+        [Command]
+        void CmdFire()
+        {
+            Player player = profile.Player;
+            if (player == null)
             {
-                OpenPauseMenu();
+                return;
             }
+            Raider raider = player.CurrentRaider;
+            if (raider == null)
+            {
+                return;
+            }
+
+            // create the bullet object from the bullet prefab
+            GameObject bullet = (GameObject)Instantiate(
+                NetworkManager.singleton.spawnPrefabs[0],
+                raider.transform.position + raider.transform.forward,
+                Quaternion.identity);
+
+            // make the bullet move away in front of the player
+            bullet.GetComponentInChildren<Rigidbody>().velocity = raider.transform.forward * 4;
+
+            // spawn the bullet on the clients
+            NetworkServer.Spawn(bullet);
+
+            // make bullet disappear after 2 seconds
+            Destroy(bullet, 2.0f);
         }
 
         protected void OpenPauseMenu()

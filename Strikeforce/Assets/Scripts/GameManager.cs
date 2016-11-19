@@ -377,6 +377,11 @@ namespace Strikeforce
 
         public void AddPlayerAccount(string username, int avatarId)
         {
+            AddPlayerAccount(username, avatarId, false);
+        }
+
+        public void AddPlayerAccount(string username, int avatarId, bool isSelectedProfile)
+        {
             bool usernameConflict = AllPlayerAccounts.ContainsKey(username);
             if (usernameConflict == true)
             {
@@ -384,7 +389,7 @@ namespace Strikeforce
                 return;
             }
 
-            Profile accountToAdd = new Profile(username, avatarId);
+            Profile accountToAdd = new Profile(username, avatarId, isSelectedProfile);
             AllPlayerAccounts.Add(username, accountToAdd);
         }
 

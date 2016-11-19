@@ -18,7 +18,6 @@ namespace Strikeforce
             base.Awake();
 
             DisableMatchmaking();
-            EnableMatchmaking();
         }
 
         protected void EnableMatchmaking()

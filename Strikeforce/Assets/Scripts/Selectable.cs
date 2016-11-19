@@ -41,7 +41,7 @@ namespace Strikeforce
             base.Awake();
 
             SelectionBounds = GlobalAssets.InvalidBounds;
-            UpdateBounds();
+            //UpdateBounds();
         }
 
         protected virtual void Start()

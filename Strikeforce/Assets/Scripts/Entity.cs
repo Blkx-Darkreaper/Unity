@@ -15,6 +15,7 @@ namespace Strikeforce
         private Vector3 currentWaypoint;
         private Quaternion targetHeading;
         private GameObject targetEntityGameObject;
+        public Rect playingArea { get; set; }
         protected struct UnitProperties
         {
             public const string IS_MOVING = "IsMoving";
@@ -29,7 +30,6 @@ namespace Strikeforce
             public const string ROTATION = "Rotation";
             public const string SCALE = "Scale";
         }
-        public Rect playingArea { get; set; }
 
         protected virtual void Awake()
         {

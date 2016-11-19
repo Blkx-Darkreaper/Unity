@@ -85,7 +85,7 @@
      <Compile Include="Assets\Scripts\Menu.cs" />
      <Compile Include="Assets\Scripts\MenuManager.cs" />
      <Compile Include="Assets\Scripts\Missile.cs" />
-     <Compile Include="Assets\Scripts\NetworkManager.cs" />
+     <Compile Include="Assets\Scripts\MultiplayerManager.cs" />
      <Compile Include="Assets\Scripts\OptionsMenu.cs" />
      <Compile Include="Assets\Scripts\Ordnance.cs" />
      <Compile Include="Assets\Scripts\PauseMenu.cs" />
@@ -99,6 +99,7 @@
      <Compile Include="Assets\Scripts\RaidMenu.cs" />
      <Compile Include="Assets\Scripts\Raider.cs" />
      <Compile Include="Assets\Scripts\RallyPoint.cs" />
+     <Compile Include="Assets\Scripts\Rank.cs" />
      <Compile Include="Assets\Scripts\ResultsMenu.cs" />
      <Compile Include="Assets\Scripts\Selectable.cs" />
      <Compile Include="Assets\Scripts\SelectionList.cs" />

@@ -10,15 +10,20 @@ namespace Strikeforce
         public const string PLAYER = "Player";
         public const string GROUND = "Ground";
         public const string BOUNDARY = "Boundary";
-        public const string STRUCTURE = "Structure";
         public const string UNIT = "Unit";
+        public const string STRUCTURE = "Structure";
         public const string ENEMY = "Enemy";
         public const string SUN = "Sun";
         public const string MAIN_CAMERA = "MainCamera";
-        public const string GAMECONTROLLER = "GameController";
-        public const string RESOURCE = "Resource";
+        public const string GAME_MANAGER = "GameManager";
+        public const string NETWORK_MANAGER = "NetworkManager";
         public const string HEADER = "Header";
         public const string BUTTON = "Button";
+    }
+
+    public struct Hooks
+    {
+        public const string CHANGE_HEALTH = "OnChangeHealth";
     }
 
     public enum CursorState
@@ -106,12 +111,6 @@ namespace Strikeforce
         public const string SCROLL_WHEEL = "Mouse ScrollWheel";
     }
 
-    public struct Axis
-    {
-        public const string HORIZONTAL = "Horizontal";
-        public const string VERTICAL = "Vertical";
-    }
-
     public static class GlobalAssets
     {
         public static string DefaultUsername = "NewPlayer";
@@ -135,19 +134,19 @@ namespace Strikeforce
 
         public struct Camera
         {
-            public static float scrollSpeed = 25f;
-            public static int scrollArea = 15;
-            public static float minHeight = 10;
-            public static float maxHeight = 40;
-            public static float rotationAmount = 10f;
-            public static float rotationSpeed = 100f;
+            public static float ScrollSpeed = 25f;
+            public static int ScrollArea = 15;
+            public static float MinHeight = 10;
+            public static float MaxHeight = 40;
+            public static float RotationAmount = 10f;
+            public static float RotationSpeed = 100f;
         }
 
         public struct HealthBarTextures
         {
-            public static Texture2D healthy;
-            public static Texture2D damaged;
-            public static Texture2D critical;
+            public static Texture2D Healthy;
+            public static Texture2D Damaged;
+            public static Texture2D Critical;
         }
 
         public static ResourceType GetResourceType(string typeName)
@@ -337,6 +336,19 @@ namespace Strikeforce
             playerAccounts.Keys.CopyTo(allUsernames, 0);
 
             return allUsernames;
+        }
+
+        public static Texture2D MakeTexture(int width, int height, Color colour)
+        {
+            Color[] pix = new Color[width * height];
+            for (int i = 0; i < pix.Length; ++i)
+            {
+                pix[i] = colour;
+            }
+            Texture2D result = new Texture2D(width, height);
+            result.SetPixels(pix);
+            result.Apply();
+            return result;
         }
     }
 }

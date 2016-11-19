@@ -14,12 +14,13 @@ namespace Strikeforce
         private const string AVATAR_PROPERTY = "Avatar";
         public string Username { get; set; }
         public int AvatarId { get; protected set; }
+        public Rank Ranking { get; protected set; }
         public bool IsCurrentProfile { get; protected set; }
         [JsonIgnore]
         public Player Player;
 
         [JsonConstructor]
-        public Profile(string username, int avatarId)
+        public Profile(string username, int avatarId, bool isCurrentProfile)
         {
             bool noUsername = username.Equals(string.Empty);
             if (noUsername == true)
@@ -33,18 +34,19 @@ namespace Strikeforce
 
             this.Username = username;
             this.AvatarId = avatarId;
+			this.IsCurrentProfile = isCurrentProfile;
         }
 
-        public static void SetCurrentProfile(Profile lastProfile, Profile currentProfile)
+        public static void SetCurrentProfile(Profile previousProfile, Profile currentProfile)
         {
             currentProfile.IsCurrentProfile = true;
 
-            if (lastProfile == null)
+            if (previousProfile == null)
             {
                 return;
             }
 
-            lastProfile.IsCurrentProfile = false;
+            previousProfile.IsCurrentProfile = false;
         }
 
         private string GetDefaultUsername()

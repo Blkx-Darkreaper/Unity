@@ -11,14 +11,14 @@ public class _DestroyOnContact : MonoBehaviour
 
     public void Start()
     {
-        GameObject gameControllerObject = GameObject.FindWithTag(Tags.GAMECONTROLLER);
-        if (gameControllerObject == null)
+        GameObject gameManagerObject = GameObject.FindWithTag(Tags.GAME_MANAGER);
+        if (gameManagerObject == null)
         {
             Debug.Log("Cannot find 'GameController' script");
             return;
         }
 
-        gameManager = gameControllerObject.GetComponent<GameManager>();
+        gameManager = gameManagerObject.GetComponent<GameManager>();
     }
 
     public void OnTriggerEnter(Collider other)

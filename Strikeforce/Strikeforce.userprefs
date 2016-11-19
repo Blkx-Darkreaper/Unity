@@ -1,14 +1,19 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\MatchmakingMenu.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="D:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\Hud.cs">
     <Files>
-      <File FileName="Assets\Scripts\MatchmakingMenu.cs" Line="27" Column="22" />
+      <File FileName="Assets\Scripts\MatchmakingMenu.cs" Line="50" Column="1" />
+      <File FileName="D:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\Player.cs" Line="62" Column="1" />
+      <File FileName="D:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\Hud.cs" Line="185" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\GlobalAssets.cs" line="282" />
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\ProfileStorage.cs" line="33" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\UserInput.cs" line="429" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\UserInput.cs" line="30" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\MatchmakingMenu.cs" line="49" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
