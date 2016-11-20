@@ -45,7 +45,7 @@ namespace Strikeforce
 
         protected void Start()
         {
-            profile = ProfileManager.ActiveInstance.CurrentProfile;
+            profile = ProfileManager.Singleton.CurrentProfile;
 
             SetCursorState(CursorState.select);
             InitResources();

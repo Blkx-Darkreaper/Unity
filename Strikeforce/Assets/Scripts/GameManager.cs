@@ -8,7 +8,7 @@ namespace Strikeforce
 {
     public class GameManager : Manager
     {
-        public static GameManager ActiveInstance = null;
+        public static GameManager Singleton = null;
         protected bool isLoading = false;
         public GameObject[] Structures;
         private Dictionary<string, GameObject> allStructures;
@@ -30,12 +30,12 @@ namespace Strikeforce
 
         private void Awake()
         {
-            if (ActiveInstance == null)
+            if (Singleton == null)
             {
                 DontDestroyOnLoad(gameObject);
-                ActiveInstance = this;
+                Singleton = this;
             }
-            if (ActiveInstance != this)
+            if (Singleton != this)
             {
                 Destroy(gameObject);
                 return;
@@ -258,11 +258,11 @@ namespace Strikeforce
 
         public int GetNextUniqueId()
         {
-            int id = ActiveInstance.nextId;
-            ActiveInstance.nextId++;
-            if (ActiveInstance.nextId >= int.MaxValue)
+            int id = Singleton.nextId;
+            Singleton.nextId++;
+            if (Singleton.nextId >= int.MaxValue)
             {
-                ActiveInstance.nextId = 0;
+                Singleton.nextId = 0;
             }
 
             return id;

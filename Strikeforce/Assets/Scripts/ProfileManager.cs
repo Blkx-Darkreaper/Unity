@@ -8,19 +8,19 @@ namespace Strikeforce
 {
     public class ProfileManager : Manager
     {
-        public static ProfileManager ActiveInstance = null;
+        public static ProfileManager Singleton = null;
         public string ProfileSaveFile = @"profiles.json";
         public Dictionary<string, Profile> AllProfiles = new Dictionary<string, Profile>();
         public Profile CurrentProfile { get; protected set; }
 
         public void Awake()
         {
-            if (ActiveInstance == null)
+            if (Singleton == null)
             {
                 DontDestroyOnLoad(gameObject);
-                ActiveInstance = this;
+                Singleton = this;
             }
-            if (ActiveInstance != this)
+            if (Singleton != this)
             {
                 Destroy(gameObject);
                 return;

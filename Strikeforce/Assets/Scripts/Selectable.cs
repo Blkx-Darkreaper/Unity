@@ -84,7 +84,7 @@ namespace Strikeforce
             {
                 return;
             }
-            if (GameManager.ActiveInstance.IsMenuOpen)
+            if (GameManager.Singleton.IsMenuOpen)
             {
                 return;
             }
@@ -105,7 +105,7 @@ namespace Strikeforce
 
             try
             {
-                actionTarget = (Entity)GameManager.ActiveInstance.GetGameEntityById(entityId);
+                actionTarget = (Entity)GameManager.Singleton.GetGameEntityById(entityId);
             }
             catch
             {
@@ -138,7 +138,7 @@ namespace Strikeforce
             {
                 if (Owner == null)
                 {
-                    teamColour.GetComponent<Renderer>().material.color = GameManager.ActiveInstance.DefaultColour;
+                    teamColour.GetComponent<Renderer>().material.color = GameManager.Singleton.DefaultColour;
                     continue;
                 }
 

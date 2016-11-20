@@ -74,7 +74,7 @@ namespace Strikeforce
 
         protected void AddUnitToBuildQueue(string unitName)
         {
-            GameObject unitGameObject = GameManager.ActiveInstance.GetUnitPrefab(unitName);
+            GameObject unitGameObject = GameManager.Singleton.GetUnitPrefab(unitName);
             Selectable unit = unitGameObject.GetComponent<Selectable>();
             if (Owner != null)
             {

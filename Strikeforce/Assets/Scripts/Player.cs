@@ -32,7 +32,7 @@ namespace Strikeforce
 
         protected override void Awake()
         {
-            Profile profile = ProfileManager.ActiveInstance.CurrentProfile;
+            Profile profile = ProfileManager.Singleton.CurrentProfile;
             if (profile != null)
             {
                 profile.Player = this;
@@ -162,7 +162,7 @@ namespace Strikeforce
                 return;
             }
             //Units allUnits = GetComponentInChildren<Units>();
-            GameObject unitToSpawn = (GameObject)Instantiate(GameManager.ActiveInstance.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
+            GameObject unitToSpawn = (GameObject)Instantiate(GameManager.Singleton.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
             unitToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", unitName, PlayerId));
 
@@ -192,7 +192,7 @@ namespace Strikeforce
                 return;
             }
 
-            GameObject unitToSpawn = (GameObject)Instantiate(GameManager.ActiveInstance.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
+            GameObject unitToSpawn = (GameObject)Instantiate(GameManager.Singleton.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
             unitToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", unitName, PlayerId.ToString()));
 

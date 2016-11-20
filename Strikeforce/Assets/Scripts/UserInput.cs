@@ -34,6 +34,11 @@ namespace Strikeforce
             public const string HORIZONTAL = "Horizontal";
             public const string VERTICAL = "Vertical";
         }
+        public struct Side
+        {
+            public const string LEFT = "Left";
+            public const string RIGHT = "Right";
+        }
 
         protected void Awake()
         {
@@ -43,11 +48,17 @@ namespace Strikeforce
         protected void InitKeyBinds()
         {
             keyBinds = new KeyMap();
+            //InitKeyboardBinds();
+            InitGamepadBinds();
+        }
+
+        protected void InitKeyboardBinds()
+        {
             keyBinds.Action1 = KeyCode.A;
             keyBinds.Action2 = KeyCode.S;
             keyBinds.Special1 = KeyCode.D;
             keyBinds.Special2 = KeyCode.F;
-            keyBinds.LeftTrigger =KeyCode.E;
+            keyBinds.LeftTrigger = KeyCode.E;
             keyBinds.RightTrigger = KeyCode.R;
             keyBinds.Menu = KeyCode.Escape;
             keyBinds.Back = KeyCode.Backspace;
@@ -63,9 +74,31 @@ namespace Strikeforce
             keyBinds.RightStick.Right = KeyCode.Keypad6;
         }
 
+        protected void InitGamepadBinds()
+        {
+            keyBinds.Action1 = KeyCode.Joystick1Button0;
+            keyBinds.Action2 = KeyCode.Joystick1Button1;
+            keyBinds.Special1 = KeyCode.Joystick1Button2;
+            keyBinds.Special2 = KeyCode.Joystick1Button3;
+            keyBinds.LeftTrigger = KeyCode.Joystick1Button9;
+            keyBinds.RightTrigger = KeyCode.Joystick1Button10;
+            keyBinds.Menu = KeyCode.Joystick1Button7;
+            keyBinds.Back = KeyCode.Joystick1Button6;
+
+            //keyBinds.LeftStick.Up = KeyCode.UpArrow;
+            //keyBinds.LeftStick.Down = KeyCode.DownArrow;
+            //keyBinds.LeftStick.Left = KeyCode.LeftArrow;
+            //keyBinds.LeftStick.Right = KeyCode.RightArrow;
+
+            //keyBinds.RightStick.Up = KeyCode.Keypad8;
+            //keyBinds.RightStick.Down = KeyCode.Keypad2;
+            //keyBinds.RightStick.Left = KeyCode.Keypad4;
+            //keyBinds.RightStick.Right = KeyCode.Keypad6;
+        }
+
         protected void Start()
         {
-            profile = ProfileManager.ActiveInstance.CurrentProfile;
+            profile = ProfileManager.Singleton.CurrentProfile;
             if (profile == null)
             {
                 return;
@@ -87,62 +120,6 @@ namespace Strikeforce
             //}
 
             RespondToKeyboardActivity();
-            //RespondToMouseActivity();
-            //UpdateCamera();
-        }
-
-        protected void UpdateCamera()
-        {
-            MoveCamera();
-            RotateCamera();
-        }
-
-        protected void MoveCamera()
-        {
-            bool altKeyPressed = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-            if (altKeyPressed == true)
-            {
-                return;
-            }
-
-            float x = Input.mousePosition.x;
-            float y = Input.mousePosition.y;
-
-            float horizontalScrollRate = getHorizontalScrollRate(x);
-            float verticalScrollRate = getVerticalScrollRate(y);
-            //if (Mathf.Abs(horizontalScrollRate) + Mathf.Abs(verticalScrollRate) == 0)
-            //{
-            //    player.hud.SetCursorState(CursorState.select);
-            //}
-
-            Vector3 movement = new Vector3(horizontalScrollRate, 0, verticalScrollRate);
-
-            // Scroll the camera in the direction it is pointing but ignore the vertical tilt
-            movement = Camera.main.transform.TransformDirection(movement);
-
-            // Change camera zoom
-            movement.y = getCameraZoomRate();
-
-            Vector3 origin = Camera.main.transform.position;
-
-            Vector3 destination = origin;
-            destination.x += movement.x;
-            destination.y += movement.y;
-            destination.z += movement.z;
-
-            destination = new Vector3(
-                destination.x,
-                destination.y = Mathf.Clamp(destination.y, GlobalAssets.Camera.MinHeight, GlobalAssets.Camera.MaxHeight),
-                destination.z
-            );
-
-            if (destination == origin)
-            {
-                //player.PlayerHud.SetCursorState(CursorState.select);
-                return;
-            }
-
-            Camera.main.transform.position = Vector3.MoveTowards(origin, destination, Time.deltaTime * GlobalAssets.Camera.ScrollSpeed);
         }
 
         protected float getHorizontalScrollRate(float x)
@@ -191,49 +168,6 @@ namespace Strikeforce
             return scrollRate;
         }
 
-        protected float getCameraZoomRate()
-        {
-            // Away from ground is positive
-            float scrollwheelInput = Input.GetAxis(KeyMappings.SCROLL_WHEEL);
-            float zoomRate = -GlobalAssets.Camera.ScrollSpeed * scrollwheelInput;
-
-            return zoomRate;
-        }
-
-        protected void RotateCamera()
-        {
-            Vector3 origin = Camera.main.transform.eulerAngles;
-            Vector3 destination = origin;
-
-            // Detect rotation amount if Alt and the right mouse button are held down
-            bool altKeyPressed = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-            if (altKeyPressed == false)
-            {
-                return;
-            }
-
-            bool rightMousePressed = Input.GetMouseButton(1);
-            if (rightMousePressed == false)
-            {
-                return;
-            }
-
-            float rotationAmount = GlobalAssets.Camera.RotationAmount;
-
-            float horizontalInput = Input.GetAxis(KeyMappings.MOUSE_Y_AXIS);
-            destination.x -= horizontalInput * rotationAmount;
-
-            float verticalInput = Input.GetAxis(KeyMappings.MOUSE_X_AXIS);
-            destination.y += verticalInput * rotationAmount;
-
-            if (destination == origin)
-            {
-                return;
-            }
-
-            Camera.main.transform.eulerAngles = Vector3.MoveTowards(origin, destination, Time.deltaTime * GlobalAssets.Camera.RotationSpeed);
-        }
-
         public static GameObject GetHitGameObject()
         {
             Vector3 mousePosition = Input.mousePosition;
@@ -273,152 +207,6 @@ namespace Strikeforce
             return hit.point;
         }
 
-        protected void RespondToMouseActivity()
-        {
-            if (Input.GetMouseButton(0) == true)
-            {
-                LeftMouseClick();
-            }
-            else if (Input.GetMouseButton(1) == true)
-            {
-                RightMouseClick();
-            }
-
-            MouseOver();
-        }
-
-        protected void MouseOver()
-        {
-            Player player = profile.Player;
-            if (player == null)
-            {
-                return;
-            }
-
-            bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
-            if (mouseInBounds == false)
-            {
-                return;
-            }
-
-            //if (player.IsSettingConstructionPoint == true)
-            //{
-            //    player.SetConstructionPoint();
-            //    return;
-            //}
-
-            GameObject entityUnderMouse = GetHitGameObject();
-            if (entityUnderMouse == null)
-            {
-                return;
-            }
-
-            if (player.SelectedEntity != null)
-            {
-                player.SelectedEntity.SetHoverState(entityUnderMouse);
-            }
-            else
-            {
-                bool entityIsGround = entityUnderMouse.CompareTag(Tags.GROUND);
-                if (entityIsGround == true)
-                {
-                    return;
-                }
-
-                Player owner = entityUnderMouse.GetComponentInParent<Player>();
-                if (owner == null)
-                {
-                    return;
-                }
-
-                Selectable unit = null;
-                if (entityUnderMouse.CompareTag(Tags.UNIT) == true)
-                {
-                    unit = entityUnderMouse.GetComponentInParent<Selectable>();
-                }
-
-                Structure structure = null;
-                if (entityUnderMouse.CompareTag(Tags.STRUCTURE) == true)
-                {
-                    structure = entityUnderMouse.GetComponentInParent<Structure>();
-                }
-                bool entityNeitherUnitOrStructure = unit == null && structure == null;
-                if (entityNeitherUnitOrStructure == true)
-                {
-                    return;
-                }
-
-                bool playerOwnsEntity = owner.PlayerId == player.PlayerId;
-                if (playerOwnsEntity == false)
-                {
-                    return;
-                }
-
-                player.PlayerHud.SetCursorState(CursorState.select);
-            }
-        }
-
-        protected void LeftMouseClick()
-        {
-            Player player = profile.Player;
-            if (player == null)
-            {
-                return;
-            }
-
-            bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
-            if (mouseInBounds == false)
-            {
-                return;
-            }
-
-            //bool settingBuildPoint = player.IsSettingConstructionPoint;
-            //if (settingBuildPoint == true)
-            //{
-            //    bool validBuildPoint = player.IsConstructionSiteValid();
-            //    if (validBuildPoint == false)
-            //    {
-            //        return;
-            //    }
-
-            //    player.StartConstruction();
-            //    return;
-            //}
-
-            GameObject hitEntity = GetHitGameObject();
-            if (hitEntity == null)
-            {
-                return;
-            }
-
-            Vector3 hitPoint = GetHitPoint();
-            if (hitPoint == GlobalAssets.InvalidPoint)
-            {
-                return;
-            }
-
-            if (player.SelectedEntity != null)
-            {
-                player.SelectedEntity.MouseClick(hitEntity, hitPoint, player);
-            }
-            else
-            {
-                bool isGround = hitEntity.CompareTag(Tags.GROUND);
-                if (isGround == true)
-                {
-                    return;
-                }
-
-                Selectable entity = hitEntity.GetComponentInParent<Selectable>();
-                if (entity == null)
-                {
-                    return;
-                }
-
-                SelectEntity(entity);
-            }
-        }
-
         protected void SelectEntity(Selectable entityToSelect)
         {
             Player player = profile.Player;
@@ -429,41 +217,6 @@ namespace Strikeforce
 
             player.SelectedEntity = entityToSelect;
             entityToSelect.SetSelection(true);
-        }
-
-        protected void RightMouseClick()
-        {
-            Player player = profile.Player;
-            if (player == null)
-            {
-                return;
-            }
-
-            bool mouseInBounds = player.PlayerHud.MouseInPlayArea();
-            if (mouseInBounds == false)
-            {
-                return;
-            }
-
-            bool altKeyPressed = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-            if (altKeyPressed == true)
-            {
-                return;
-            }
-            if (player.SelectedEntity == null)
-            {
-                return;
-            }
-
-            bool settingConstructionSite = player.IsSettingConstructionPoint;
-            if (settingConstructionSite == true)
-            {
-                //player.CancelConstruction();
-            }
-            else
-            {
-                Deselect();
-            }
         }
 
         protected void Deselect()
@@ -512,8 +265,11 @@ namespace Strikeforce
                 return;
             }
 
-            float x = Input.GetAxis(Axis.HORIZONTAL) * 0.1f;
-            float z = Input.GetAxis(Axis.VERTICAL) * 0.1f;
+			string leftStickHor = string.Format ("{0} {1}", Side.LEFT, Axis.HORIZONTAL);
+			string leftStickVert = string.Format ("{0} {1}", Side.LEFT, Axis.VERTICAL);
+
+            float x = Input.GetAxis(leftStickHor) * 0.1f;
+            float z = Input.GetAxis(leftStickVert) * 0.1f;
 
             raider.transform.Translate(x, 0, z);    //testing
             //profile.Player.MovePlayer(x, 0, z);
@@ -553,9 +309,9 @@ namespace Strikeforce
         {
             Time.timeScale = 0f;
             GetComponentInChildren<PauseMenu>().enabled = true;
-            GetComponent<UserInput>().enabled = false;
+            //GetComponent<UserInput>().enabled = false;
             Cursor.visible = true;
-            GameManager.ActiveInstance.IsMenuOpen = true;
+            GameManager.Singleton.IsMenuOpen = true;
         }
     }
 }

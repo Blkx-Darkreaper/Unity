@@ -33,7 +33,7 @@ namespace Strikeforce
 
         private static void LoadUsernames()
         {
-            string[] allUsernames = ProfileManager.ActiveInstance.GetAllUsernames();
+            string[] allUsernames = ProfileManager.Singleton.GetAllUsernames();
             SelectionList.AddAllEntries(allUsernames);
         }
 
@@ -106,7 +106,7 @@ namespace Strikeforce
 
         protected void SelectProfile(string usernameToFind)
         {
-            Profile profile = ProfileManager.ActiveInstance.GetProfile(usernameToFind, avatarIndex);
+            Profile profile = ProfileManager.Singleton.GetProfile(usernameToFind, avatarIndex);
             if (profile == null)
             {
                 return;

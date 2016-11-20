@@ -22,12 +22,12 @@ namespace Strikeforce
 
         protected void EnableMatchmaking()
         {
-            if (ProfileManager.ActiveInstance == null)
+            if (ProfileManager.Singleton == null)
             {
                 return;
             }
 
-            bool profileSelected = ProfileManager.ActiveInstance.CurrentProfile != null;
+            bool profileSelected = ProfileManager.Singleton.CurrentProfile != null;
             if (profileSelected == false)
             {
                 return;

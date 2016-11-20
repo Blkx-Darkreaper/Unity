@@ -33,7 +33,7 @@ namespace Strikeforce
 
         protected virtual void Awake()
         {
-            GameManager.ActiveInstance.RegisterGameEntity(this);
+            GameManager.Singleton.RegisterGameEntity(this);
 
             playingArea = new Rect(0f, 0f, 0f, 0f);
         }

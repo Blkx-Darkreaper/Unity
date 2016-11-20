@@ -299,7 +299,7 @@ namespace Strikeforce
         protected virtual void ExitGame()
         {
             string username = "Unknown player";
-            Profile profile = ProfileManager.ActiveInstance.CurrentProfile;
+            Profile profile = ProfileManager.Singleton.CurrentProfile;
             if (profile != null)
             {
                 username = profile.Username;

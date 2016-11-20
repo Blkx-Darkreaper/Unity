@@ -49,7 +49,7 @@ namespace Strikeforce
             if (buttonPressed == true)
             {
                 Time.timeScale = 1f;
-                GameManager.ActiveInstance.IsMenuOpen = false;
+                GameManager.Singleton.IsMenuOpen = false;
                 Application.LoadLevel(Levels.Game);
             }
 
@@ -58,7 +58,7 @@ namespace Strikeforce
             buttonPressed = GUI.Button(new Rect(x, y, buttonWidth, buttonHeight), Message.MAIN_MENU);
             if (buttonPressed == true)
             {
-                GameManager.ActiveInstance.LoadLevel(string.Empty);
+                GameManager.Singleton.LoadLevel(string.Empty);
                 Application.LoadLevel(Levels.MainMenu);
                 Cursor.visible = true;
             }

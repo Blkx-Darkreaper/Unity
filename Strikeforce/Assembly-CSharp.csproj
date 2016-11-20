@@ -90,7 +90,6 @@
      <Compile Include="Assets\Scripts\Ordnance.cs" />
      <Compile Include="Assets\Scripts\PauseMenu.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
-     <Compile Include="Assets\Scripts\PlayerMove.cs" />
      <Compile Include="Assets\Scripts\Production.cs" />
      <Compile Include="Assets\Scripts\Profile.cs" />
      <Compile Include="Assets\Scripts\ProfileManager.cs" />
