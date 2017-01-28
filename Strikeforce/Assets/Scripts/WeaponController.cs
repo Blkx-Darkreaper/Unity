@@ -10,6 +10,8 @@ namespace Strikeforce
         private const string FIRE = "Fire";
         //public BallisticWeapon weapon;
 
+        public Weapon(int width, int height) : base(width, height) { }
+
         //public void Start()
         //{
         //    InvokeRepeating(FIRE, attackDelay, weapon.cooldown);

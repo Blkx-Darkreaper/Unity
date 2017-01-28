@@ -49,7 +49,7 @@ namespace Strikeforce
             if (buttonPressed == true)
             {
                 Time.timeScale = 1f;
-                GameManager.Singleton.IsMenuOpen = false;
+                IsOpening = false;
                 Application.LoadLevel(Levels.Game);
             }
 

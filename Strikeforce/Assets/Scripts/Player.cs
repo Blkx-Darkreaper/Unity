@@ -14,6 +14,7 @@ namespace Strikeforce
         [HideInInspector] public BuildCursor Cursor;
         [HideInInspector] public Raider CurrentRaider;
         [HideInInspector] protected bool isInBuildMode = true;
+        [HideInInspector] public bool IsMenuOpen { get; set; }
         [HideInInspector] public Inventory CurrentInventory;
         public Selectable SelectedEntity { get; set; }
         public bool IsSettingConstructionPoint;
@@ -47,9 +48,10 @@ namespace Strikeforce
 
         protected void SpawnRaider()
         {
+            Vector3 spawn = new Vector3(0, 5, 5);
             GameObject raiderObject = Instantiate(
                 NetworkManager.singleton.spawnPrefabs[3], 
-                Vector3.zero, 
+                spawn, 
                 Quaternion.identity) as GameObject;
 
             CurrentRaider = raiderObject.GetComponent<Raider>();
@@ -57,7 +59,7 @@ namespace Strikeforce
 
             Vector3 raiderPosition = raiderObject.transform.position;
 
-            Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 20, raiderPosition.z);
+            Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 10, raiderPosition.z);
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
         }
@@ -75,6 +77,7 @@ namespace Strikeforce
 
         public void MovePlayer(float x, float y, float z)
         {
+			isInBuildMode = false;	//testing
             if (isInBuildMode == true)
             {
                 Cursor.transform.Translate(x, 0, z);
@@ -83,6 +86,8 @@ namespace Strikeforce
             {
                 CurrentRaider.transform.Translate(x, 0, z);
             }
+
+            mainCamera.transform.Translate(x, z, 0);	//testing
         }
 
         public bool IsConstructionSiteValid(Structure constructionSite)

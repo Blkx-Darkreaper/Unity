@@ -271,8 +271,7 @@ namespace Strikeforce
             float x = Input.GetAxis(leftStickHor) * 0.1f;
             float z = Input.GetAxis(leftStickVert) * 0.1f;
 
-            raider.transform.Translate(x, 0, z);    //testing
-            //profile.Player.MovePlayer(x, 0, z);
+            profile.Player.MovePlayer(x, 0, z);
         }
 
         [Command]
@@ -311,7 +310,7 @@ namespace Strikeforce
             GetComponentInChildren<PauseMenu>().enabled = true;
             //GetComponent<UserInput>().enabled = false;
             Cursor.visible = true;
-            GameManager.Singleton.IsMenuOpen = true;
+            profile.Player.IsMenuOpen = true;
         }
     }
 }

@@ -84,10 +84,6 @@ namespace Strikeforce
             {
                 return;
             }
-            if (GameManager.Singleton.IsMenuOpen)
-            {
-                return;
-            }
 
             DrawSelection();
         }

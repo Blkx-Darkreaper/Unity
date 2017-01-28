@@ -16,9 +16,7 @@ namespace Strikeforce
         private Dictionary<string, GameObject> allUnits;
         public GameObject[] Entities;
         private Dictionary<string, GameObject> allEntities;
-        public GameObject Player;
         protected VictoryCondition[] victoryConditions;
-        public bool IsMenuOpen { get; set; }
         public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
         public Profile CurrentPlayerAccount { get; protected set; }
         public string CurrentGameName { get; protected set; }
@@ -48,19 +46,6 @@ namespace Strikeforce
             InitEntities();
         }
 
-        protected void OnLevelWasLoaded()
-        {
-            if (isLoading == false)
-            {
-                return;
-            }
-
-            isLoading = false;
-            LoadDetails();
-            Time.timeScale = 1f;
-            IsMenuOpen = false;
-        }
-
         protected void Update()
         {
             if (victoryConditions == null)
@@ -88,7 +73,7 @@ namespace Strikeforce
                 resultsScreen.enabled = true;
                 Time.timeScale = 0f;
                 Cursor.visible = true;
-                IsMenuOpen = true;
+                winner.Player.IsMenuOpen = true;
                 winner.Player.PlayerHud.enabled = false;
             }
         }
@@ -341,11 +326,6 @@ namespace Strikeforce
 
             GameObject entity = allEntities[name];
             return entity;
-        }
-
-        public GameObject GetPlayerPrefab()
-        {
-            return Player;
         }
 
         public string[] GetAllPlayerNames() {

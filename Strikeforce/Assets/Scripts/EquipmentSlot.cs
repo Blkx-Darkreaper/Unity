@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Drawing;
 
 namespace Strikeforce
 {
@@ -32,7 +33,7 @@ namespace Strikeforce
             {
                 for (int y = row; y < itemHeight; y++)
                 {
-                    if (EquppedItems[x, y] != null)
+                    if (EquippedItems[x, y] != null)
                     {
                         return false;
                     }
@@ -62,7 +63,7 @@ namespace Strikeforce
             bool isRemovable = item.IsRemovable;
             if (isRemovable == false)
             {
-                return;
+                return null;
             }
 
             for (int x = 0; x < this.Width; x++)
@@ -70,7 +71,7 @@ namespace Strikeforce
                 for (int y = 0; y < this.Height; y++)
                 {
                     Equipment itemToCheck = EquippedItems[x, y];
-                    if (itemToCheck.equals(item) == false)
+                    if (itemToCheck.Equals(item) == false)
                     {
                         continue;
                     }

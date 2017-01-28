@@ -2,19 +2,24 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\UserInput.cs">
     <Files>
-      <File FileName="Assets\Scripts\UserInput.cs" Line="270" Column="1" />
+      <File FileName="Assets\Scripts\Level.cs" Line="80" Column="5" />
+      <File FileName="Assets\Scripts\StrikeforceMap.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\MainMenu.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Menu.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Player.cs" Line="90" Column="63" />
+      <File FileName="Assets\Scripts\UserInput.cs" Line="273" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\GlobalAssets.cs" line="282" />
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\ProfileStorage.cs" line="33" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\UserInput.cs" line="432" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\UserInput.cs" line="431" />
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\MatchmakingMenu.cs" line="49" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\UserInput.cs" line="270" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>
     <Watch file="..\RTS Tutorial\Assets\Scripts\OreDeposit.cs" line="37" offsetX="702" offsetY="756" expression="transform.Find(&quot;Meshes&quot;).gameObject" liveUpdate="False" />
+    <Watch file="Assets\Scripts\Level.cs" line="78" offsetX="572" offsetY="1617" expression="Tileset" liveUpdate="False" />
   </MonoDevelop.Ide.DebuggingService.PinnedWatches>
 </Properties>

@@ -15,8 +15,8 @@ namespace Strikeforce
         public GameObject ButtonPrefab;
         public const string MENU_OPEN = "MenuOpen";
         public const string IS_OPENING_MENU = "IsOpeningMenu";
-        public bool IsOpeningMenu { get { return animator.GetBool(IS_OPENING_MENU); } set { animator.SetBool(IS_OPENING_MENU, value); } }
-		public bool IsMenuOpen { get { return animator.GetCurrentAnimatorStateInfo (0).IsName (MENU_OPEN); } }
+        public bool IsOpening { get { return animator.GetBool(IS_OPENING_MENU); } set { animator.SetBool(IS_OPENING_MENU, value); } }
+		public bool IsOpen { get { return animator.GetCurrentAnimatorStateInfo (0).IsName (MENU_OPEN); } }
         protected MenuManager menuManager;
         protected Animator animator;
         protected CanvasGroup canvasGroup;
@@ -48,7 +48,7 @@ namespace Strikeforce
 
         protected void Update()
         {
-            if (IsMenuOpen == false)
+            if (IsOpen == false)
             {
                 canvasGroup.blocksRaycasts = canvasGroup.interactable = false;
                 return;
@@ -61,7 +61,7 @@ namespace Strikeforce
 
         protected virtual void OnGUI()
         {
-            if (IsMenuOpen == false)
+            if (IsOpen == false)
             {
                 return;
             }
@@ -253,15 +253,14 @@ namespace Strikeforce
         {
             Time.timeScale = 0f;
             Cursor.visible = true;
-            IsOpeningMenu = true;
+            IsOpening = true;
         }
 
         protected virtual void Resume()
         {
             Time.timeScale = 1f;
             //Cursor.visible = false;
-            IsOpeningMenu = false;
-            //GameManager.ActiveInstance.IsMenuOpen = false;
+            IsOpening = false;
         }
 
         protected virtual void Back()
@@ -288,12 +287,12 @@ namespace Strikeforce
 
         public virtual void ShowMenu()
         {
-            this.IsOpeningMenu = true;
+            this.IsOpening = true;
         }
 
         public virtual void HideMenu()
         {
-            this.IsOpeningMenu = false;
+            this.IsOpening = false;
         }
 
         protected virtual void ExitGame()
