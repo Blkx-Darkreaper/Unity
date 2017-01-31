@@ -3,14 +3,15 @@ using System.Drawing;
 
 namespace Strikeforce
 {
-    public class EquipmentSlot : MonoBehaviour
+    public class Hardpoint : MonoBehaviour
     {
-        public Vector2 Location { get; protected set; }
+        public Vector2 Location;
         public int Width { get { return EquippedItems.GetLength(1); } }
         public int Height { get { return EquippedItems.GetLength(0); } }
 		public Equipment[,] EquippedItems { get; protected set; }
+        public Transform SpawnPoint;
 		
-		public EquipmentSlot(int x, int y, int width, int height) {
+		public Hardpoint(int x, int y, int width, int height) {
 			this.Location = new Vector2(x, y);
 			this.EquippedItems = new Equipment[width, height];
 		}

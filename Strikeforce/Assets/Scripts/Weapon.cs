@@ -5,21 +5,23 @@ namespace Strikeforce
 {
     public class Weapon : Equipment
     {
-        public Transform shotSpawn;
-        public float attackDelay;
+        public string Type;
+        public int Priority;
+        public bool IsOrdnanceWeapon = false;
         private const string FIRE = "Fire";
-        //public BallisticWeapon weapon;
 
-        public Weapon(int width, int height) : base(width, height) { }
+        public Weapon(int width, int height) : base(width, height) {
+            this.IsWeapon = true;
+        }
 
         //public void Start()
         //{
-        //    InvokeRepeating(FIRE, attackDelay, weapon.cooldown);
+        //    InvokeRepeating(FIRE, AttackDelay, weapon.cooldown);
         //}
 
         //private void Fire()
         //{
-        //    Instantiate(weapon.projectileType, shotSpawn.position, shotSpawn.rotation);
+        //    Instantiate(weapon.projectileType, ShotSpawn.position, ShotSpawn.rotation);
         //    var blasterSound = GetComponent<AudioSource>();
         //    blasterSound.Play();
         //}
