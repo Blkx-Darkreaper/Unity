@@ -71,29 +71,29 @@ namespace Strikeforce
 
         protected class TriggerLink
         {
-            public Weapon Dominant { get; protected set; }
+            public string DominantWeaponType { get; protected set; }
             public float AngledSpread { get; protected set; }
             public float HorizontalSpread { get; protected set; }
             public int FiringGroups { get; protected set; }
             public int GroupingSize { get; protected set; }
-            protected LinkedList<Weapon> allLinkedWeapons { get; protected set; }
+            protected List<Weapon> allLinkedWeapons { get; protected set; }
             protected List<FiringGroup> allFiringGroups { get; protected set; }
             protected Dictionary<string, int> allWeaponTypes { get; protected set; }
 
             public TriggerLink()
             {
-                this.Dominant = null;
+                this.DominantWeaponType = string.Empty;
                 this.AngledSpread = 0f;
                 this.HorizontalSpread = 0f;
                 this.GroupingSize = 1;
-                this.allLinkedWeapons = new LinkedList<Weapon>();
+                this.allLinkedWeapons = new List<Weapon>();
                 this.allFiringGroups = new List<FiringGroup>();
                 this.allWeaponTypes = new Dictionary<string, int>();
             }
 
             public void LinkWeapon(Weapon weapon)
             {
-                this.allLinkedWeapons.AddFirst(weapon);
+                this.allLinkedWeapons.Add(weapon);
                 
                 bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
                 if (hasType == false)
@@ -104,20 +104,124 @@ namespace Strikeforce
                 {
                     this.allWeaponTypes[weapon.Type]++;
                 }
+
+                SetDominantWeaponType();
+                SetAngledSpread();
             }
 
-            protected void SetDominant()
+            protected void SetDominantWeaponType()
             {
+                int maxValue = 0;
 
+                foreach (string type in allWeaponTypes.Keys)
+                {
+                    Weapon weapon = GlobalAssets.Weapons[type];
+                    int priority = weapon.Priority;
+                    int quantity = this.allWeaponTypes[type];
+
+                    int triples = quantity / 3;
+                    int pairs = (quantity - 3 * triples) / 2;
+                    int value = 100 * triples + 10 * pairs + priority;
+
+                    if (value < maxValue)
+                    {
+                        continue;
+                    }
+
+                    maxValue = value;
+                    this.DominantWeaponType = type;
+                }
+            }
+
+            protected void SetAngledSpread()
+            {
+                if(DominantWeaponType.Equals(WeaponTypes.BOLT) == true) {
+                    return;
+                }
+
+                if (allWeaponTypes.ContainsKey(WeaponTypes.BOLT) == false)
+                {
+                    return;
+                }
+
+                int quantity = allWeaponTypes[WeaponTypes.BOLT];
+                this.AngledSpread = quantity * 0.05f;
+            }
+
+            protected void SetHorizontalSpread()
+            {
+                if (DominantWeaponType.Equals(WeaponTypes.FLAMEBURST) == true)
+                {
+                    return;
+                }
+
+                if(allWeaponTypes.ContainsKey(WeaponTypes.FLAMEBURST) == false) {
+                    return;
+                }
+
+                int quantity = allWeaponTypes[WeaponTypes.FLAMEBURST];
+                this.HorizontalSpread = quantity * .1f;
+            }
+
+            protected void SetFiringGroups()
+            {
+                if (DominantWeaponType.Equals(WeaponTypes.WAVE) == true)
+                {
+                    return;
+                }
+
+                if (allWeaponTypes.ContainsKey(WeaponTypes.WAVE) == false)
+                {
+                    return;
+                }
+
+                int quantity = allWeaponTypes[WeaponTypes.WAVE];
+                this.FiringGroups = quantity + 1;
+
+                this.allFiringGroups = new List<FiringGroup>(FiringGroups);
+                for (int i = 0; i < FiringGroups; i++)
+                {
+                    this.allFiringGroups.Add(new FiringGroup());
+                }
+
+                for (int i = 0; i < allLinkedWeapons.Count; i++)
+                {
+                    int groupIndex = i % FiringGroups;
+                    FiringGroup group = this.allFiringGroups[groupIndex];
+
+                    Weapon weapon = allLinkedWeapons[i];
+                    group.AddWeapon(weapon);
+                }
+            }
+
+            protected void SetGroupingSize()
+            {
+                if (DominantWeaponType.Equals(WeaponTypes.CANNON) == true)
+                {
+                    return;
+                }
+
+                if (allWeaponTypes.ContainsKey(WeaponTypes.CANNON) == false)
+                {
+                    return;
+                }
+
+                int quantity = allWeaponTypes[WeaponTypes.CANNON];
+                this.GroupingSize = quantity + 1;
             }
         }
 
         protected class FiringGroup {
-            public LinkedList<Weapon> AllWeapons { get; protected set; }
+            public SortedList<int, Weapon> AllWeapons { get; protected set; }
 
             public FiringGroup()
             {
-                this.AllWeapons = new LinkedList<Weapon>();
+                this.AllWeapons = new SortedList<int, Weapon>();
+            }
+
+            public void AddWeapon(Weapon weapon)
+            {
+                this.AllWeapons.Add(weapon.Priority, weapon);
             }
         }
 

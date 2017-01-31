@@ -111,6 +111,16 @@ namespace Strikeforce
         public const string SCROLL_WHEEL = "Mouse ScrollWheel";
     }
 
+    public struct WeaponTypes
+    {
+        public const string SHOT = "Shot";
+        public const string FLAMEBURST = "Flameburst";
+        public const string CANNON = "Cannon";
+        public const string BOLT = "Bolt";
+        public const string WAVE = "Wave";
+        public const string BEAM = "Beam";
+    }
+
     public static class GlobalAssets
     {
         public static string DefaultUsername = "NewPlayer";
@@ -131,6 +141,14 @@ namespace Strikeforce
             new KeyValuePair<string, string>(ResourceProperties.BOMBS, ResourceProperties.BOMBS_LIMIT),
             new KeyValuePair<string, string>(ResourceProperties.MATERIEL, ResourceProperties.MATERIEL_LIMIT)
 	    };
+        public static Dictionary<string, Weapon> Weapons = new Dictionary<string, Weapon>() {
+            {WeaponTypes.SHOT, new Weapon(WeaponTypes.SHOT, 1, 1, 1)},
+            {WeaponTypes.FLAMEBURST, new Weapon(WeaponTypes.FLAMEBURST, 2, 1, 1)},
+            {WeaponTypes.CANNON, new Weapon(WeaponTypes.CANNON, 3, 1, 1)},
+            {WeaponTypes.BOLT, new Weapon(WeaponTypes.BOLT, 3, 1, 1)},
+            {WeaponTypes.WAVE, new Weapon(WeaponTypes.WAVE, 4, 2, 1)},
+            {WeaponTypes.BEAM, new Weapon(WeaponTypes.BEAM, 5, 1, 2)}
+        };
 
         public struct Camera
         {
@@ -266,9 +284,10 @@ namespace Strikeforce
 
         public static GameObject GetChildGameObjectWithName(GameObject parent, string nameToFind)
         {
-			if (parent == null) {
-				return null;
-			}
+            if (parent == null)
+            {
+                return null;
+            }
 
             foreach (Transform child in parent.transform)
             {
@@ -286,9 +305,10 @@ namespace Strikeforce
 
         public static GameObject GetChildGameObjectWithTag(GameObject parent, string tagToFind)
         {
-			if (parent == null) {
-				return null;
-			}
+            if (parent == null)
+            {
+                return null;
+            }
 
             foreach (Transform child in parent.transform)
             {

@@ -10,7 +10,9 @@ namespace Strikeforce
         public bool IsOrdnanceWeapon = false;
         private const string FIRE = "Fire";
 
-        public Weapon(int width, int height) : base(width, height) {
+        public Weapon(string type, int priority, int width, int height) : base(width, height) {
+            this.Type = type;
+            this.Priority = priority;
             this.IsWeapon = true;
         }
 
