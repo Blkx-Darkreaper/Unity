@@ -288,20 +288,7 @@ namespace Strikeforce
                 return;
             }
 
-            // create the bullet object from the bullet prefab
-            GameObject bullet = (GameObject)Instantiate(
-                NetworkManager.singleton.spawnPrefabs[0],
-                raider.transform.position + raider.transform.forward,
-                Quaternion.identity);
-
-            // make the bullet move away in front of the player
-            bullet.GetComponentInChildren<Rigidbody>().velocity = raider.transform.forward * 4;
-
-            // spawn the bullet on the clients
-            NetworkServer.Spawn(bullet);
-
-            // make bullet disappear after 2 seconds
-            Destroy(bullet, 2.0f);
+            raider.Fire();  // Testing
         }
 
         protected void OpenPauseMenu()

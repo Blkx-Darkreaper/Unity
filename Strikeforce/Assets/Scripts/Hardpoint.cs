@@ -6,13 +6,16 @@ namespace Strikeforce
     public class Hardpoint : MonoBehaviour
     {
         public Vector2 Location;
+        public HardpointPosition Position { get; protected set; }
+        public static Size PixelsPerSlot = new Size(42, 42);
         public int Width { get { return EquippedItems.GetLength(1); } }
         public int Height { get { return EquippedItems.GetLength(0); } }
 		public Equipment[,] EquippedItems { get; protected set; }
         public Transform SpawnPoint;
 		
-		public Hardpoint(int x, int y, int width, int height) {
+		public Hardpoint(int x, int y, int width, int height, HardpointPosition position) {
 			this.Location = new Vector2(x, y);
+            this.Position = position;
 			this.EquippedItems = new Equipment[width, height];
 		}
 

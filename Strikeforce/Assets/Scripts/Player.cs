@@ -9,13 +9,20 @@ namespace Strikeforce
     {
         public int PlayerId { get { return this.playerControllerId; } }
         public bool IsNPC;
-        [HideInInspector]  protected Camera mainCamera;
-        [HideInInspector] public Hud PlayerHud;
-        [HideInInspector] public BuildCursor Cursor;
-        [HideInInspector] public Raider CurrentRaider;
-        [HideInInspector] protected bool isInBuildMode = true;
-        [HideInInspector] public bool IsMenuOpen { get; set; }
-        [HideInInspector] public Inventory CurrentInventory;
+        [HideInInspector]
+        protected Camera mainCamera;
+        [HideInInspector]
+        public Hud PlayerHud;
+        [HideInInspector]
+        public BuildCursor Cursor;
+        [HideInInspector]
+        public Raider CurrentRaider;
+        [HideInInspector]
+        protected bool isInBuildMode = true;
+        [HideInInspector]
+        public bool IsMenuOpen { get; set; }
+        [HideInInspector]
+        public Inventory CurrentInventory;
         public Selectable SelectedEntity { get; set; }
         public bool IsSettingConstructionPoint;
         public Material NotAllowedMaterial, AllowedMaterial;
@@ -50,12 +57,21 @@ namespace Strikeforce
         {
             Vector3 spawn = new Vector3(0, 5, 5);
             GameObject raiderObject = Instantiate(
-                NetworkManager.singleton.spawnPrefabs[3], 
-                spawn, 
+                NetworkManager.singleton.spawnPrefabs[3],
+                spawn,
                 Quaternion.identity) as GameObject;
 
             CurrentRaider = raiderObject.GetComponent<Raider>();
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
+
+            Hardpoint[] hardpoints = new Hardpoint[] {
+                new Hardpoint(32, 305, 1, 1, HardpointPosition.LeftOuterWing), 
+                new Hardpoint(76, 252, 1, 1, HardpointPosition.LeftWing), 
+                new Hardpoint(148, 120, 1, 4, HardpointPosition.Center), 
+                new Hardpoint(220, 252, 1, 1, HardpointPosition.RightWing), 
+                new Hardpoint(264, 305, 1, 1, HardpointPosition.RightOuterWing)
+            };
+            CurrentRaider.Init(50f, hardpoints);
 
             Vector3 raiderPosition = raiderObject.transform.position;
 
@@ -77,14 +93,14 @@ namespace Strikeforce
 
         public void MovePlayer(float x, float y, float z)
         {
-			isInBuildMode = false;	//testing
+            isInBuildMode = false;	//testing
             if (isInBuildMode == true)
             {
                 Cursor.transform.Translate(x, 0, z);
             }
             else
             {
-                CurrentRaider.transform.Translate(x, 0, z);
+                CurrentRaider.Move(x, z);
             }
 
             mainCamera.transform.Translate(x, z, 0);	//testing

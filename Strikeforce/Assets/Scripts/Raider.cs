@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Networking;
 using System;
 using System.Collections.Generic;
 
@@ -6,6 +7,8 @@ namespace Strikeforce
 {
     public class Raider : Aircraft
     {
+        public float MaxEnergy;
+        public float CurrentEnergy { get; protected set; }
         public Hardpoint Center { get; protected set; }
         public Hardpoint LeftWing { get; protected set; }
         public Hardpoint RightWing { get; protected set; }
@@ -16,24 +19,59 @@ namespace Strikeforce
         public TriggerLink SpecialFire { get; protected set; }  // Only Ordnance weapons can be linked
         public Equipment EquippedItem { get; protected set; }
 
-        public Raider(Hardpoint[] hardpoints) : base()
+        public void Start()
         {
-            // Hardpoints Left 0 1 2 3 4 Right
-            this.Center = hardpoints[2];
-            this.LeftWing = hardpoints[1];
-            this.RightWing = hardpoints[3];
-            this.LeftOuterWing = hardpoints[0];
-            this.RightOuterWing = hardpoints[4];
-
             this.PrimaryFire = new TriggerLink();
             this.SecondaryFire = new TriggerLink();
             this.SpecialFire = new TriggerLink();
             this.EquippedItem = null;
         }
 
+        public void Init(float maxEnergy, Hardpoint[] hardpoints)
+        {
+            this.MaxEnergy = maxEnergy;
+            this.CurrentEnergy = maxEnergy;
+
+            // Hardpoints Left 0 1 2 3 4 Right
+            this.Center = hardpoints[2];
+            this.LeftWing = hardpoints[1];
+            this.RightWing = hardpoints[3];
+            this.LeftOuterWing = hardpoints[0];
+            this.RightOuterWing = hardpoints[4];
+        }
+
+        public void Fire()  // Testing
+        {
+            //// create the bullet object from the bullet prefab
+            //GameObject bullet = (GameObject)Instantiate(
+            //    NetworkManager.singleton.spawnPrefabs[0],
+            //    transform.position + transform.forward,
+            //    Quaternion.identity);
+
+            //// make the bullet move away in front of the player
+            //bullet.GetComponentInChildren<Rigidbody>().velocity = transform.forward * 4;
+
+            //// spawn the bullet on the clients
+            //NetworkServer.Spawn(bullet);
+
+            //// make bullet disappear after 2 seconds
+            //Destroy(bullet, 2.0f);
+            PrimaryFire.IsFiring = true;
+        }
+
         public void TogglePrimaryFire()
         {
             PrimaryFire.IsFiring = !PrimaryFire.IsFiring;
+        }
+
+        public void Update()
+        {
+            PrimaryFire.IsFiring = false;
+        }
+
+        public void UseEnergy(float amount)
+        {
+            this.CurrentEnergy -= amount;
         }
 
         public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int row, int column)
@@ -176,33 +214,13 @@ namespace Strikeforce
 
             protected void SetFiringGroups()
             {
-                //if (DominantWeaponType.Equals(WeaponTypes.WAVE) == true)
-                //{
-                //    return;
-                //}
+                int quantity = 0;
+                if (allWeaponTypes.ContainsKey(WeaponTypes.WAVE) == true)
+                {
+                    quantity = allWeaponTypes[WeaponTypes.WAVE];
+                }
 
-                //if (allWeaponTypes.ContainsKey(WeaponTypes.WAVE) == false)
-                //{
-                //    return;
-                //}
-
-                int quantity = allWeaponTypes[WeaponTypes.WAVE];
                 this.FiringGroups = quantity + 1;
-
-                //this.allFiringGroups = new List<FiringGroup>(FiringGroups);
-                //for (int i = 0; i < FiringGroups; i++)
-                //{
-                //    this.allFiringGroups.Add(new FiringGroup());
-                //}
-
-                //for (int i = 0; i < allLinkedWeapons.Count; i++)
-                //{
-                //    int groupIndex = i % FiringGroups;
-                //    FiringGroup group = this.allFiringGroups[groupIndex];
-
-                //    Weapon weapon = allLinkedWeapons[i];
-                //    group.AddWeapon(weapon);
-                //}
 
                 if (allLinkedWeapons.Count == 0)
                 {
