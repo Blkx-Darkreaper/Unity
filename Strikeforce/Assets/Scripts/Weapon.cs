@@ -8,12 +8,25 @@ namespace Strikeforce
         public string Type;
         public int Priority;
         public bool IsOrdnanceWeapon = false;
+        public HardpointPosition EquippedHardpoint { get; protected set; }
         private const string FIRE = "Fire";
 
-        public Weapon(string type, int priority, int width, int height) : base(width, height) {
+        public Weapon(string type, int priority, int width, int height) : this(-1, type, priority, width, height) { }
+
+        public Weapon(int id, string type, int priority, int width, int height) : base(id, width, height) {
             this.Type = type;
             this.Priority = priority;
             this.IsWeapon = true;
+        }
+
+        public void Equip(HardpointPosition hardpoint)
+        {
+            this.EquippedHardpoint = hardpoint;
+        }
+
+        public void Fire()
+        {
+
         }
 
         //public void Start()

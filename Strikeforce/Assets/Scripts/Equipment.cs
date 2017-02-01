@@ -6,6 +6,7 @@ namespace Strikeforce
 {
     public class Equipment : MonoBehaviour
     {
+        public int Id { get; protected set; }
 		public Size SlotSize { get; set; }
         public bool IsRemovable;
         public bool IsWeapon = false;
@@ -14,7 +15,8 @@ namespace Strikeforce
         public float EnergyCost;
         public float Cooldown;
 		
-		public Equipment(int width, int height) {
+		public Equipment(int id, int width, int height) {
+            this.Id = id;
 			this.SlotSize = new Size(width, height);
 		}
     }

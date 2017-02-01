@@ -121,6 +121,64 @@ namespace Strikeforce
         public const string BEAM = "Beam";
     }
 
+    public enum HardpointPosition { LeftOuterWing, LeftWing, Center, RightWing, RightOuterWing }
+
+    public static class FiringGroupPatterns
+    {
+        private static Dictionary<int, int[][]> allPatterns = new Dictionary<int, int[][]>() {
+            	{1, new int[][] {
+                	    new int[] {0, 1, 2, 3, 4}
+                	}
+            	},
+            	{2, new int[][] {
+                    	new int[] {0, 2, 4},
+                    	new int[] {1, 3}
+                	}
+            	},
+            	{3, new int[][] {
+                    	new int[] {2},
+                    	new int[] {1, 3},
+                    	new int[] {0, 4}
+                	}
+            	},
+            	{4, new int[][] {
+                    	new int[] {2},
+                    	new int[] {1, 2, 3},
+                    	new int[] {1, 2, 3},
+                    	new int[] {0, 4}
+                	}
+            	},
+            	{5, new int[][] {
+                	    new int[] {2},
+                    	new int[] {1},
+                    	new int[] {3},
+                    	new int[] {0},
+                    	new int[] {4}
+                	}
+            	},
+            	{6, new int[][] {
+                	    new int[] {2},
+                    	new int[] {1, 3},
+                    	new int[] {0, 2, 4},
+                    	new int[] {1, 3},
+                    	new int[] {0, 2, 4},
+                    	new int[] {1, 3}
+                	}
+            	}
+        	};
+
+        public static int[] GetFiringPattern(int totalFiringGroups, int firingGroupIndex)
+        {
+            if (allPatterns.ContainsKey(totalFiringGroups) == false)
+            {
+                return null;
+            }
+
+            int[] pattern = allPatterns[totalFiringGroups][firingGroupIndex];
+            return pattern;
+        }
+    }
+
     public static class GlobalAssets
     {
         public static string DefaultUsername = "NewPlayer";
@@ -146,7 +204,7 @@ namespace Strikeforce
             {WeaponTypes.FLAMEBURST, new Weapon(WeaponTypes.FLAMEBURST, 2, 1, 1)},
             {WeaponTypes.CANNON, new Weapon(WeaponTypes.CANNON, 3, 1, 1)},
             {WeaponTypes.BOLT, new Weapon(WeaponTypes.BOLT, 3, 1, 1)},
-            {WeaponTypes.WAVE, new Weapon(WeaponTypes.WAVE, 4, 2, 1)},
+            {WeaponTypes.WAVE, new Weapon(WeaponTypes.WAVE, 4, 1, 2)},
             {WeaponTypes.BEAM, new Weapon(WeaponTypes.BEAM, 5, 1, 2)}
         };
 
