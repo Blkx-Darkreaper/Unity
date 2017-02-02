@@ -16,6 +16,13 @@ namespace Strikeforce
         public int Level;
         public float EnergyCost;
         public float Cooldown;
+        public string CurrentStatus { get; protected set; }
+        public static struct EquipmentStatus
+        {
+            public const string READY = "Ready";
+            public const string RECHARGING = "Recharging";
+            public const string DISABLED = "Disabled";
+        }
 
         public Equipment(int id, Raider parent, int width, int height) : this(id, width, height)
         {
@@ -25,6 +32,7 @@ namespace Strikeforce
 		public Equipment(int id, int width, int height) {
             this.Id = id;
 			this.SlotSize = new Size(width, height);
+            this.CurrentStatus = EquipmentStatus.READY;
 		}
 
         public void Equip(Raider parent, HardpointPosition hardpoint)
