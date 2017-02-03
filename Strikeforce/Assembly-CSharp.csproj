@@ -57,8 +57,10 @@
      <Compile Include="Assets\Done\Done_Scripts\Done_WeaponController.cs" />
      <Compile Include="Assets\Scripts\Aircraft.cs" />
      <Compile Include="Assets\Scripts\Alert.cs" />
+     <Compile Include="Assets\Scripts\AssetManager.cs" />
      <Compile Include="Assets\Scripts\Behaviour.cs" />
      <Compile Include="Assets\Scripts\BlackMarketMenu.cs" />
+     <Compile Include="Assets\Scripts\Body.cs" />
      <Compile Include="Assets\Scripts\Boss.cs" />
      <Compile Include="Assets\Scripts\BossComponent.cs" />
      <Compile Include="Assets\Scripts\BuildCursor.cs" />
@@ -70,13 +72,13 @@
      <Compile Include="Assets\Scripts\EndGameMenu.cs" />
      <Compile Include="Assets\Scripts\Entity.cs" />
      <Compile Include="Assets\Scripts\Equipment.cs" />
-     <Compile Include="Assets\Scripts\EquipmentSlot.cs" />
      <Compile Include="Assets\Scripts\Explosion.cs" />
      <Compile Include="Assets\Scripts\FactionColour.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\GameMenu.cs" />
      <Compile Include="Assets\Scripts\GlobalAssets.cs" />
      <Compile Include="Assets\Scripts\Grid.cs" />
+     <Compile Include="Assets\Scripts\Hardpoint.cs" />
      <Compile Include="Assets\Scripts\Headquarters.cs" />
      <Compile Include="Assets\Scripts\Hud.cs" />
      <Compile Include="Assets\Scripts\Infrastructure.cs" />
@@ -93,6 +95,7 @@
      <Compile Include="Assets\Scripts\Ordnance.cs" />
      <Compile Include="Assets\Scripts\PauseMenu.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
+     <Compile Include="Assets\Scripts\PriorityQueue.cs" />
      <Compile Include="Assets\Scripts\Production.cs" />
      <Compile Include="Assets\Scripts\Profile.cs" />
      <Compile Include="Assets\Scripts\ProfileManager.cs" />
@@ -111,10 +114,11 @@
      <Compile Include="Assets\Scripts\StrikeforceMap.cs" />
      <Compile Include="Assets\Scripts\Structure.cs" />
      <Compile Include="Assets\Scripts\Tile.cs" />
+     <Compile Include="Assets\Scripts\TriggerLink.cs" />
      <Compile Include="Assets\Scripts\UserInput.cs" />
      <Compile Include="Assets\Scripts\Vehicle.cs" />
      <Compile Include="Assets\Scripts\VictoryCondition.cs" />
-     <Compile Include="Assets\Scripts\WeaponController.cs" />
+     <Compile Include="Assets\Scripts\Weapon.cs" />
      <Compile Include="Assets\Scripts\_AddToLevel.cs" />
      <Compile Include="Assets\Scripts\_BackgroundScroller.cs" />
      <Compile Include="Assets\Scripts\_ChangeMusic.cs" />
@@ -128,11 +132,17 @@
      <Compile Include="Assets\Scripts\_RandomRotator.cs" />
      <Compile Include="Assets\Scripts\_SetParticleSortLayer.cs" />
      <None Include="Assets\Scripts\Newtonsoft.Json.xml" />
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
  <HintPath>D:/Users/Darkreaper/Git/Unity/Strikeforce/Assets/Scripts/Newtonsoft.Json.dll</HintPath>

@@ -13,7 +13,7 @@ namespace Strikeforce
         public Raider parent;
         public HardpointPosition EquippedHardpoint { get; protected set; }
         public float Cost;
-        public int Level;
+        public int Level = 1;
         public float EnergyCost;
         public float Cooldown;
         public string CurrentStatus { get; protected set; }
