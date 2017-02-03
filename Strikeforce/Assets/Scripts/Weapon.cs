@@ -35,21 +35,24 @@ namespace Strikeforce
             }
 
             parent.UseEnergy(EnergyCost);
+            this.CurrentStatus = EquipmentStatus.RECHARGING;
 
-            // create the bullet object from the bullet prefab
-            GameObject bullet = (GameObject)Instantiate(
-                NetworkManager.singleton.spawnPrefabs[0],
-                parent.transform.position + parent.transform.forward,
-                Quaternion.identity);
+            Debug.Log(string.Format("{0} fired!", Type));
 
-            // make the bullet move away in front of the player
-            bullet.GetComponentInChildren<Rigidbody>().velocity = parent.transform.forward * 4;
+            //// create the bullet object from the bullet prefab
+            //GameObject bullet = (GameObject)Instantiate(
+            //    NetworkManager.singleton.spawnPrefabs[0],
+            //    parent.transform.position + parent.transform.forward,
+            //    Quaternion.identity);
 
-            // spawn the bullet on the clients
-            NetworkServer.Spawn(bullet);
+            //// make the bullet move away in front of the player
+            //bullet.GetComponentInChildren<Rigidbody>().velocity = parent.transform.forward * 4;
 
-            // make bullet disappear after 2 seconds
-            Destroy(bullet, 2.0f);
+            //// spawn the bullet on the clients
+            //NetworkServer.Spawn(bullet);
+
+            //// make bullet disappear after 2 seconds
+            //Destroy(bullet, 2.0f);
         }
 
         //public void Start()

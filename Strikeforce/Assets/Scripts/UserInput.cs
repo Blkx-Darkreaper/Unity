@@ -288,7 +288,7 @@ namespace Strikeforce
                 return;
             }
 
-            raider.Fire();  // Testing
+            raider.FirePrimary();  // Testing
         }
 
         protected void OpenPauseMenu()

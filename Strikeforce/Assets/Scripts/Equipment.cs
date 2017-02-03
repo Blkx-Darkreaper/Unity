@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Strikeforce
 {
-    public class Equipment : MonoBehaviour
+    public class Equipment
     {
         public int Id { get; protected set; }
 		public Size SlotSize { get; set; }
@@ -17,7 +17,7 @@ namespace Strikeforce
         public float EnergyCost;
         public float Cooldown;
         public string CurrentStatus { get; protected set; }
-        public static struct EquipmentStatus
+        public struct EquipmentStatus
         {
             public const string READY = "Ready";
             public const string RECHARGING = "Recharging";
@@ -34,6 +34,19 @@ namespace Strikeforce
 			this.SlotSize = new Size(width, height);
             this.CurrentStatus = EquipmentStatus.READY;
 		}
+
+        protected virtual void Update()
+        {
+            if(CurrentStatus.Equals(EquipmentStatus.DISABLED)) {
+                return;
+            }
+
+            if(Cooldown > 0) {
+                return;
+            }
+
+            this.CurrentStatus = EquipmentStatus.READY;
+        }
 
         public void Equip(Raider parent, HardpointPosition hardpoint)
         {

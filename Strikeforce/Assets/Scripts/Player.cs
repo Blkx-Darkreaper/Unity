@@ -55,23 +55,25 @@ namespace Strikeforce
 
         protected void SpawnRaider()
         {
+            //TODO: get spawn point from level
             Vector3 spawn = new Vector3(0, 5, 5);
             GameObject raiderObject = Instantiate(
                 NetworkManager.singleton.spawnPrefabs[3],
                 spawn,
                 Quaternion.identity) as GameObject;
+            raiderObject.transform.parent = gameObject.transform;
 
             CurrentRaider = raiderObject.GetComponent<Raider>();
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
 
             Hardpoint[] hardpoints = new Hardpoint[] {
-                new Hardpoint(32, 305, 1, 1, HardpointPosition.LeftOuterWing), 
-                new Hardpoint(76, 252, 1, 1, HardpointPosition.LeftWing), 
-                new Hardpoint(148, 120, 1, 4, HardpointPosition.Center), 
-                new Hardpoint(220, 252, 1, 1, HardpointPosition.RightWing), 
-                new Hardpoint(264, 305, 1, 1, HardpointPosition.RightOuterWing)
+			    new Hardpoint (32, 305, 1, 1, HardpointPosition.LeftOuterWing),
+			    new Hardpoint (76, 252, 1, 1, HardpointPosition.LeftWing),
+			    new Hardpoint (148, 120, 1, 4, HardpointPosition.Center),
+			    new Hardpoint (220, 252, 1, 1, HardpointPosition.RightWing),
+			    new Hardpoint(264, 305, 1, 1, HardpointPosition.RightOuterWing)
             };
-            CurrentRaider.Init(50f, hardpoints);
+            CurrentRaider.AllHardpoints = hardpoints;
 
             Vector3 raiderPosition = raiderObject.transform.position;
 

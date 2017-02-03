@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace Strikeforce
 {
-    public class Hardpoint : MonoBehaviour
+    public class Hardpoint
     {
         public Vector2 Location;
         public HardpointPosition Position { get; protected set; }
