@@ -10,30 +10,10 @@ namespace Strikeforce
         public float BuildTime { get; set; }
         public int Cost { get; set; }
         public int SellValue { get; set; }
+        public string[] Actions { get; set; }
+        protected bool isSelected { get; set; }
         public Bounds SelectionBounds { get; protected set; }
         public Player Owner { get; set; }
-        public string[] Actions { get; set; }
-        public float WeaponRange = 10f;
-        private const float DEFAULT_WEAPON_RANGE = 10f;
-        public float WeaponAimSpeed = 1f;
-        private const float DEFAULT_WEAPON_AIM_SPEED = 1f;
-        public float WeaponCooldown = 1f;
-        private const float DEFAULT_WEAPON_COOLDOWN = 1f;
-        protected float currentCooldownRemaining { get; set; }
-        protected bool isSelected { get; set; }
-        protected bool isAttacking { get; set; }
-        protected bool isAdvancing { get; set; }
-        protected bool isAiming { get; set; }
-        protected Entity actionTarget { get; set; }
-        protected int actionTargetId { get; set; }
-        protected struct SelectableProperties
-        {
-            public const string IS_ATTACKING = "IsAttacking";
-            public const string IS_ADVANCING = "IsAdvancing";
-            public const string IS_AIMING = "IsAiming";
-            public const string COOLDOWN = "CurrentCooldown";
-            public const string TARGET_ID = "TargetId";
-        }
         private List<Material> oldMaterials { get; set; }
 
         protected override void Awake()
@@ -47,35 +27,6 @@ namespace Strikeforce
         protected virtual void Start()
         {
             SetOwnership();
-
-            if (isLoadedFromSave == true)
-            {
-                LoadAttackTarget(actionTargetId);
-                return;
-            }
-
-            SetWeaponDefaults();
-        }
-
-        protected virtual void Update()
-        {
-            currentCooldownRemaining -= Time.deltaTime;
-            currentCooldownRemaining = Mathf.Clamp(currentCooldownRemaining, 0f, float.MaxValue);
-
-            if (isAttacking == false)
-            {
-                return;
-            }
-            if (isAdvancing == true)
-            {
-                return;
-            }
-            if (isAiming == true)
-            {
-                return;
-            }
-
-            AttackTarget(actionTarget);
         }
 
         protected virtual void OnGUI()
@@ -88,25 +39,10 @@ namespace Strikeforce
             DrawSelection();
         }
 
+        protected virtual void Update() { }
+
         public virtual void SetSpawner(Structure spawner)
         {
-        }
-
-        protected void LoadAttackTarget(int entityId)
-        {
-            if (entityId < 0)
-            {
-                return;
-            }
-
-            try
-            {
-                actionTarget = (Entity)GameManager.Singleton.GetGameEntityById(entityId);
-            }
-            catch
-            {
-                Debug.Log(string.Format("Failed to load Attack target"));
-            }
         }
 
         protected void SetOwnership()
@@ -140,49 +76,6 @@ namespace Strikeforce
 
                 teamColour.GetComponent<Renderer>().material.color = Owner.Colour;
             }
-        }
-
-        protected virtual void SetWeaponDefaults()
-        {
-            bool readyToAttack = IsAbleToAttack();
-            if (readyToAttack == false)
-            {
-                return;
-            }
-
-            SetDefaultWeaponRange();
-            SetDefaultWeaponAimSpeed();
-            SetDefaultWeaponCooldown();
-        }
-
-        private void SetDefaultWeaponRange()
-        {
-            if (WeaponRange > 0)
-            {
-                return;
-            }
-
-            WeaponRange = DEFAULT_WEAPON_RANGE;
-        }
-
-        private void SetDefaultWeaponAimSpeed()
-        {
-            if (WeaponAimSpeed > 0)
-            {
-                return;
-            }
-
-            WeaponAimSpeed = DEFAULT_WEAPON_AIM_SPEED;
-        }
-
-        private void SetDefaultWeaponCooldown()
-        {
-            if (WeaponCooldown > 0)
-            {
-                return;
-            }
-
-            WeaponCooldown = DEFAULT_WEAPON_COOLDOWN;
         }
 
         public bool IsOwnedByPlayer(Player player)
@@ -244,55 +137,55 @@ namespace Strikeforce
 
         public virtual void MouseClick(GameObject hitGameObject, Vector3 hitPoint, Player player)
         {
-            if (isSelected == false)
-            {
-                return;
-            }
-            if (hitGameObject == null)
-            {
-                return;
-            }
-            bool isGround = hitGameObject.CompareTag(Tags.GROUND);
-            if (isGround == true)
-            {
-                return;
-            }
+        //    if (isSelected == false)
+        //    {
+        //        return;
+        //    }
+        //    if (hitGameObject == null)
+        //    {
+        //        return;
+        //    }
+        //    bool isGround = hitGameObject.CompareTag(Tags.GROUND);
+        //    if (isGround == true)
+        //    {
+        //        return;
+        //    }
 
-            Destructible hitEntity = hitGameObject.GetComponentInParent<Destructible>();
-            if (hitEntity == null)
-            {
-                return;
-            }
-            if (hitEntity == this)
-            {
-                return;
-            }
+        //    Destructible hitEntity = hitGameObject.GetComponentInParent<Destructible>();
+        //    if (hitEntity == null)
+        //    {
+        //        return;
+        //    }
+        //    if (hitEntity == this)
+        //    {
+        //        return;
+        //    }
 
-            bool readyToAttack = IsAbleToAttack();
-            if (readyToAttack == false)
-            {
-                ChangeSelection(hitEntity, player);
-                return;
-            }
+        //    bool readyToAttack = IsAbleToAttack();
+        //    if (readyToAttack == false)
+        //    {
+        //        ChangeSelection(hitEntity, player);
+        //        return;
+        //    }
 
-            if (hitEntity.MaxHitPoints == 0)
-            {
-                ChangeSelection(hitEntity, player);
-                return;
-            }
+        //    if (hitEntity.MaxHitPoints == 0)
+        //    {
+        //        ChangeSelection(hitEntity, player);
+        //        return;
+        //    }
 
-            Player hitEntityOwner = hitEntity.Owner;
-            if (hitEntityOwner != null)
-            {
-                bool samePlayer = Owner.PlayerId == hitEntityOwner.PlayerId;
-                if (samePlayer == true)
-                {
-                    ChangeSelection(hitEntity, player);
-                    return;
-                }
-            }
+        //    Player hitEntityOwner = hitEntity.Owner;
+        //    if (hitEntityOwner != null)
+        //    {
+        //        bool samePlayer = Owner.PlayerId == hitEntityOwner.PlayerId;
+        //        if (samePlayer == true)
+        //        {
+        //            ChangeSelection(hitEntity, player);
+        //            return;
+        //        }
+        //    }
 
-            SetAttackTarget(hitEntity);
+        //    SetAttackTarget(hitEntity);
         }
 
         private void ChangeSelection(Selectable otherEntity, Player player)
@@ -315,198 +208,55 @@ namespace Strikeforce
 
         public virtual void SetHoverState(GameObject gameObjectUnderMouse)
         {
-            if (Owner == null)
-            {
-                return;
-            }
-            if (Owner.IsNPC == true)
-            {
-                return;
-            }
-            if (isSelected == false)
-            {
-                return;
-            }
+        //    if (Owner == null)
+        //    {
+        //        return;
+        //    }
+        //    if (Owner.IsNPC == true)
+        //    {
+        //        return;
+        //    }
+        //    if (isSelected == false)
+        //    {
+        //        return;
+        //    }
 
-            bool isGround = gameObjectUnderMouse.CompareTag(Tags.GROUND);
-            if (isGround == true)
-            {
-                return;
-            }
+        //    bool isGround = gameObjectUnderMouse.CompareTag(Tags.GROUND);
+        //    if (isGround == true)
+        //    {
+        //        return;
+        //    }
 
-            Owner.PlayerHud.SetCursorState(CursorState.select);
+        //    Owner.PlayerHud.SetCursorState(CursorState.select);
 
-            bool canAttack = IsAbleToAttack();
-            if (canAttack == false)
-            {
-                return;
-            }
+        //    bool canAttack = IsAbleToAttack();
+        //    if (canAttack == false)
+        //    {
+        //        return;
+        //    }
 
-            Destructible entityUnderMouse = gameObjectUnderMouse.GetComponentInParent<Destructible>();
-            if (entityUnderMouse == null)
-            {
-                return;
-            }
+        //    Destructible entityUnderMouse = gameObjectUnderMouse.GetComponentInParent<Destructible>();
+        //    if (entityUnderMouse == null)
+        //    {
+        //        return;
+        //    }
 
-            if (entityUnderMouse.MaxHitPoints == 0)
-            {
-                return;
-            }
+        //    if (entityUnderMouse.MaxHitPoints == 0)
+        //    {
+        //        return;
+        //    }
 
-            Player entityOwner = entityUnderMouse.Owner;
-            if (entityOwner != null)
-            {
-                bool samePlayer = Owner.PlayerId == entityOwner.PlayerId;
-                if (samePlayer == true)
-                {
-                    return;
-                }
-            }
+        //    Player entityOwner = entityUnderMouse.Owner;
+        //    if (entityOwner != null)
+        //    {
+        //        bool samePlayer = Owner.PlayerId == entityOwner.PlayerId;
+        //        if (samePlayer == true)
+        //        {
+        //            return;
+        //        }
+        //    }
 
-            Owner.PlayerHud.SetCursorState(CursorState.attack);
-        }
-
-        protected virtual void SetAttackTarget(Entity target)
-        {
-            actionTarget = target;
-
-            Vector3 targetPosition = actionTarget.transform.position;
-            bool targetInRange = IsTargetInRange(targetPosition);
-            if (targetInRange == true)
-            {
-                isAttacking = true;
-                AttackTarget(actionTarget);
-            }
-            else
-            {
-                AdvanceTowardsTarget(targetPosition);
-            }
-        }
-
-        public virtual bool IsAbleToAttack()
-        {
-            return false;
-        }
-
-        private bool IsTargetInRange(Vector3 targetPosition)
-        {
-
-            Vector3 bearingToTarget = targetPosition - transform.position;
-            float weaponsRangeSquared = WeaponRange * WeaponRange;
-            if (bearingToTarget.sqrMagnitude < weaponsRangeSquared)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private void AttackTarget(Entity attackTarget)
-        {
-            if (attackTarget == null)
-            {
-                isAttacking = false;
-                return;
-            }
-
-            Vector3 targetPosition = attackTarget.transform.position;
-            bool targetInRange = IsTargetInRange(targetPosition);
-            if (targetInRange == false)
-            {
-                AdvanceTowardsTarget(targetPosition);
-                return;
-            }
-
-            bool targetInSights = IsTargetInSights(targetPosition);
-            if (targetInSights == false)
-            {
-                GetBearingToTarget(targetPosition);
-                return;
-            }
-
-            bool readyToFire = IsReadyToFire();
-            if (readyToFire == false)
-            {
-                return;
-            }
-
-            FireWeaponAtTarget(attackTarget);
-        }
-
-        private bool IsTargetInSights(Vector3 targetPosition)
-        {
-            Vector3 bearingToTarget = targetPosition - transform.position;
-            if (bearingToTarget.normalized == transform.forward.normalized)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private bool IsReadyToFire()
-        {
-            if (currentCooldownRemaining <= 0)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        protected virtual void FireWeaponAtTarget(Entity target)
-        {
-            currentCooldownRemaining = WeaponCooldown;
-
-            string ownersName = "Neutral";
-            string attackTargetsOwnersName = ownersName;
-            if (Owner != null)
-            {
-                ownersName = Owner.PlayerId.ToString();
-            }
-
-            Selectable attackTarget = target as Selectable;
-            if (attackTarget == null)
-            {
-                Debug.Log(string.Format("{0} {1} fired at {2} {3}", ownersName, name, attackTargetsOwnersName, attackTarget.name));
-                return;
-            }
-
-            if (attackTarget.Owner != null)
-            {
-                attackTargetsOwnersName = attackTarget.Owner.PlayerId.ToString();
-            }
-
-            Debug.Log(string.Format("{0} {1} fired at {2} {3}", ownersName, name, attackTargetsOwnersName, attackTarget.name));
-        }
-
-        protected virtual void GetBearingToTarget(Vector3 targetPosition)
-        {
-            isAiming = true;
-        }
-
-        private void AdvanceTowardsTarget(Vector3 targetPosition)
-        {
-            Selectable unit = this as Selectable;
-            if (unit == null)
-            {
-                isAttacking = false;
-                return;
-            }
-
-            isAdvancing = true;
-            Vector3 attackPosition = GetNearestAttackPosition(targetPosition);
-            unit.SetWaypoint(attackPosition);
-            isAttacking = true;
-        }
-
-        private Vector3 GetNearestAttackPosition(Vector3 targetPosition)
-        {
-            Vector3 bearingToTarget = targetPosition - transform.position;
-            float distanceToTarget = bearingToTarget.magnitude;
-            float distanceToTravel = distanceToTarget - (0.9f * WeaponRange); // Move in slightly closer than weapon's range
-            Vector3 attackPosition = Vector3.Lerp(transform.position, targetPosition, distanceToTravel / distanceToTarget);
-            return attackPosition;
+        //    Owner.PlayerHud.SetCursorState(CursorState.attack);
         }
 
         public void SetTransparencyMaterial(Material transparencyMaterial, bool saveCurrentMaterial)
