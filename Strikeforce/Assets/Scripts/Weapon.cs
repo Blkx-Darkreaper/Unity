@@ -10,14 +10,20 @@ namespace Strikeforce
         public int Priority;
         public bool IsOrdnanceWeapon = false;
         private const string FIRE = "Fire";
+        public struct Types
+        {
+            public const string SHOT = "Shot";
+            public const string FLAMEBURST = "Flameburst";
+            public const string CANNON = "Cannon";
+            public const string BOLT = "Bolt";
+            public const string WAVE = "Wave";
+            public const string BEAM = "Beam";
+        }
 
-        public Weapon(string type, int priority, int width, int height) : this(-1, type, priority, width, height) { }
+        protected override void Awake()
+        {
+            base.Awake();
 
-        public Weapon(int id, string type, int priority, int width, int height) : this(id, null, type, priority, width, height) { }
-
-        public Weapon(int id, Raider parent, string type, int priority, int width, int height) : base(id, parent, width, height) {
-            this.Type = type;
-            this.Priority = priority;
             this.IsWeapon = true;
         }
 

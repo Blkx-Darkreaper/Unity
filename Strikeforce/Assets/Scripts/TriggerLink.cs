@@ -81,42 +81,42 @@ namespace Strikeforce
 
         protected void SetAngledSpread()
         {
-            if (DominantWeaponType.Equals(WeaponTypes.BOLT) == true)
+            if (DominantWeaponType.Equals(Weapon.Types.BOLT) == true)
             {
                 return;
             }
 
-            if (allWeaponTypes.ContainsKey(WeaponTypes.BOLT) == false)
+            if (allWeaponTypes.ContainsKey(Weapon.Types.BOLT) == false)
             {
                 return;
             }
 
-            int quantity = allWeaponTypes[WeaponTypes.BOLT];
+            int quantity = allWeaponTypes[Weapon.Types.BOLT];
             this.AngledSpread = quantity * 0.05f;
         }
 
         protected void SetHorizontalSpread()
         {
-            if (DominantWeaponType.Equals(WeaponTypes.FLAMEBURST) == true)
+            if (DominantWeaponType.Equals(Weapon.Types.FLAMEBURST) == true)
             {
                 return;
             }
 
-            if (allWeaponTypes.ContainsKey(WeaponTypes.FLAMEBURST) == false)
+            if (allWeaponTypes.ContainsKey(Weapon.Types.FLAMEBURST) == false)
             {
                 return;
             }
 
-            int quantity = allWeaponTypes[WeaponTypes.FLAMEBURST];
+            int quantity = allWeaponTypes[Weapon.Types.FLAMEBURST];
             this.HorizontalSpread = quantity * .1f;
         }
 
         protected void SetFiringGroups()
         {
             int quantity = 0;
-            if (allWeaponTypes.ContainsKey(WeaponTypes.WAVE) == true)
+            if (allWeaponTypes.ContainsKey(Weapon.Types.WAVE) == true)
             {
-                quantity = allWeaponTypes[WeaponTypes.WAVE];
+                quantity = allWeaponTypes[Weapon.Types.WAVE];
             }
 
             this.FiringGroups = quantity + 1;

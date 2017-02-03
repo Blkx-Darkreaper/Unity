@@ -180,7 +180,7 @@ namespace Strikeforce
             return properName;
         }
 
-        public void RegisterGameEntity(Entity spawnedEntity)
+        public void RegisterEntity(Entity spawnedItem)
         {
             int id;
             bool idInUse = true;
@@ -192,15 +192,15 @@ namespace Strikeforce
                 int count = allGameEntities.Count;
                 if (count > MaxEntities)
                 {
-                    DestroyGameEntity(spawnedEntity);
+                    DestroyEntity(spawnedItem);
                     Debug.Log(string.Format("Entity limit reached"));
                     return;
                 }
 
             } while (idInUse == true);
 
-            spawnedEntity.entityId = id;
-            allGameEntities.Add(id, spawnedEntity);
+            spawnedItem.EntityId = id;
+            allGameEntities.Add(id, spawnedItem);
         }
 
         public Entity GetGameEntityById(int id)
@@ -215,7 +215,7 @@ namespace Strikeforce
             return entity;
         }
 
-        public void DestroyGameEntity(GameObject gameObjectToDestroy)
+        public void DestroyEntity(GameObject gameObjectToDestroy)
         {
             Entity entityToDestroy = gameObjectToDestroy.GetComponent<Entity>();
             if (entityToDestroy == null)
@@ -223,12 +223,12 @@ namespace Strikeforce
                 return;
             }
 
-            DestroyGameEntity(entityToDestroy);
+            DestroyEntity(entityToDestroy);
         }
 
-        public void DestroyGameEntity(Entity entityToDestroy)
+        public void DestroyEntity(Entity entityToDestroy)
         {
-            int id = entityToDestroy.entityId;
+            int id = entityToDestroy.EntityId;
 
             Entity toCheck = allGameEntities[id];
             if (toCheck != entityToDestroy)

@@ -20,14 +20,13 @@ namespace Strikeforce
 		}
 
 		public bool IsEquippable(Equipment item, int row, int column) {
-			Size slotSize = item.SlotSize;
-			int itemWidth = slotSize.Width;
+			int itemWidth = item.Width;
             if (itemWidth > this.Width)
             {
                 return false;
             }
 
-			int itemHeight = slotSize.Height;
+			int itemHeight = item.Height;
             if (itemHeight > this.Height)
             {
                 return false;
@@ -49,9 +48,8 @@ namespace Strikeforce
 
         public void Equip(Equipment item, int row, int column)
         {
-            Size slotSize = item.SlotSize;
-			int itemWidth = slotSize.Width;
-            int itemHeight = slotSize.Height;
+            int itemWidth = item.Width;
+            int itemHeight = item.Height;
 
             for(int x = column; x < itemWidth; x++) {
                 for (int y = row; y < itemHeight; y++)

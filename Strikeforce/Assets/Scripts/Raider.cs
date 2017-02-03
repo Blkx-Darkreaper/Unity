@@ -56,7 +56,7 @@ namespace Strikeforce
             this.CurrentEnergy -= amount;
         }
 
-        public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int row, int column)
+        public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int row, int column, TriggerLink trigger)
         {
             Hardpoint hardpoint = null;
             switch (hardpointPosition)
@@ -89,7 +89,7 @@ namespace Strikeforce
             }
 
             hardpoint.Equip(weapon, row, column);
-            this.PrimaryFire.LinkWeapon(weapon);
+            trigger.LinkWeapon(weapon);
 
             return true;
         }

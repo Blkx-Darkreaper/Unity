@@ -97,28 +97,11 @@ namespace Strikeforce
         //public const string UNITS = "Units";
     }
 
-    public struct EntityProperties
-    {
-        public const string NAME = "Name";
-        public const string ID = "Id";
-        public const string MESHES = "Meshes";
-    }
-
     public struct KeyMappings
     {
         public const string MOUSE_X_AXIS = "Mouse X";
         public const string MOUSE_Y_AXIS = "Mouse Y";
         public const string SCROLL_WHEEL = "Mouse ScrollWheel";
-    }
-
-    public struct WeaponTypes
-    {
-        public const string SHOT = "Shot";
-        public const string FLAMEBURST = "Flameburst";
-        public const string CANNON = "Cannon";
-        public const string BOLT = "Bolt";
-        public const string WAVE = "Wave";
-        public const string BEAM = "Beam";
     }
 
     public enum HardpointPosition { LeftOuterWing, LeftWing, Center, RightWing, RightOuterWing }
@@ -199,14 +182,7 @@ namespace Strikeforce
             new KeyValuePair<string, string>(ResourceProperties.BOMBS, ResourceProperties.BOMBS_LIMIT),
             new KeyValuePair<string, string>(ResourceProperties.MATERIEL, ResourceProperties.MATERIEL_LIMIT)
 	    };
-        public static Dictionary<string, Weapon> Weapons = new Dictionary<string, Weapon>() {
-            {WeaponTypes.SHOT, new Weapon(WeaponTypes.SHOT, 1, 1, 1)},
-            {WeaponTypes.FLAMEBURST, new Weapon(WeaponTypes.FLAMEBURST, 2, 1, 1)},
-            {WeaponTypes.CANNON, new Weapon(WeaponTypes.CANNON, 3, 1, 1)},
-            {WeaponTypes.BOLT, new Weapon(WeaponTypes.BOLT, 3, 1, 1)},
-            {WeaponTypes.WAVE, new Weapon(WeaponTypes.WAVE, 4, 1, 2)},
-            {WeaponTypes.BEAM, new Weapon(WeaponTypes.BEAM, 5, 1, 2)}
-        };
+        public static Dictionary<string, Weapon> Weapons = new Dictionary<string, Weapon>();
 
         public struct Camera
         {

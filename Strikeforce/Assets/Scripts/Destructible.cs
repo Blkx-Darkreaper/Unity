@@ -112,7 +112,7 @@ namespace Strikeforce
 
         protected virtual void DestroyEntity()
         {
-            GameManager.Singleton.DestroyGameEntity(this);
+            GameManager.Singleton.DestroyEntity(this);
 
             string ownersName = "Neutral";
             if (Owner != null)

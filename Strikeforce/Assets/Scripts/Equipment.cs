@@ -4,13 +4,13 @@ using System.Collections;
 
 namespace Strikeforce
 {
-    public class Equipment
+    public class Equipment : Entity
     {
-        public int Id { get; protected set; }
-		public Size SlotSize { get; set; }
-        public bool IsRemovable;
+        public int Width;
+        public int Height;
+        public bool IsRemovable = true;
         public bool IsWeapon = false;
-        protected Raider parent { get; set; }
+        public Raider parent;
         public HardpointPosition EquippedHardpoint { get; protected set; }
         public float Cost;
         public int Level;
@@ -24,16 +24,15 @@ namespace Strikeforce
             public const string DISABLED = "Disabled";
         }
 
-        public Equipment(int id, Raider parent, int width, int height) : this(id, width, height)
+        protected override void Awake()
         {
-            this.parent = parent;
-        }
-		
-		public Equipment(int id, int width, int height) {
-            this.Id = id;
-			this.SlotSize = new Size(width, height);
             this.CurrentStatus = EquipmentStatus.READY;
-		}
+        }
+
+        protected virtual void Start()
+        {
+            GameManager.Singleton.RegisterEntity(this);
+        }
 
         protected virtual void Update()
         {

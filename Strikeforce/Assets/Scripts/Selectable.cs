@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
-    public class Selectable : Entity
+    public class Selectable : Body
     {
         public Texture2D BuildImage { get; set; }
         public float BuildTime { get; set; }
@@ -55,10 +55,6 @@ namespace Strikeforce
             }
 
             //Debug.Log(string.Format("{0} belongs to {1}", entityName, player.username));
-            if (isLoadedFromSave == true)
-            {
-                return;
-            }
 
             SetTeamColour();
         }
@@ -117,7 +113,7 @@ namespace Strikeforce
         public void UpdateBounds()
         {
             Bounds updatedBounds = new Bounds(transform.position, Vector3.zero);
-            GameObject meshes = transform.Find(EntityProperties.MESHES).gameObject;
+            GameObject meshes = transform.Find(BodyProperties.MESHES).gameObject;
             Renderer[] allRenderers = meshes.GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in allRenderers)
             {
