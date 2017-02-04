@@ -110,7 +110,7 @@ namespace Strikeforce
             DestroyEntity();
         }
 
-        protected virtual void DestroyEntity()
+        protected override void DestroyEntity()
         {
             GameManager.Singleton.DestroyEntity(this);
 

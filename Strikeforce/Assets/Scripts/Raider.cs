@@ -9,7 +9,9 @@ namespace Strikeforce
     {
         public float MaxEnergy;
         public float CurrentEnergy { get; protected set; }
-        public Hardpoint[] AllHardpoints;
+        public Dictionary<HardpointPosition, Hardpoint[]> AllHardpoints { get; protected set; }
+        public LinkedList<Armour> allArmour { get; protected set; }
+        protected LinkedListNode<Armour> nextArmourNode { get; set; }
         public TriggerLink PrimaryFire { get; protected set; }
         public TriggerLink SecondaryFire { get; protected set; }
         public TriggerLink SpecialFire { get; protected set; } // Only Ordnance weapons can be linked
@@ -20,6 +22,9 @@ namespace Strikeforce
             base.Awake();
 
             this.CurrentEnergy = MaxEnergy;
+
+            this.allArmour = new LinkedList<Armour>();
+            this.nextArmourNode = allArmour.First;
 
             this.PrimaryFire = new TriggerLink();
             this.SecondaryFire = new TriggerLink();
@@ -51,36 +56,78 @@ namespace Strikeforce
             PrimaryFire.Update();
         }
 
-        public void UseEnergy(float amount)
+        public void UpdateEnergy(float amount)
         {
-            this.CurrentEnergy -= amount;
+            this.CurrentEnergy += amount;
         }
 
-        public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int row, int column, TriggerLink trigger)
+        public override void TakeDamage(int damage)
         {
-            Hardpoint hardpoint = null;
-            switch (hardpointPosition)
+            damage = SoakDamage(damage);
+            
+            base.TakeDamage(damage);
+        }
+
+        private int SoakDamage(int damage)
+        {
+            int distribution = allArmour.Count;
+            if (distribution == 0)
             {
-                case HardpointPosition.LeftOuterWing:
-                    hardpoint = AllHardpoints[0];
-                    break;
-
-                case HardpointPosition.LeftWing:
-                    hardpoint = AllHardpoints[1];
-                    break;
-
-                case HardpointPosition.Center:
-                    hardpoint = AllHardpoints[2];
-                    break;
-
-                case HardpointPosition.RightWing:
-                    hardpoint = AllHardpoints[3];
-                    break;
-
-                case HardpointPosition.RightOuterWing:
-                    hardpoint = AllHardpoints[4];
-                    break;
+                return damage;
             }
+
+            for (int i = 0; i < damage; i++)
+            {
+                if (allArmour.Count == 0)
+                {
+                    break;
+                }
+
+                LinkedListNode<Armour> currentNode = nextArmourNode;
+
+                // Get next node
+                this.nextArmourNode = nextArmourNode.Next;
+                if (this.nextArmourNode == null)
+                {
+                    // Loop round to the beginning of the list
+                    this.nextArmourNode = this.allArmour.First;
+                }
+
+                Armour currentArmour = currentNode.Value;
+                currentArmour.TakeDamage(1);
+
+                // If armour is destroyed
+                if (currentArmour.CurrentHitPoints == 0)
+                {
+                    DestroyEntity();
+                    allArmour.Remove(currentNode);
+                }
+
+                damage--;
+            }
+
+            return damage;
+        }
+
+        public bool EquipItem(Equipment item, HardpointPosition hardpointPosition, int index, int row, int column)
+        {
+            Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
+
+            bool isEquippable = hardpoint.IsEquippable(item, row, column);
+            if (isEquippable == false)
+            {
+                return false;
+            }
+
+            hardpoint.Equip(item, row, column);
+            this.EquippedItem = item;
+
+            return true;
+        }
+
+        public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int index, int row, int column, TriggerLink trigger)
+        {
+            Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
 
             bool isEquippable = hardpoint.IsEquippable(weapon, row, column);
             if (isEquippable == false)
@@ -90,6 +137,22 @@ namespace Strikeforce
 
             hardpoint.Equip(weapon, row, column);
             trigger.LinkWeapon(weapon);
+
+            return true;
+        }
+
+        public bool EquipArmour(Armour armour, HardpointPosition hardpointPosition, int index, int row, int column)
+        {
+            Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
+
+            bool isEquippable = hardpoint.IsEquippable(armour, row, column);
+            if (isEquippable == false)
+            {
+                return false;
+            }
+
+            hardpoint.Equip(armour, row, column);
+            allArmour.AddLast(armour);
 
             return true;
         }

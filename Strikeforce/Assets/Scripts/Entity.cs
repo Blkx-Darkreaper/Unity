@@ -1,4 +1,5 @@
-﻿using UnityEngine.Networking;
+﻿using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Strikeforce
 {
@@ -15,6 +16,13 @@ namespace Strikeforce
         protected virtual void Awake()
         {
             GameManager.Singleton.RegisterEntity(this);
+        }
+
+        protected virtual void DestroyEntity()
+        {
+            GameManager.Singleton.DestroyEntity(this);
+
+            Debug.Log(string.Format("{0} has been destroyed", name));
         }
     }
 }

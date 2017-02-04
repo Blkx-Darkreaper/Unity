@@ -40,7 +40,7 @@ namespace Strikeforce
                 return;
             }
 
-            parent.UseEnergy(EnergyCost);
+            parent.UpdateEnergy(EnergyCost);
             this.CurrentStatus = EquipmentStatus.RECHARGING;
 
             Debug.Log(string.Format("{0} fired!", Type));
