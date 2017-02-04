@@ -8,7 +8,8 @@ namespace Strikeforce
     public class UserInput : NetworkBehaviour
     {
         public Profile profile;
-        protected KeyMap keyBinds;
+        protected KeyMap gamepadBinds;
+        protected KeyMap keyboardBinds;
         public struct KeyMap
         {
             public KeyCode Action1;
@@ -47,43 +48,44 @@ namespace Strikeforce
 
         protected void InitKeyBinds()
         {
-            keyBinds = new KeyMap();
-            //InitKeyboardBinds();
+            InitKeyboardBinds();
             InitGamepadBinds();
         }
 
         protected void InitKeyboardBinds()
         {
-            keyBinds.Action1 = KeyCode.A;
-            keyBinds.Action2 = KeyCode.S;
-            keyBinds.Special1 = KeyCode.D;
-            keyBinds.Special2 = KeyCode.F;
-            keyBinds.LeftTrigger = KeyCode.E;
-            keyBinds.RightTrigger = KeyCode.R;
-            keyBinds.Menu = KeyCode.Escape;
-            keyBinds.Back = KeyCode.Backspace;
+			keyboardBinds = new KeyMap();
+            keyboardBinds.Action1 = KeyCode.A;
+            keyboardBinds.Action2 = KeyCode.S;
+            keyboardBinds.Special1 = KeyCode.D;
+            keyboardBinds.Special2 = KeyCode.F;
+            keyboardBinds.LeftTrigger = KeyCode.E;
+            keyboardBinds.RightTrigger = KeyCode.R;
+            keyboardBinds.Menu = KeyCode.Escape;
+            keyboardBinds.Back = KeyCode.Backspace;
 
-            keyBinds.LeftStick.Up = KeyCode.UpArrow;
-            keyBinds.LeftStick.Down = KeyCode.DownArrow;
-            keyBinds.LeftStick.Left = KeyCode.LeftArrow;
-            keyBinds.LeftStick.Right = KeyCode.RightArrow;
+            keyboardBinds.LeftStick.Up = KeyCode.UpArrow;
+            keyboardBinds.LeftStick.Down = KeyCode.DownArrow;
+            keyboardBinds.LeftStick.Left = KeyCode.LeftArrow;
+            keyboardBinds.LeftStick.Right = KeyCode.RightArrow;
 
-            keyBinds.RightStick.Up = KeyCode.Keypad8;
-            keyBinds.RightStick.Down = KeyCode.Keypad2;
-            keyBinds.RightStick.Left = KeyCode.Keypad4;
-            keyBinds.RightStick.Right = KeyCode.Keypad6;
+            keyboardBinds.RightStick.Up = KeyCode.Keypad8;
+            keyboardBinds.RightStick.Down = KeyCode.Keypad2;
+            keyboardBinds.RightStick.Left = KeyCode.Keypad4;
+            keyboardBinds.RightStick.Right = KeyCode.Keypad6;
         }
 
         protected void InitGamepadBinds()
         {
-            keyBinds.Action1 = KeyCode.Joystick1Button0;
-            keyBinds.Action2 = KeyCode.Joystick1Button1;
-            keyBinds.Special1 = KeyCode.Joystick1Button2;
-            keyBinds.Special2 = KeyCode.Joystick1Button3;
-            keyBinds.LeftTrigger = KeyCode.Joystick1Button9;
-            keyBinds.RightTrigger = KeyCode.Joystick1Button10;
-            keyBinds.Menu = KeyCode.Joystick1Button7;
-            keyBinds.Back = KeyCode.Joystick1Button6;
+			gamepadBinds = new KeyMap();
+            gamepadBinds.Action1 = KeyCode.Joystick1Button0;
+            gamepadBinds.Action2 = KeyCode.Joystick1Button1;
+            gamepadBinds.Special1 = KeyCode.Joystick1Button2;
+            gamepadBinds.Special2 = KeyCode.Joystick1Button3;
+            gamepadBinds.LeftTrigger = KeyCode.Joystick1Button9;
+            gamepadBinds.RightTrigger = KeyCode.Joystick1Button10;
+            gamepadBinds.Menu = KeyCode.Joystick1Button7;
+            gamepadBinds.Back = KeyCode.Joystick1Button6;
 
             //keyBinds.LeftStick.Up = KeyCode.UpArrow;
             //keyBinds.LeftStick.Down = KeyCode.DownArrow;
@@ -119,7 +121,7 @@ namespace Strikeforce
             //    return;
             //}
 
-            RespondToKeyboardActivity();
+            RespondToKeyActivity();
         }
 
         protected float getHorizontalScrollRate(float x)
@@ -231,7 +233,7 @@ namespace Strikeforce
             player.SelectedEntity = null;
         }
 
-        protected void RespondToKeyboardActivity()
+        protected void RespondToKeyActivity()
         {
             //if (isLocalPlayer == false)
             //{
@@ -240,12 +242,12 @@ namespace Strikeforce
 
             MovePlayer();
 
-            if (Input.GetKeyDown(keyBinds.Menu))
+            if (Input.GetKeyDown(gamepadBinds.Menu))
             {
                 OpenPauseMenu();
             }
 
-            if (Input.GetKeyDown(keyBinds.Action1))
+            if (Input.GetKeyDown(gamepadBinds.Action1))
             {
                 // Command function is called from the client, but invoked on the server
                 CmdFire();

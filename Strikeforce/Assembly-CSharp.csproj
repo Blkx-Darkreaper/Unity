@@ -57,6 +57,7 @@
      <Compile Include="Assets\Done\Done_Scripts\Done_WeaponController.cs" />
      <Compile Include="Assets\Scripts\Aircraft.cs" />
      <Compile Include="Assets\Scripts\Alert.cs" />
+     <Compile Include="Assets\Scripts\Armour.cs" />
      <Compile Include="Assets\Scripts\AssetManager.cs" />
      <Compile Include="Assets\Scripts\Behaviour.cs" />
      <Compile Include="Assets\Scripts\BlackMarketMenu.cs" />
