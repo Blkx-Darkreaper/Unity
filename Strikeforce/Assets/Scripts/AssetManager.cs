@@ -7,13 +7,17 @@ namespace Strikeforce
     public class AssetManager : MonoBehaviour
     {
         public Texture2D healthy, damaged, critical;
-        public Weapon shot, flameburst, bolt, wave, beam;
+        public GameObject shot, flameburst, bolt, wave, beam;
         public GameObject[] Structures, Vehicles, Misc;
 
         public void Awake()
         {
             // Load all game assets
             LoadHealthBarTextures();
+            LoadWeaponPrefabs();
+            LoadStructurePrefabs();
+            LoadVehiclePrefabs();
+            LoadMiscPrefabs();
         }
 
         protected void LoadHealthBarTextures()
@@ -23,7 +27,7 @@ namespace Strikeforce
             GlobalAssets.HealthBarTextures.Critical = critical;
         }
 
-        protected void LoadWeapons()
+        protected void LoadWeaponPrefabs()
         {
             GlobalAssets.WeaponPrefabs.Add(Weapon.Types.SHOT, shot);
             GlobalAssets.WeaponPrefabs.Add(Weapon.Types.FLAMEBURST, flameburst);
@@ -73,7 +77,7 @@ namespace Strikeforce
             }
         }
 
-        private void SetEntityName(GameObject gameObject, Entity entity)
+        public void SetEntityName(GameObject gameObject, Entity entity)
         {
             if (entity.name == null)
             {

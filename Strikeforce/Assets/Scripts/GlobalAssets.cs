@@ -182,7 +182,7 @@ namespace Strikeforce
             new KeyValuePair<string, string>(ResourceProperties.BOMBS, ResourceProperties.BOMBS_LIMIT),
             new KeyValuePair<string, string>(ResourceProperties.MATERIEL, ResourceProperties.MATERIEL_LIMIT)
 	    };
-        public static Dictionary<string, Weapon> WeaponPrefabs = new Dictionary<string, Weapon>();
+        public static Dictionary<string, GameObject> WeaponPrefabs = new Dictionary<string, GameObject>();
         public static Dictionary<string, GameObject> StructurePrefabs = new Dictionary<string, GameObject>();
         public static Dictionary<string, GameObject> VehiclePrefabs = new Dictionary<string, GameObject>();
         public static Dictionary<string, GameObject> MiscPrefabs = new Dictionary<string, GameObject>();
