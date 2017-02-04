@@ -13,8 +13,8 @@ namespace Strikeforce
 		public Equipment[,] EquippedItems { get; protected set; }
         public Transform SpawnPoint;
 		
-		public Hardpoint(int x, int y, int width, int height, HardpointPosition position) {
-			this.Location = new Vector2(x, y);
+		public Hardpoint(int relativeToCenterX, int relativeToCenterY, int width, int height, HardpointPosition position) {
+			this.Location = new Vector2(relativeToCenterX, relativeToCenterY);
             this.Position = position;
 			this.EquippedItems = new Equipment[width, height];
 		}
