@@ -11,6 +11,8 @@ namespace Strikeforce
         protected GUIStyle healthStyle { get; set; }
         private const int HEALTH_BAR_VERTICAL_OFFSET = 7;
         private const int HEALTH_BAR_HEIGHT = 5;
+        public Orbit CurrentOrbit;
+        public enum Orbit { Ground, Air }
         protected struct DestructibleProperties
         {
             public const string HIT_POINTS = "HitPoints";
