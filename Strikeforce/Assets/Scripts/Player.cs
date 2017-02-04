@@ -189,7 +189,7 @@ namespace Strikeforce
                 return;
             }
             //Units allUnits = GetComponentInChildren<Units>();
-            GameObject unitToSpawn = (GameObject)Instantiate(GameManager.Singleton.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
+            GameObject unitToSpawn = (GameObject)Instantiate(GlobalAssets.GetVehiclePrefab(unitName), spawnPoint, startingOrientation);
             unitToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", unitName, PlayerId));
 
@@ -211,7 +211,7 @@ namespace Strikeforce
             controller.SetWaypoint(rallyPoint);
         }
 
-        public void SpawnUnit(string unitName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation, Structure spawner)
+        public void SpawnUnit(string vehicleName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation, Structure spawner)
         {
             GameObject allUnits = transform.Find(PlayerProperties.UNITS).gameObject;
             if (allUnits == null)
@@ -219,9 +219,9 @@ namespace Strikeforce
                 return;
             }
 
-            GameObject unitToSpawn = (GameObject)Instantiate(GameManager.Singleton.GetUnitPrefab(unitName), spawnPoint, startingOrientation);
+            GameObject unitToSpawn = (GameObject)Instantiate(GlobalAssets.GetVehiclePrefab(vehicleName), spawnPoint, startingOrientation);
             unitToSpawn.transform.parent = allUnits.transform;
-            Debug.Log(string.Format("Spawned {0} for player {1}", unitName, PlayerId.ToString()));
+            Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId.ToString()));
 
             if (rallyPoint == GlobalAssets.InvalidPoint)
             {

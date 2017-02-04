@@ -65,19 +65,7 @@ namespace Strikeforce
         public const string UNKNOWN = "Unknown";
     }
 
-    public struct MenuAttributes
-    {
-        public static float Width { get { return HeaderWidth + 2 * ButtonHeight + 4 * Padding; } }
-        public static float Padding = 10f;
-        public static float TextHeight = 25f;
-        public static float HeaderWidth = 256f;
-        public static float HeaderHeight = 32f;
-        public static float ButtonWidth { get { return (Width - 3 * Padding) / 2; } }
-        public static float ButtonHeight = 40f;
-        public static float pauseMenuHeight = 20f;
-    }
-
-    public struct Levels
+    public struct Scenes
     {
         public static string Lobby = "lobby";
         public static string MainMenu = "mainMenu";
@@ -438,15 +426,6 @@ namespace Strikeforce
             {
                 outputFile.WriteLine(text);
             }
-        }
-
-        public static string[] GetAllUsernames(Dictionary<string, Profile> playerAccounts)
-        {
-            int count = playerAccounts.Count;
-            string[] allUsernames = new string[count];
-            playerAccounts.Keys.CopyTo(allUsernames, 0);
-
-            return allUsernames;
         }
 
         public static Texture2D MakeTexture(int width, int height, Color colour)

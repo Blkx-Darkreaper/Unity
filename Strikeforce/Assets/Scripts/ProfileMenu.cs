@@ -53,9 +53,9 @@ namespace Strikeforce
 
             float menuHeight = GetMenuHeight();
 
-            float x = Screen.width / 2 - MenuAttributes.Width / 2;
+            float x = Screen.width / 2 - Attributes.Width / 2;
             float y = Screen.height / 2 - menuHeight / 2;
-            float width = MenuAttributes.Width;
+            float width = Attributes.Width;
             float height = menuHeight;
             Rect rect = new Rect(x, y, width, height);
 
@@ -67,10 +67,10 @@ namespace Strikeforce
             GUI.Box(new Rect(x, y, width, height), string.Empty);
 
             // Menu buttons
-            x = MenuAttributes.Width / 2 - MenuAttributes.ButtonWidth / 2;
-            y = menuHeight - MenuAttributes.Padding - MenuAttributes.ButtonHeight;
-            width = MenuAttributes.ButtonWidth;
-            height = MenuAttributes.ButtonHeight;
+            x = Attributes.Width / 2 - Attributes.ButtonWidth / 2;
+            y = menuHeight - Attributes.Padding - Attributes.ButtonHeight;
+            width = Attributes.ButtonWidth;
+            height = Attributes.ButtonHeight;
             bool buttonPressed = GUI.Button(new Rect(x, y, width, height), "Select");
             if (buttonPressed == true)
             {
@@ -78,10 +78,10 @@ namespace Strikeforce
             }
 
             // Text area to enter new username
-            x = MenuAttributes.Padding;
-            y = menuHeight - 2 * MenuAttributes.Padding - MenuAttributes.ButtonHeight - MenuAttributes.TextHeight;
-            width = MenuAttributes.Width - 2 * MenuAttributes.Padding;
-            height = MenuAttributes.TextHeight;
+            x = Attributes.Padding;
+            y = menuHeight - 2 * Attributes.Padding - Attributes.ButtonHeight - Attributes.TextHeight;
+            width = Attributes.Width - 2 * Attributes.Padding;
+            height = Attributes.TextHeight;
             selectedUsername = GUI.TextField(new Rect(x, y, width, height), selectedUsername, UsernameCharacterLimit);
             SelectionList.SetCurrentEntryToFirstMatch(selectedUsername);
 
@@ -126,11 +126,11 @@ namespace Strikeforce
 
         protected void DrawSelectionList(Rect menu)
         {
-            float x = menu.x + MenuAttributes.Padding;
-            float y = menu.y + MenuAttributes.Padding;
-            float width = menu.width - 2 * MenuAttributes.Padding;
+            float x = menu.x + Attributes.Padding;
+            float y = menu.y + Attributes.Padding;
+            float width = menu.width - 2 * Attributes.Padding;
             float menuItemsHeight = GetMenuItemsHeight();
-            float height = menu.height - menuItemsHeight - MenuAttributes.Padding;
+            float height = menu.height - menuItemsHeight - Attributes.Padding;
             SelectionList.Draw(x, y, width, height, SelectionSkin);
         }
 
@@ -145,10 +145,10 @@ namespace Strikeforce
                 return;
             }
 
-            float x = MenuAttributes.Padding;
-            float y = textY - MenuAttributes.Padding - MenuAttributes.ButtonHeight;
-            float width = MenuAttributes.ButtonHeight;
-            float height = MenuAttributes.ButtonHeight;
+            float x = Attributes.Padding;
+            float y = textY - Attributes.Padding - Attributes.ButtonHeight;
+            float width = Attributes.ButtonHeight;
+            float height = Attributes.ButtonHeight;
             bool buttonPressed = GUI.Button(new Rect(x, y, width, height), "<");
             if (buttonPressed == true)
             {
@@ -157,7 +157,7 @@ namespace Strikeforce
                 avatarIndex %= Avatars.Length;
             }
 
-            x = MenuAttributes.Width - MenuAttributes.Padding - MenuAttributes.ButtonHeight;
+            x = Attributes.Width - Attributes.Padding - Attributes.ButtonHeight;
             buttonPressed = GUI.Button(new Rect(x, y, width, height), ">");
             if (buttonPressed == true)
             {
@@ -171,8 +171,8 @@ namespace Strikeforce
             }
 
             Texture2D avatarImage = Avatars[avatarIndex];
-            x = MenuAttributes.Width / 2 - avatarImage.width / 2;
-            y = textY - MenuAttributes.Padding - avatarImage.height;
+            x = Attributes.Width / 2 - avatarImage.width / 2;
+            y = textY - Attributes.Padding - avatarImage.height;
             width = avatarImage.width;
             height = avatarImage.height;
             GUI.DrawTexture(new Rect(x, y, width, height), avatarImage);
@@ -180,7 +180,7 @@ namespace Strikeforce
 
         protected override float GetMenuHeight()
         {
-            float menuHeight = MenuAttributes.ButtonHeight + MenuAttributes.TextHeight + 3 * MenuAttributes.Padding;
+            float menuHeight = Attributes.ButtonHeight + Attributes.TextHeight + 3 * Attributes.Padding;
 
             float menuItemsHeight = GetMenuItemsHeight();
             menuHeight += menuItemsHeight;
@@ -193,14 +193,14 @@ namespace Strikeforce
             float avatarHeight = 0;
             if (Avatars.Length > 0)
             {
-                avatarHeight = Avatars[avatarIndex].height + 2 * MenuAttributes.Padding;
+                avatarHeight = Avatars[avatarIndex].height + 2 * Attributes.Padding;
             }
             return avatarHeight;
         }
 
         protected override float GetMenuItemsHeight()
         {
-            float menuItemsHeight = MenuAttributes.ButtonHeight + MenuAttributes.TextHeight + 3 * MenuAttributes.Padding;
+            float menuItemsHeight = Attributes.ButtonHeight + Attributes.TextHeight + 3 * Attributes.Padding;
 
             float avatarHeight = GetAvatarHeight();
             menuItemsHeight += avatarHeight;

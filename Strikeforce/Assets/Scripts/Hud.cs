@@ -151,9 +151,9 @@ namespace Strikeforce
             float height = Screen.height;
             GUI.BeginGroup(new Rect(x, y, width, height));
 
-            height = MenuAttributes.TextHeight;
-            x = MenuAttributes.TextHeight;
-            y = Screen.height - x - MenuAttributes.Padding;
+            height = Menu.Attributes.TextHeight;
+            x = Menu.Attributes.TextHeight;
+            y = Screen.height - x - Menu.Attributes.Padding;
 
             x = DrawPlayerAvatar(x, y, height);
 
@@ -205,7 +205,7 @@ namespace Strikeforce
 
             GUI.DrawTexture(new Rect(x, y, height, height), avatar);
 
-            x += height + MenuAttributes.Padding;
+            x += height + Menu.Attributes.Padding;
             return x;
         }
 

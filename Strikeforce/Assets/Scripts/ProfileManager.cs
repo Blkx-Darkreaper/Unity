@@ -81,7 +81,7 @@ namespace Strikeforce
 
         public string[] GetAllUsernames()
         {
-            string[] usernames = GlobalAssets.GetAllUsernames(AllProfiles);
+            string[] usernames = GameManager.GetAllUsernames(AllProfiles);
             return usernames;
         }
 

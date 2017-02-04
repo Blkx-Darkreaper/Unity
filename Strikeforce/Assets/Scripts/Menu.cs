@@ -23,6 +23,17 @@ namespace Strikeforce
         protected string[] buttonNames;
         protected Dictionary<string, Button> allButtons;
         protected const string EXIT = "Quit Game";
+        public struct Attributes
+        {
+            public static float Width { get { return HeaderWidth + 2 * ButtonHeight + 4 * Padding; } }
+            public static float Padding = 10f;
+            public static float TextHeight = 25f;
+            public static float HeaderWidth = 256f;
+            public static float HeaderHeight = 32f;
+            public static float ButtonWidth { get { return (Width - 3 * Padding) / 2; } }
+            public static float ButtonHeight = 40f;
+            public static float pauseMenuHeight = 20f;
+        }
 
         protected virtual void Awake()
         {
@@ -144,9 +155,9 @@ namespace Strikeforce
 
             float menuHeight = GetMenuHeight();
 
-            float x = Screen.width / 2 - MenuAttributes.Width / 2;
+            float x = Screen.width / 2 - Attributes.Width / 2;
             float y = Screen.height / 2 - menuHeight / 2;
-            float width = MenuAttributes.Width;
+            float width = Attributes.Width;
             float height = menuHeight;
             GUI.BeginGroup(new Rect(x, y, width, height));
 
@@ -156,10 +167,10 @@ namespace Strikeforce
             GUI.Box(new Rect(x, y, width, height), string.Empty);
 
             // Header image
-            width = MenuAttributes.HeaderWidth;
-            height = MenuAttributes.HeaderHeight;
-            x = MenuAttributes.Width / 2 - width / 2;
-            y = MenuAttributes.Padding;
+            width = Attributes.HeaderWidth;
+            height = Attributes.HeaderHeight;
+            x = Attributes.Width / 2 - width / 2;
+            y = Attributes.Padding;
             GUI.DrawTexture(new Rect(x, y, width, height), HeaderImage);
 
             // Welcome message
@@ -182,18 +193,18 @@ namespace Strikeforce
                 return;
             }
 
-            x = MenuAttributes.Width / 2 - MenuAttributes.ButtonWidth / 2;
+            x = Attributes.Width / 2 - Attributes.ButtonWidth / 2;
             //y = 2 * MenuAttributes.padding + headerImage.height;
-            y += MenuAttributes.TextHeight + MenuAttributes.Padding;
-            width = MenuAttributes.ButtonWidth;
-            height = MenuAttributes.ButtonHeight;
+            y += Attributes.TextHeight + Attributes.Padding;
+            width = Attributes.ButtonWidth;
+            height = Attributes.ButtonHeight;
 
             for (int i = 0; i < buttonNames.Length; i++)
             {
                 string buttonName = buttonNames[i];
                 bool buttonPressed = GUI.Button(new Rect(x, y, width, height), buttonName);
 
-                y += MenuAttributes.ButtonHeight + MenuAttributes.Padding;
+                y += Attributes.ButtonHeight + Attributes.Padding;
 
                 if (buttonPressed == false)
                 {
@@ -209,16 +220,16 @@ namespace Strikeforce
         protected virtual float GetMenuHeight()
         {
             float buttonHeight = 0;
-            float paddingHeight = 2 * MenuAttributes.Padding;
+            float paddingHeight = 2 * Attributes.Padding;
             if (buttonNames != null)
             {
-                buttonHeight = buttonNames.Length * MenuAttributes.ButtonHeight;
-                paddingHeight += buttonNames.Length * MenuAttributes.Padding;
+                buttonHeight = buttonNames.Length * Attributes.ButtonHeight;
+                paddingHeight += buttonNames.Length * Attributes.Padding;
             }
 
-            float messageHeight = MenuAttributes.TextHeight + MenuAttributes.Padding;
+            float messageHeight = Attributes.TextHeight + Attributes.Padding;
 
-            float menuHeight = MenuAttributes.HeaderHeight + buttonHeight + paddingHeight + messageHeight;
+            float menuHeight = Attributes.HeaderHeight + buttonHeight + paddingHeight + messageHeight;
             return menuHeight;
         }
 

@@ -43,7 +43,7 @@ namespace Strikeforce
         protected override void Update()
         {
             base.Update();
-            BuildUnits();
+            BuildVehicles();
         }
 
         protected override void OnGUI()
@@ -72,9 +72,9 @@ namespace Strikeforce
             GUI.EndGroup();
         }
 
-        protected void AddUnitToBuildQueue(string unitName)
+        protected void AddVehicleToBuildQueue(string unitName)
         {
-            GameObject unitGameObject = GameManager.Singleton.GetUnitPrefab(unitName);
+            GameObject unitGameObject = GlobalAssets.GetVehiclePrefab(unitName);
             Selectable unit = unitGameObject.GetComponent<Selectable>();
             if (Owner != null)
             {
@@ -96,7 +96,7 @@ namespace Strikeforce
             buildQueue.Enqueue(unitName);
         }
 
-        protected void BuildUnits()
+        protected void BuildVehicles()
         {
             if (buildQueue.Count <= 0)
             {

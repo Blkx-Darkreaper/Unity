@@ -12,7 +12,6 @@ namespace Strikeforce
         //protected bool isLoading = false;
         protected VictoryCondition[] victoryConditions;
         public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
-        public Profile CurrentPlayerAccount { get; protected set; }
         public string CurrentGameName { get; protected set; }
         public string CurrentLevelName { get; protected set; }
         public Color DefaultColour;
@@ -110,7 +109,7 @@ namespace Strikeforce
         public void ExitGame()
         {
             CurrentGameName = string.Empty;
-            CurrentLevelName = Levels.MainMenu;
+            CurrentLevelName = Scenes.MainMenu;
         }
 
         public void GameOver()
@@ -202,8 +201,13 @@ namespace Strikeforce
             return id;
         }
 
-        public string[] GetAllPlayerNames() {
-            return GlobalAssets.GetAllUsernames(AllPlayerAccounts);
+        public static string[] GetAllUsernames(Dictionary<string, Profile> playerAccounts)
+        {
+            int count = playerAccounts.Count;
+            string[] allUsernames = new string[count];
+            playerAccounts.Keys.CopyTo(allUsernames, 0);
+
+            return allUsernames;
         }
 
         public Profile GetPlayerAccount(string username)
@@ -216,17 +220,6 @@ namespace Strikeforce
 
             Profile account = AllPlayerAccounts[username];
             return account;
-        }
-
-        public void SetCurrentPlayerAccount(string username, int avatarId)
-        {
-            bool playerExists = AllPlayerAccounts.ContainsKey(username);
-            if (playerExists == false)
-            {
-                AddPlayerAccount(username, avatarId);
-            }
-
-            CurrentPlayerAccount = AllPlayerAccounts[username];
         }
 
         public void AddPlayerAccount(string username, int avatarId)
@@ -249,7 +242,7 @@ namespace Strikeforce
 
         private void VerifyAccounts()
         {
-            string[] allUsernames = GetAllPlayerNames();
+            string[] allUsernames = GameManager.GetAllUsernames(AllPlayerAccounts);
             int count = AllPlayerAccounts.Count;
             if (allUsernames.Length != count)
             {

@@ -33,9 +33,9 @@ namespace Strikeforce
                 message = string.Format("Congratulations {0}! You have won by {1}.", winner.Username, metWinCondition.GetDescription());
             }
 
-            float padding = MenuAttributes.Padding;
-            float buttonHeight = MenuAttributes.ButtonHeight;
-            float buttonWidth = MenuAttributes.ButtonWidth;
+            float padding = Attributes.Padding;
+            float buttonHeight = Attributes.ButtonHeight;
+            float buttonWidth = Attributes.ButtonWidth;
             x = padding;
             y = padding;
             width = Screen.width - 2 * padding;
@@ -50,7 +50,7 @@ namespace Strikeforce
             {
                 Time.timeScale = 1f;
                 IsOpening = false;
-                Application.LoadLevel(Levels.Game);
+                Application.LoadLevel(Scenes.Game);
             }
 
             x += padding + buttonWidth;
@@ -59,7 +59,7 @@ namespace Strikeforce
             if (buttonPressed == true)
             {
                 GameManager.Singleton.LoadLevel(string.Empty);
-                Application.LoadLevel(Levels.MainMenu);
+                Application.LoadLevel(Scenes.MainMenu);
                 Cursor.visible = true;
             }
 

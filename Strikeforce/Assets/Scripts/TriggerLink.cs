@@ -78,7 +78,8 @@ namespace Strikeforce
 
             foreach (string type in allWeaponTypes.Keys)
             {
-                Weapon weapon = GlobalAssets.WeaponPrefabs[type];
+                GameObject prefab = GlobalAssets.WeaponPrefabs[type];
+                Weapon weapon = prefab.GetComponent<Weapon>();
                 int priority = weapon.Priority;
                 int quantity = this.allWeaponTypes[type];
 
