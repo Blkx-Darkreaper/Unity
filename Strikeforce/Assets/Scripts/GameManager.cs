@@ -9,13 +9,7 @@ namespace Strikeforce
     public class GameManager : Manager
     {
         public static GameManager Singleton = null;
-        protected bool isLoading = false;
-        public GameObject[] Structures;
-        private Dictionary<string, GameObject> allStructures;
-        public GameObject[] Units;
-        private Dictionary<string, GameObject> allUnits;
-        public GameObject[] Entities;
-        private Dictionary<string, GameObject> allEntities;
+        //protected bool isLoading = false;
         protected VictoryCondition[] victoryConditions;
         public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
         public Profile CurrentPlayerAccount { get; protected set; }
@@ -40,10 +34,6 @@ namespace Strikeforce
             }
 
             allGameEntities = new Dictionary<int, Entity>();
-
-            InitStructures();
-            InitUnits();
-            InitEntities();
         }
 
         protected void Update()
@@ -105,47 +95,6 @@ namespace Strikeforce
             }
         }
 
-        private void InitStructures()
-        {
-            InitCollection<Structure>(ref allStructures, Structures, "Structure");
-        }
-
-        private void InitUnits()
-        {
-            InitCollection<Selectable>(ref allUnits, Units, "Unit");
-        }
-
-        private void InitEntities()
-        {
-            InitCollection<Entity>(ref allEntities, Entities, "Entity");
-        }
-
-        private void InitCollection<T>(ref Dictionary<string, GameObject> collection, GameObject[] items, string className)
-        where T : Entity
-        {
-            collection = new Dictionary<string,
-            GameObject>();
-            foreach (GameObject gameObject in items)
-            {
-                T controller = gameObject.GetComponent<T>();
-                if (controller == null)
-                {
-                    Debug.Log(string.Format("{0} gameobject has no controller", gameObject.name));
-                    continue;
-                }
-
-                SetEntityName(gameObject, controller);
-                string name = controller.name;
-                if (name.Equals(string.Empty) == true)
-                {
-                    Debug.Log(string.Format("{0} {1} has no name", className, gameObject.ToString()));
-                    continue;
-                }
-
-                collection.Add(name, gameObject);
-            }
-        }
-
         public void LoadGame(string gameToLoad, string levelToLoad)
         {
             CurrentGameName = gameToLoad;
@@ -155,7 +104,7 @@ namespace Strikeforce
         public void LoadLevel(string levelToLoad)
         {
             CurrentLevelName = levelToLoad;
-            isLoading = true;
+            //isLoading = true;
         }
 
         public void ExitGame()
@@ -168,15 +117,15 @@ namespace Strikeforce
         {
         }
 
-        public string GetProperName(string cloneName)
+        public string GetProperName(string name)
         {
-            int index = cloneName.IndexOf("(Clone)");
+            int index = name.IndexOf("(Clone)");
             if (index < 0)
             {
-                return cloneName;
+                return name;
             }
 
-            string properName = cloneName.Substring(0, index);
+            string properName = name.Substring(0, index);
             return properName;
         }
 
@@ -253,81 +202,6 @@ namespace Strikeforce
             return id;
         }
 
-        private void SetEntityName(GameObject gameObject, Entity entity)
-        {
-            if (entity.name == null)
-            {
-                entity.name = string.Empty;
-            }
-
-            if (entity.name.Equals(string.Empty) == false)
-            {
-                return;
-            }
-
-            entity.name = gameObject.name;
-            if (entity.name.Equals(string.Empty) == false)
-            {
-                return;
-            }
-
-            entity.name = gameObject.tag;
-        }
-
-        public GameObject GetPrefab(string name)
-        {
-            GameObject entity = GetStructurePrefab(name);
-            if (entity != null)
-            {
-                return entity;
-            }
-
-            entity = GetUnitPrefab(name);
-            if (entity != null)
-            {
-                return entity;
-            }
-
-            entity = GetEntityPrefab(name);
-            return entity;
-        }
-
-        public GameObject GetStructurePrefab(string name)
-        {
-            bool exists = allStructures.ContainsKey(name);
-            if (exists == false)
-            {
-                return null;
-            }
-
-            GameObject structure = allStructures[name];
-            return structure;
-        }
-
-        public GameObject GetUnitPrefab(string name)
-        {
-            bool exists = allUnits.ContainsKey(name);
-            if (exists == false)
-            {
-                return null;
-            }
-
-            GameObject unit = allUnits[name];
-            return unit;
-        }
-
-        public GameObject GetEntityPrefab(string name)
-        {
-            bool exists = allEntities.ContainsKey(name);
-            if (exists == false)
-            {
-                return null;
-            }
-
-            GameObject entity = allEntities[name];
-            return entity;
-        }
-
         public string[] GetAllPlayerNames() {
             return GlobalAssets.GetAllUsernames(AllPlayerAccounts);
         }
@@ -396,10 +270,10 @@ namespace Strikeforce
 
         public Texture2D GetBuildIcon(string name)
         {
-            GameObject entity = GetStructurePrefab(name);
+            GameObject entity = GlobalAssets.GetStructurePrefab(name);
             if (entity == null)
             {
-                entity = GetUnitPrefab(name);
+                entity = GlobalAssets.GetVehiclePrefab(name);
             }
             if (entity == null)
             {

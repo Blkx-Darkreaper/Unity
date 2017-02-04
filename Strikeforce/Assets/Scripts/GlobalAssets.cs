@@ -182,7 +182,10 @@ namespace Strikeforce
             new KeyValuePair<string, string>(ResourceProperties.BOMBS, ResourceProperties.BOMBS_LIMIT),
             new KeyValuePair<string, string>(ResourceProperties.MATERIEL, ResourceProperties.MATERIEL_LIMIT)
 	    };
-        public static Dictionary<string, Weapon> Weapons = new Dictionary<string, Weapon>();
+        public static Dictionary<string, Weapon> WeaponPrefabs = new Dictionary<string, Weapon>();
+        public static Dictionary<string, GameObject> StructurePrefabs = new Dictionary<string, GameObject>();
+        public static Dictionary<string, GameObject> VehiclePrefabs = new Dictionary<string, GameObject>();
+        public static Dictionary<string, GameObject> MiscPrefabs = new Dictionary<string, GameObject>();
 
         public struct Camera
         {
@@ -314,6 +317,60 @@ namespace Strikeforce
                 Texture2D avatar = images[i];
                 playerAvatars.Add(i, avatar);
             }
+        }
+
+        public static GameObject GetPrefab(string name)
+        {
+            GameObject entity = GetStructurePrefab(name);
+            if (entity != null)
+            {
+                return entity;
+            }
+
+            entity = GetVehiclePrefab(name);
+            if (entity != null)
+            {
+                return entity;
+            }
+
+            entity = GetMiscPrefab(name);
+            return entity;
+        }
+
+        public static GameObject GetStructurePrefab(string name)
+        {
+            bool exists = StructurePrefabs.ContainsKey(name);
+            if (exists == false)
+            {
+                return null;
+            }
+
+            GameObject structure = StructurePrefabs[name];
+            return structure;
+        }
+
+        public static GameObject GetVehiclePrefab(string name)
+        {
+            bool exists = VehiclePrefabs.ContainsKey(name);
+            if (exists == false)
+            {
+                return null;
+            }
+
+            GameObject unit = VehiclePrefabs[name];
+            return unit;
+        }
+
+        public static GameObject GetMiscPrefab(string name)
+        {
+            bool exists = MiscPrefabs.ContainsKey(name);
+            if (exists == false)
+            {
+                return null;
+            }
+
+            GameObject entity = MiscPrefabs[name];
+            return entity;
         }
 
         public static GameObject GetChildGameObjectWithName(GameObject parent, string nameToFind)

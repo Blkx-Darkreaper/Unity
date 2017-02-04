@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Strikeforce
 {
@@ -7,6 +8,7 @@ namespace Strikeforce
     {
         public Texture2D healthy, damaged, critical;
         public Weapon shot, flameburst, bolt, wave, beam;
+        public GameObject[] Structures, Vehicles, Misc;
 
         public void Awake()
         {
@@ -23,12 +25,73 @@ namespace Strikeforce
 
         protected void LoadWeapons()
         {
-            GlobalAssets.Weapons.Add(Weapon.Types.SHOT, shot); //new Weapon(Weapon.Types.SHOT, 1, 1, 1)},
-            GlobalAssets.Weapons.Add(Weapon.Types.FLAMEBURST, flameburst);  //new Weapon(Weapon.Types.FLAMEBURST, 2, 1, 1)},
-            //new Weapon(Weapon.Types.CANNON, 3, 1, 1)},
-            GlobalAssets.Weapons.Add(Weapon.Types.BOLT, bolt);  //new Weapon(Weapon.Types.BOLT, 3, 1, 1)},
-            GlobalAssets.Weapons.Add(Weapon.Types.WAVE, wave);  //new Weapon(Weapon.Types.WAVE, 4, 1, 2)},
-            GlobalAssets.Weapons.Add(Weapon.Types.BEAM, beam);  //new Weapon(Weapon.Types.BEAM, 5, 1, 2)}
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.SHOT, shot);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.FLAMEBURST, flameburst);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.BOLT, bolt);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.WAVE, wave);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.BEAM, beam);
+        }
+
+        protected void LoadStructurePrefabs()
+        {
+            LoadPrefabs<Structure>(ref GlobalAssets.StructurePrefabs, Structures, "Structure");
+        }
+
+        protected void LoadVehiclePrefabs()
+        {
+            LoadPrefabs<Selectable>(ref GlobalAssets.VehiclePrefabs, Vehicles, "Vehicle");
+        }
+
+        protected void LoadMiscPrefabs()
+        {
+            LoadPrefabs<Entity>(ref GlobalAssets.MiscPrefabs, Misc, "Entity");
+        }
+
+        protected void LoadPrefabs<T>(ref Dictionary<string, GameObject> collection, GameObject[] items, string className)
+        where T : Entity
+        {
+            collection = new Dictionary<string,
+            GameObject>();
+            foreach (GameObject gameObject in items)
+            {
+                T controller = gameObject.GetComponent<T>();
+                if (controller == null)
+                {
+                    Debug.Log(string.Format("{0} gameobject has no controller", gameObject.name));
+                    continue;
+                }
+
+                SetEntityName(gameObject, controller);
+                string name = controller.name;
+                if (name.Equals(string.Empty) == true)
+                {
+                    Debug.Log(string.Format("{0} {1} has no name", className, gameObject.ToString()));
+                    continue;
+                }
+
+                collection.Add(name, gameObject);
+            }
+        }
+
+        private void SetEntityName(GameObject gameObject, Entity entity)
+        {
+            if (entity.name == null)
+            {
+                entity.name = string.Empty;
+            }
+
+            if (entity.name.Equals(string.Empty) == false)
+            {
+                return;
+            }
+
+            entity.name = gameObject.name;
+            if (entity.name.Equals(string.Empty) == false)
+            {
+                return;
+            }
+
+            entity.name = gameObject.tag;
         }
     }
 }
