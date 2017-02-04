@@ -70,10 +70,8 @@ namespace Strikeforce
                 new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) });
             CurrentRaider.AllHardpoints.Add(HardpointPosition.LeftWing, 
                 new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) });
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.Center, 
-                new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center) });
             CurrentRaider.AllHardpoints.Add(HardpointPosition.Center,
-                new Hardpoint[] { new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center)});
+                new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center), new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) });
             CurrentRaider.AllHardpoints.Add(HardpointPosition.RightWing, 
                 new Hardpoint[] { new Hardpoint(50, -16, 1, 1, HardpointPosition.RightWing) });
             CurrentRaider.AllHardpoints.Add(HardpointPosition.RightOuterWing, 

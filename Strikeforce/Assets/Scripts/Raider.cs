@@ -23,6 +23,8 @@ namespace Strikeforce
 
             this.CurrentEnergy = MaxEnergy;
 
+            this.AllHardpoints = new Dictionary<HardpointPosition, Hardpoint[]>();
+
             this.allArmour = new LinkedList<Armour>();
             this.nextArmourNode = allArmour.First;
 
