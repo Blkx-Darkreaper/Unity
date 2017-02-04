@@ -19,29 +19,18 @@ namespace Strikeforce
         private const int TEXT_HEIGHT = 32;
         private const int BUTTON_PADDING = 7;
         private const int SCROLL_BAR_WIDTH = 22;
-
         protected Profile profile;
-
         [HideInInspector] public Texture2D ActiveCursor;
         private CursorState activeCursorState;
         private int currentFrame = 0;
         public CursorState PreviousCursorState { get; private set; }
-
         public Texture2D[] ResourceIcons;
         private Dictionary<ResourceType, Texture2D> allResources;
-
         private Selectable previousSelection = null;
         private float sliderValue;
         public Texture2D ButtonHover, ButtonClick;
         public Texture2D BuildFrame, BuildMask;
         public Texture2D SmallButtonHover, SmallButtonClick;
-
-        public Texture2D HealthyTexture, DamagedTexture, CriticalTexture;
-
-        protected void Awake()
-        {
-            StoreSelectionBoxTextures(SelectionBoxSkin, HealthyTexture, DamagedTexture, CriticalTexture);
-        }
 
         protected void Start()
         {
@@ -49,14 +38,6 @@ namespace Strikeforce
 
             SetCursorState(CursorState.select);
             InitResources();
-        }
-
-        protected void StoreSelectionBoxTextures(GUISkin skin, Texture2D healthyTexture, Texture2D damagedTexture, Texture2D criticalTexture)
-        {
-            GlobalAssets.SelectionBoxSkin = skin;
-            GlobalAssets.HealthBarTextures.Healthy = healthyTexture;
-            GlobalAssets.HealthBarTextures.Damaged = damagedTexture;
-            GlobalAssets.HealthBarTextures.Critical = criticalTexture;
         }
 
         protected void InitStyles()

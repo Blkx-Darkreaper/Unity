@@ -6,6 +6,7 @@ namespace Strikeforce
 {
     public class AssetManager : MonoBehaviour
     {
+        public GUISkin hudSkin;
         public Texture2D healthy, damaged, critical;
         public GameObject shot, flameburst, bolt, wave, beam;
         public GameObject[] Structures, Vehicles, Misc;
@@ -13,11 +14,17 @@ namespace Strikeforce
         public void Awake()
         {
             // Load all game assets
+            LoadGuiSkins();
             LoadHealthBarTextures();
             LoadWeaponPrefabs();
             LoadStructurePrefabs();
             LoadVehiclePrefabs();
             LoadMiscPrefabs();
+        }
+
+        protected void LoadGuiSkins()
+        {
+            GlobalAssets.SelectionBoxSkin = hudSkin;
         }
 
         protected void LoadHealthBarTextures()
