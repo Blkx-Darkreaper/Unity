@@ -7,6 +7,7 @@ namespace Strikeforce
 {
     public class TriggerLink
     {
+        public bool IsSpecial { get; protected set; }
         public string DominantWeaponType { get; protected set; }
         public float AngledSpread { get; protected set; }
         public float HorizontalSpread { get; protected set; }
@@ -22,6 +23,7 @@ namespace Strikeforce
 
         public TriggerLink()
         {
+            this.IsSpecial = false;
             this.DominantWeaponType = string.Empty;
             this.AngledSpread = 0f;
             this.HorizontalSpread = 0f;
@@ -35,8 +37,23 @@ namespace Strikeforce
             SetFiringGroups();
         }
 
+        public TriggerLink(bool isSpecial)
+            : this()
+        {
+            this.IsSpecial = isSpecial;
+        }
+
         public void LinkWeapon(Weapon weapon)
         {
+            if (this.IsSpecial == true)
+            {
+                // Only allow Ordnance weapons
+                if (weapon.IsOrdnanceWeapon == false)
+                {
+                    return;
+                }
+            }
+
             this.allLinkedWeapons.AddFirst(weapon);
 
             bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
