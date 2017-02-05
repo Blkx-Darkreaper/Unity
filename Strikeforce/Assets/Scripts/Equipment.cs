@@ -6,8 +6,10 @@ namespace Strikeforce
 {
     public class Equipment : Entity
     {
+        public int Level = 1;
         public int Width;
         public int Height;
+        public string Description;
         public bool IsRemovable = true;
         public bool IsWeapon = false;
         public Raider parent;
