@@ -66,15 +66,15 @@ namespace Strikeforce
             CurrentRaider = raiderObject.GetComponent<Raider>();
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
 
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.LeftOuterWing, 
+            CurrentRaider.AllHardpoints.Add(HardpointPosition.LeftOuterWing,
                 new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) });
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.LeftWing, 
+            CurrentRaider.AllHardpoints.Add(HardpointPosition.LeftWing,
                 new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) });
             CurrentRaider.AllHardpoints.Add(HardpointPosition.Center,
                 new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center), new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) });
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.RightWing, 
+            CurrentRaider.AllHardpoints.Add(HardpointPosition.RightWing,
                 new Hardpoint[] { new Hardpoint(50, -16, 1, 1, HardpointPosition.RightWing) });
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.RightOuterWing, 
+            CurrentRaider.AllHardpoints.Add(HardpointPosition.RightOuterWing,
                 new Hardpoint[] { new Hardpoint(94, -69, 1, 1, HardpointPosition.RightOuterWing) });
 
             Vector3 raiderPosition = raiderObject.transform.position;
@@ -95,7 +95,13 @@ namespace Strikeforce
             IsSettingConstructionPoint = false;
         }
 
-        public void MovePlayer(float x, float y, float z)
+        public void LeftStick(float x, float y, float z)
+        {
+            CmdMovePlayer(x, y, z);
+        }
+
+        [Command]
+        protected void CmdMovePlayer(float x, float y, float z)
         {
             isInBuildMode = false;	//testing
             if (isInBuildMode == true)
@@ -108,6 +114,50 @@ namespace Strikeforce
             }
 
             mainCamera.transform.Translate(x, z, 0);	//testing
+        }
+
+        public void RespondToKeyEvent(KeyEvent keyEvent)
+        {
+            ActionKey key = keyEvent.Key;
+
+            switch (key)
+            {
+                case ActionKey.Action1:
+                    if (isInBuildMode == true)
+                    {
+                    }
+                    else
+                    {
+                    }
+                    break;
+
+                case ActionKey.RightTrigger:
+                    if (isInBuildMode == true)
+                    {
+                    }
+                    else
+                    {
+                        bool charging = keyEvent.IsBeingHeld;
+                        if (charging == false)
+                        {
+                            CmdFirePrimary();
+                        }
+                    }
+                    break;
+            }
+        }
+
+        [Command]
+        protected void CmdFirePrimary()
+        {
+            // Command function is called from the client, but invoked on the server
+            Raider raider = CurrentRaider;
+            if (raider == null)
+            {
+                return;
+            }
+
+            raider.FirePrimary();  // Testing
         }
 
         public bool IsConstructionSiteValid(Structure constructionSite)

@@ -84,6 +84,7 @@
      <Compile Include="Assets\Scripts\Hud.cs" />
      <Compile Include="Assets\Scripts\Infrastructure.cs" />
      <Compile Include="Assets\Scripts\Inventory.cs" />
+     <Compile Include="Assets\Scripts\KeyEvent.cs" />
      <Compile Include="Assets\Scripts\Level.cs" />
      <Compile Include="Assets\Scripts\MainMenu.cs" />
      <Compile Include="Assets\Scripts\Manager.cs" />

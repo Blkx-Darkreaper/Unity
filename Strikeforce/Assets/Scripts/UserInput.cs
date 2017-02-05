@@ -5,11 +5,18 @@ using System.Collections.Generic;
 
 namespace Strikeforce
 {
+    public enum ActionKey { Action1, Action2, Special1, Special2, LeftTrigger, RightTrigger, Menu, Back, LeftStick, RightStick }
+
     public class UserInput : NetworkBehaviour
     {
         public Profile profile;
         protected KeyMap gamepadBinds;
         protected KeyMap keyboardBinds;
+        public float KeyHoldDuration = 1f;
+        protected Dictionary<ActionKey, float> allPressedKeys { get; set; }
+        protected Queue<KeyEvent> allKeyEvents { get; set; }
+        protected bool rightTriggerDown = false;
+        protected bool leftTriggerDown = false;
         public struct KeyMap
         {
             public KeyCode Action1;
@@ -43,6 +50,9 @@ namespace Strikeforce
 
         protected void Awake()
         {
+            allPressedKeys = new Dictionary<ActionKey, float>();
+            allKeyEvents = new Queue<KeyEvent>();
+
             InitKeyBinds();
         }
 
@@ -54,30 +64,30 @@ namespace Strikeforce
 
         protected void InitKeyboardBinds()
         {
-			keyboardBinds = new KeyMap();
-            keyboardBinds.Action1 = KeyCode.A;
-            keyboardBinds.Action2 = KeyCode.S;
-            keyboardBinds.Special1 = KeyCode.D;
-            keyboardBinds.Special2 = KeyCode.F;
-            keyboardBinds.LeftTrigger = KeyCode.E;
-            keyboardBinds.RightTrigger = KeyCode.R;
+            keyboardBinds = new KeyMap();
+            keyboardBinds.Action1 = KeyCode.K;
+            keyboardBinds.Action2 = KeyCode.L;
+            keyboardBinds.Special1 = KeyCode.I;
+            keyboardBinds.Special2 = KeyCode.O;
+            keyboardBinds.LeftTrigger = KeyCode.J;
+            keyboardBinds.RightTrigger = KeyCode.Semicolon;
             keyboardBinds.Menu = KeyCode.Escape;
             keyboardBinds.Back = KeyCode.Backspace;
 
-            keyboardBinds.LeftStick.Up = KeyCode.UpArrow;
-            keyboardBinds.LeftStick.Down = KeyCode.DownArrow;
-            keyboardBinds.LeftStick.Left = KeyCode.LeftArrow;
-            keyboardBinds.LeftStick.Right = KeyCode.RightArrow;
+            keyboardBinds.LeftStick.Up = KeyCode.W;
+            keyboardBinds.LeftStick.Down = KeyCode.S;
+            keyboardBinds.LeftStick.Left = KeyCode.A;
+            keyboardBinds.LeftStick.Right = KeyCode.D;
 
-            keyboardBinds.RightStick.Up = KeyCode.Keypad8;
-            keyboardBinds.RightStick.Down = KeyCode.Keypad2;
-            keyboardBinds.RightStick.Left = KeyCode.Keypad4;
-            keyboardBinds.RightStick.Right = KeyCode.Keypad6;
+            keyboardBinds.RightStick.Up = KeyCode.UpArrow;
+            keyboardBinds.RightStick.Down = KeyCode.DownArrow;
+            keyboardBinds.RightStick.Left = KeyCode.LeftArrow;
+            keyboardBinds.RightStick.Right = KeyCode.RightArrow;
         }
 
         protected void InitGamepadBinds()
         {
-			gamepadBinds = new KeyMap();
+            gamepadBinds = new KeyMap();
             gamepadBinds.Action1 = KeyCode.Joystick1Button0;
             gamepadBinds.Action2 = KeyCode.Joystick1Button1;
             gamepadBinds.Special1 = KeyCode.Joystick1Button2;
@@ -121,7 +131,13 @@ namespace Strikeforce
             //    return;
             //}
 
-            RespondToKeyActivity();
+            LeftStick();
+
+            RightTrigger();
+
+            CheckForPressedKeys();
+            CheckForReleasedKeys();
+            HandleKeyEvents();
         }
 
         protected float getHorizontalScrollRate(float x)
@@ -233,64 +249,158 @@ namespace Strikeforce
             player.SelectedEntity = null;
         }
 
-        protected void RespondToKeyActivity()
+        protected void LeftStick()
+        {
+            string leftStickHor = string.Format("{0} {1}", Side.LEFT, Axis.HORIZONTAL);
+            string leftStickVert = string.Format("{0} {1}", Side.LEFT, Axis.VERTICAL);
+
+            float x = Input.GetAxis(leftStickHor) * 0.1f;
+            float z = Input.GetAxis(leftStickVert) * 0.1f;
+
+            Player player = profile.Player;
+            if (player == null)
+            {
+                return;
+            }
+
+            profile.Player.LeftStick(x, 0, z);
+        }
+
+        protected void RightTrigger()
+        {
+            KeyEvent keyEvent = null;
+
+            float trigger = Input.GetAxisRaw("Right Trigger");
+            if (trigger == 0)
+            {
+                if (rightTriggerDown == false)
+                {
+                    return;
+                }
+
+                rightTriggerDown = false;
+                keyEvent = GetKeyEvent(ActionKey.RightTrigger, false);
+                allKeyEvents.Enqueue(keyEvent);
+                return;
+            }
+
+            if (rightTriggerDown == true)
+            {
+                return;
+            }
+
+            rightTriggerDown = true;
+            keyEvent = GetKeyEvent(ActionKey.RightTrigger, true);
+            allKeyEvents.Enqueue(keyEvent);
+        }
+
+        protected void CheckForPressedKeys()
         {
             //if (isLocalPlayer == false)
             //{
             //    return;
             //}
 
-            MovePlayer();
-
-            if (Input.GetKeyDown(gamepadBinds.Menu))
+            if (Input.anyKeyDown == false)
             {
+                return;
+            }
+
+            KeyEvent keyEvent = null;
+
+            if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
+            {
+                keyEvent = GetKeyEvent(ActionKey.Action1, true);
+                allKeyEvents.Enqueue(keyEvent);
+            }
+
+            if (Input.GetKeyDown(keyboardBinds.RightTrigger))
+            {
+                keyEvent = GetKeyEvent(ActionKey.RightTrigger, true);
+                allKeyEvents.Enqueue(keyEvent);
+            }
+
+            if (Input.GetKeyDown(gamepadBinds.Menu) || Input.GetKeyDown(keyboardBinds.Menu))
+            {
+                keyEvent = GetKeyEvent(ActionKey.Menu, true);
+                allKeyEvents.Enqueue(keyEvent);
+            }
+        }
+
+        protected void CheckForReleasedKeys()
+        {
+            KeyEvent keyEvent = null;
+
+            if (Input.GetKeyUp(gamepadBinds.Action1) || Input.GetKeyUp(keyboardBinds.Action1))
+            {
+                keyEvent = GetKeyEvent(ActionKey.Action1, false);
+                allKeyEvents.Enqueue(keyEvent);
+            }
+
+            if (Input.GetKeyUp(gamepadBinds.RightTrigger) || Input.GetKeyUp(keyboardBinds.RightTrigger))
+            {
+                keyEvent = GetKeyEvent(ActionKey.RightTrigger, false);
+                allKeyEvents.Enqueue(keyEvent);
+            }
+
+            if (Input.GetKeyUp(gamepadBinds.Menu) || Input.GetKeyUp(keyboardBinds.Menu))
+            {
+                keyEvent = GetKeyEvent(ActionKey.Menu, false);
                 OpenPauseMenu();
             }
+        }
 
-            if (Input.GetKeyDown(gamepadBinds.Action1))
+        protected KeyEvent GetKeyEvent(ActionKey key, bool keyDownEvent)
+        {
+            if (allPressedKeys.ContainsKey(key) == false)
             {
-                // Command function is called from the client, but invoked on the server
-                CmdFire();
+                allPressedKeys.Add(key, Time.time);
+            }
+
+            KeyEvent keyEvent;
+
+            if (keyDownEvent == true)
+            {
+                // On key down
+                keyEvent = new KeyEvent(key, true);
+                return keyEvent;
+            }
+
+            // On key up
+            float downTime = allPressedKeys[key];
+            allPressedKeys.Remove(key);
+
+            float duration = Time.time - downTime;
+            if (duration < KeyHoldDuration)
+            {
+                keyEvent = new KeyEvent(key, false);
+            }
+            else
+            {
+                keyEvent = new KeyEvent(key, duration);
+            }
+
+            return keyEvent;
+        }
+
+        protected void HandleKeyEvents()
+        {
+            while (allKeyEvents.Count > 0)
+            {
+                KeyEvent keyEvent = allKeyEvents.Dequeue();
+                PlayerHandleKeyEvent(keyEvent);
             }
         }
 
-        protected void MovePlayer()
+        protected void PlayerHandleKeyEvent(KeyEvent keyEvent)
         {
             Player player = profile.Player;
             if (player == null)
             {
                 return;
             }
-            Raider raider = player.CurrentRaider;
-            if (raider == null)
-            {
-                return;
-            }
 
-			string leftStickHor = string.Format ("{0} {1}", Side.LEFT, Axis.HORIZONTAL);
-			string leftStickVert = string.Format ("{0} {1}", Side.LEFT, Axis.VERTICAL);
-
-            float x = Input.GetAxis(leftStickHor) * 0.1f;
-            float z = Input.GetAxis(leftStickVert) * 0.1f;
-
-            profile.Player.MovePlayer(x, 0, z);
-        }
-
-        [Command]
-        void CmdFire()
-        {
-            Player player = profile.Player;
-            if (player == null)
-            {
-                return;
-            }
-            Raider raider = player.CurrentRaider;
-            if (raider == null)
-            {
-                return;
-            }
-
-            raider.FirePrimary();  // Testing
+            player.RespondToKeyEvent(keyEvent);
         }
 
         protected void OpenPauseMenu()

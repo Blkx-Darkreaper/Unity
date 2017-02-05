@@ -36,21 +36,23 @@ namespace Strikeforce
 
         public void FirePrimary()  // Testing
         {
-            //// create the bullet object from the bullet prefab
-            //GameObject bullet = (GameObject)Instantiate(
-            //    NetworkManager.singleton.spawnPrefabs[0],
-            //    transform.position + transform.forward,
-            //    Quaternion.identity);
+            // create the bullet object from the bullet prefab
+            GameObject bullet = (GameObject)Instantiate(
+                NetworkManager.singleton.spawnPrefabs[0],
+                transform.position + transform.forward,
+                Quaternion.identity);
 
-            //// make the bullet move away in front of the player
-            //bullet.GetComponentInChildren<Rigidbody>().velocity = transform.forward * 4;
+			bullet.transform.parent = gameObject.transform;
 
-            //// spawn the bullet on the clients
-            //NetworkServer.Spawn(bullet);
+            // make the bullet move away in front of the player
+            bullet.GetComponentInChildren<Rigidbody>().velocity = transform.forward * 4;
 
-            //// make bullet disappear after 2 seconds
-            //Destroy(bullet, 2.0f);
-            PrimaryFire.IsFiring = true;
+            // spawn the bullet on the clients
+            NetworkServer.Spawn(bullet);
+
+            // make bullet disappear after 2 seconds
+            Destroy(bullet, 2.0f);
+            //PrimaryFire.IsFiring = true;
         }
 
         protected override void Update()
