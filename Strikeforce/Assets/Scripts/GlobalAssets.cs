@@ -82,8 +82,6 @@ namespace Strikeforce
         public const string SCROLL_WHEEL = "Mouse ScrollWheel";
     }
 
-    public enum HardpointPosition { LeftOuterWing, LeftWing, Center, RightWing, RightOuterWing }
-
     public static class FiringGroupPatterns
     {
         private static Dictionary<int, int[][]> allPatterns = new Dictionary<int, int[][]>() {
