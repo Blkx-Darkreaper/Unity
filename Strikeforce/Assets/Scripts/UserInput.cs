@@ -7,6 +7,13 @@ namespace Strikeforce
 {
     public enum ActionKey { Action1, Action2, Special1, Special2, LeftTrigger, RightTrigger, Menu, Back, LeftStick, RightStick }
 
+    public struct KeyMappings
+    {
+        public const string MOUSE_X_AXIS = "Mouse X";
+        public const string MOUSE_Y_AXIS = "Mouse Y";
+        public const string SCROLL_WHEEL = "Mouse ScrollWheel";
+    }
+
     public class UserInput : NetworkBehaviour
     {
         public Profile profile;

@@ -43,18 +43,6 @@ namespace Strikeforce
     //    public const string harvest = "Harvest Cursor";
     //}
 
-    public struct MenuAttributes
-    {
-        public static float Width { get { return HeaderWidth + 2 * ButtonHeight + 4 * Padding; } }
-        public static float Padding = 10f;
-        public static float TextHeight = 25f;
-        public static float HeaderWidth = 256f;
-        public static float HeaderHeight = 32f;
-        public static float ButtonWidth { get { return (Width - 3 * Padding) / 2; } }
-        public static float ButtonHeight = 40f;
-        public static float pauseMenuHeight = 20f;
-    }
-
     public struct Scenes
     {
         public static string Lobby = "lobby";
@@ -73,13 +61,6 @@ namespace Strikeforce
         public const string PLAYERS = "Players";
         //public const string STRUCTURES = "Structures";
         //public const string UNITS = "Units";
-    }
-
-    public struct KeyMappings
-    {
-        public const string MOUSE_X_AXIS = "Mouse X";
-        public const string MOUSE_Y_AXIS = "Mouse Y";
-        public const string SCROLL_WHEEL = "Mouse ScrollWheel";
     }
 
     public static class GlobalAssets
