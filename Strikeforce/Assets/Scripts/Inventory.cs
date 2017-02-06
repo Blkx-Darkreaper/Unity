@@ -39,10 +39,10 @@ namespace Strikeforce
         {
             AllRaiders = new List<Raider>();
             AllEquipment = new List<Equipment>();
-            InitResourceLists();
+            InitResources();
         }
 
-        private void InitResourceLists()
+        private void InitResources()
         {
             resources = new Dictionary<ResourceType, int>();
             resources.Add(ResourceType.Money, 0);
