@@ -12,33 +12,33 @@ namespace Strikeforce
         public string Description;
         public bool IsRemovable = true;
         public bool IsWeapon = false;
-        public Raider parent;
+        public Raider Parent;
         public HardpointPosition EquippedHardpoint { get; protected set; }
         public float Cost;
         public int Level = 1;
         public float EnergyCost;
         public float Cooldown;
-        public string CurrentStatus { get; protected set; }
-        public struct EquipmentStatus
+        public string CurrentStatus { get; protected set;}
+        public struct Status
         {
             public const string READY = "Ready";
             public const string RECHARGING = "Recharging";
             public const string DISABLED = "Disabled";
         }
 
-        protected override void Awake()
-        {
-            this.CurrentStatus = EquipmentStatus.READY;
+        protected virtual void Start() {
+            GameManager.Singleton.RegisterEntity(this);
         }
 
-        protected virtual void Start()
+        protected override void Awake()
         {
-            GameManager.Singleton.RegisterEntity(this);
+            this.CurrentStatus = Status.READY;
         }
 
         protected virtual void Update()
         {
-            if(CurrentStatus.Equals(EquipmentStatus.DISABLED)) {
+            if (CurrentStatus.Equals(Status.DISABLED))
+            {
                 return;
             }
 
@@ -46,11 +46,12 @@ namespace Strikeforce
                 return;
             }
 
-            this.CurrentStatus = EquipmentStatus.READY;
+            this.CurrentStatus = Status.READY;
         }
 
         public void Equip(Raider parent, HardpointPosition hardpoint)
         {
+            this.Parent = parent;
             this.EquippedHardpoint = hardpoint;
         }
     }

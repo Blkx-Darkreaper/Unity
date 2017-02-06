@@ -216,7 +216,7 @@ namespace Strikeforce
         //    }
 
         //    RemoveResource(ResourceType.money, constructionSite.Cost);
-        //    constructionSite.transform.parent = allStructures.transform;
+        //    constructionSite.transform.Parent = allStructures.transform;
         //    constructionSite.Owner = this;
         //    constructionSite.SetColliders(true);
         //    constructionSite.StartConstruction();
