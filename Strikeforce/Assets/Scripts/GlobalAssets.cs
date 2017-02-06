@@ -43,26 +43,16 @@ namespace Strikeforce
     //    public const string harvest = "Harvest Cursor";
     //}
 
-    public enum ResourceType
+    public struct MenuAttributes
     {
-        money, fuel, rockets, missiles, bombs, materiel, unknown
-    }
-
-    public struct ResourceProperties
-    {
-        public const string MONEY = "Money";
-        public const string MONEY_LIMIT = "MoneyLimit";
-        public const string FUEL = "Fuel";
-        public const string FUEL_LIMIT = "FuelLimit";
-        public const string ROCKETS = "Rockets";
-        public const string ROCKETS_LIMIT = "RocketsLimit";
-        public const string MISSILES = "Missiles";
-        public const string MISSILES_LIMIT = "MissilesLimit";
-        public const string BOMBS = "Bombs";
-        public const string BOMBS_LIMIT = "BombsLimit";
-        public const string MATERIEL = "Materiel";
-        public const string MATERIEL_LIMIT = "MaterielLimit";
-        public const string UNKNOWN = "Unknown";
+        public static float Width { get { return HeaderWidth + 2 * ButtonHeight + 4 * Padding; } }
+        public static float Padding = 10f;
+        public static float TextHeight = 25f;
+        public static float HeaderWidth = 256f;
+        public static float HeaderHeight = 32f;
+        public static float ButtonWidth { get { return (Width - 3 * Padding) / 2; } }
+        public static float ButtonHeight = 40f;
+        public static float pauseMenuHeight = 20f;
     }
 
     public struct Scenes
@@ -197,25 +187,25 @@ namespace Strikeforce
             switch (typeName)
             {
                 case ResourceProperties.MONEY:
-                    return ResourceType.money;
+                    return ResourceType.Money;
 
                 case ResourceProperties.FUEL:
-                    return ResourceType.fuel;
+                    return ResourceType.Fuel;
 
                 case ResourceProperties.ROCKETS:
-                    return ResourceType.rockets;
+                    return ResourceType.Rockets;
 
                 case ResourceProperties.MISSILES:
-                    return ResourceType.missiles;
+                    return ResourceType.Missiles;
 
                 case ResourceProperties.BOMBS:
-                    return ResourceType.bombs;
+                    return ResourceType.Bombs;
 
                 case ResourceProperties.MATERIEL:
-                    return ResourceType.materiel;
+                    return ResourceType.Materiel;
 
                 default:
-                    return ResourceType.unknown;
+                    return ResourceType.Unknown;
             }
         }
 
@@ -242,23 +232,23 @@ namespace Strikeforce
                 switch (resourceHealthBar.name)
                 {
                     case ResourceProperties.FUEL:
-                        resourceHealthBarTextures.Add(ResourceType.fuel, resourceHealthBar);
+                        resourceHealthBarTextures.Add(ResourceType.Fuel, resourceHealthBar);
                         break;
 
                     case ResourceProperties.ROCKETS:
-                        resourceHealthBarTextures.Add(ResourceType.rockets, resourceHealthBar);
+                        resourceHealthBarTextures.Add(ResourceType.Rockets, resourceHealthBar);
                         break;
 
                     case ResourceProperties.MISSILES:
-                        resourceHealthBarTextures.Add(ResourceType.missiles, resourceHealthBar);
+                        resourceHealthBarTextures.Add(ResourceType.Missiles, resourceHealthBar);
                         break;
 
                     case ResourceProperties.BOMBS:
-                        resourceHealthBarTextures.Add(ResourceType.bombs, resourceHealthBar);
+                        resourceHealthBarTextures.Add(ResourceType.Bombs, resourceHealthBar);
                         break;
 
                     case ResourceProperties.MATERIEL:
-                        resourceHealthBarTextures.Add(ResourceType.materiel, resourceHealthBar);
+                        resourceHealthBarTextures.Add(ResourceType.Materiel, resourceHealthBar);
                         break;
                 }
             }

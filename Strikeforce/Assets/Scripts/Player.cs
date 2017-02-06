@@ -208,15 +208,20 @@ namespace Strikeforce
         //        return;
         //    }
 
-        //    bool sufficientFunds = HasSufficientResources(ResourceType.money, constructionSite.Cost);
+        //    bool sufficientFunds = HasSufficientResources(ResourceType.Money, constructionSite.Cost);
         //    if (sufficientFunds == false)
         //    {
-        //        InsufficientResources(ResourceType.money);
+        //        InsufficientResources(ResourceType.Money);
         //        return;
         //    }
 
+<<<<<<< HEAD
         //    RemoveResource(ResourceType.money, constructionSite.Cost);
         //    constructionSite.transform.Parent = allStructures.transform;
+=======
+        //    RemoveResource(ResourceType.Money, constructionSite.Cost);
+        //    constructionSite.transform.parent = allStructures.transform;
+>>>>>>> Updated resource handling in Inventory. Moved resource attributes to Inventory class
         //    constructionSite.Owner = this;
         //    constructionSite.SetColliders(true);
         //    constructionSite.StartConstruction();
