@@ -3,32 +3,18 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using Random = UnityEngine.Random;
-//using Graphics = System.Drawing.Graphics;
 using Newtonsoft.Json;
 
 namespace Strikeforce
 {
     public class Level : MonoBehaviour
     {
-        //[Serializable] public class Range
-        //{
-        //    public int Min;
-        //    public int Max;
-
-        //    public Range(int min, int max)
-        //    {
-        //        this.Min = min;
-        //        this.Max = max;
-        //    }
-        //}
-
         public int Columns;
         public int Rows;
         public int TileLength = 32;
         public string LevelName;
         public Vector2 HeadquartersSpawn;
         public Vector2 RaiderSpawn;
-        //protected Image mapImage;
         public GameObject TilePrefab;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
@@ -44,6 +30,11 @@ namespace Strikeforce
             //InitGrid();
             allMapTiles = new List<GameObject>();
 
+            LoadMap();
+        }
+
+        protected void LoadMap()
+        {
             string appPath = Application.dataPath;
             string levelPath = string.Format("{0}/Levels/{1}.json", appPath, LevelName);
             Debug.Log(string.Format("Loading level {0}", levelPath));
@@ -84,7 +75,7 @@ namespace Strikeforce
                 Sprite sprite = Tileset[tileIndex];
 
                 int x = grid.Corner.X;
-				x -= halfWidth;
+                x -= halfWidth;
                 x /= TileLength;
 
                 int z = height - grid.Corner.Y;
