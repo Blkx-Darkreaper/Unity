@@ -26,15 +26,18 @@ namespace Strikeforce
         public int Rows;
         public int TileLength = 32;
         public string LevelName;
+        public Vector2 HeadquartersSpawn;
+        public Vector2 RaiderSpawn;
         //protected Image mapImage;
         public GameObject TilePrefab;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
-
         protected float PercentObstacles;
         protected GameObject[] GroundTiles;
         protected GameObject[] ObstacleTiles;
         protected List<Vector3> gridPositions = new List<Vector3>();
+        protected Rectangle[] allSectors;
+        protected Vector2[] allSectorSpawns;
 
         public void Start()
         {
@@ -65,6 +68,8 @@ namespace Strikeforce
                 Debug.Log(ex.Message);
                 return;
             }
+
+            this.RaiderSpawn = new Vector2();    // TODO
 
             int width = (int)map.MapSize.Width;
             int halfWidth = width / 2;

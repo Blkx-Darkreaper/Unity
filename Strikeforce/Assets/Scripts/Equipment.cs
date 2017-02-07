@@ -9,7 +9,7 @@ namespace Strikeforce
         public int Level = 1;
         public int Width;
         public int Height;
-        public string Description;
+        public string Description = string.Empty;
         public bool IsRemovable = true;
         public bool IsWeapon = false;
         public Raider parent;
