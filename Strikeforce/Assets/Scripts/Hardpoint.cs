@@ -3,6 +3,8 @@ using System.Drawing;
 
 namespace Strikeforce
 {
+    public enum HardpointPosition { LeftOuterWing, LeftWing, Center, RightWing, RightOuterWing }
+
     public class Hardpoint
     {
         public Vector2 Location;

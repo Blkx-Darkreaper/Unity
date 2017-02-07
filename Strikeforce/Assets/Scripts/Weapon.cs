@@ -35,12 +35,12 @@ namespace Strikeforce
             }
 
             // Check weapon has sufficient energy
-            if (parent.CurrentEnergy < EnergyCost)
+            if (Parent.CurrentEnergy < EnergyCost)
             {
                 return;
             }
 
-            parent.UpdateEnergy(EnergyCost);
+            Parent.UpdateEnergy(EnergyCost);
             this.CurrentStatus = EquipmentStatus.RECHARGING;
 
             Debug.Log(string.Format("{0} fired!", Type));
@@ -48,11 +48,11 @@ namespace Strikeforce
             //// create the bullet object from the bullet prefab
             //GameObject bullet = (GameObject)Instantiate(
             //    NetworkManager.singleton.spawnPrefabs[0],
-            //    parent.transform.position + parent.transform.forward,
+            //    Parent.transform.position + Parent.transform.forward,
             //    Quaternion.identity);
 
             //// make the bullet move away in front of the player
-            //bullet.GetComponentInChildren<Rigidbody>().velocity = parent.transform.forward * 4;
+            //bullet.GetComponentInChildren<Rigidbody>().velocity = Parent.transform.forward * 4;
 
             //// spawn the bullet on the clients
             //NetworkServer.Spawn(bullet);

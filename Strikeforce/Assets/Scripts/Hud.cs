@@ -65,27 +65,27 @@ namespace Strikeforce
                 switch (resourceName)
                 {
                     case ResourceProperties.MONEY:
-                        allResources.Add(ResourceType.money, resource);
+                        allResources.Add(ResourceType.Money, resource);
                         break;
 
                     case ResourceProperties.FUEL:
-                        allResources.Add(ResourceType.fuel, resource);
+                        allResources.Add(ResourceType.Fuel, resource);
                         break;
 
                     case ResourceProperties.ROCKETS:
-                        allResources.Add(ResourceType.rockets, resource);
+                        allResources.Add(ResourceType.Rockets, resource);
                         break;
 
                     case ResourceProperties.MISSILES:
-                        allResources.Add(ResourceType.missiles, resource);
+                        allResources.Add(ResourceType.Missiles, resource);
                         break;
 
                     case ResourceProperties.BOMBS:
-                        allResources.Add(ResourceType.bombs, resource);
+                        allResources.Add(ResourceType.Bombs, resource);
                         break;
 
                     case ResourceProperties.MATERIEL:
-                        allResources.Add(ResourceType.materiel, resource);
+                        allResources.Add(ResourceType.Materiel, resource);
                         break;
 
                     case ResourceProperties.UNKNOWN:

@@ -5,32 +5,64 @@ using System.Collections.Generic;
 
 namespace Strikeforce
 {
+    public enum ResourceType
+    {
+        Money, Fuel, Rockets, Missiles, Bombs, Materiel, Unknown
+    }
+
+    public struct ResourceProperties
+    {
+        public const string MONEY = "Money";
+        public const string MONEY_LIMIT = "MoneyLimit";
+        public const string FUEL = "Fuel";
+        public const string FUEL_LIMIT = "FuelLimit";
+        public const string ROCKETS = "Rockets";
+        public const string ROCKETS_LIMIT = "RocketsLimit";
+        public const string MISSILES = "Missiles";
+        public const string MISSILES_LIMIT = "MissilesLimit";
+        public const string BOMBS = "Bombs";
+        public const string BOMBS_LIMIT = "BombsLimit";
+        public const string MATERIEL = "Materiel";
+        public const string MATERIEL_LIMIT = "MaterielLimit";
+        public const string UNKNOWN = "Unknown";
+    }
+
     public class Inventory : MonoBehaviour
     {
-        protected List<Raider> raiders;
-        protected List<Equipment> equipment;
-        public int StartingMoney, StartingMoneyLimit, StartingFuel, StartingFuelLimit;
+        public List<Raider> AllRaiders;
+        public List<Equipment> AllEquipment;
+        public int StartingMoney = 1000, MoneyLimit = 9999999, StartingFuel = 500, FuelLimit = 9999,
+            StartingRockets = 0, RocketLimit = 9999, StartingMissiles = 0, MissileLimit = 9999, StartingBombs = 0, BombLimit = 9999;
         protected Dictionary<ResourceType, int> resources, resourceLimits;
 
         protected void Awake()
         {
-            raiders = new List<Raider>();
-            equipment = new List<Equipment>();
-            InitResourceLists();
+            AllRaiders = new List<Raider>();
+            AllEquipment = new List<Equipment>();
+            InitResources();
         }
 
-        private void InitResourceLists()
+        private void InitResources()
         {
             resources = new Dictionary<ResourceType, int>();
-            resources.Add(ResourceType.money, 0);
-            resources.Add(ResourceType.fuel, 0);
+            resources.Add(ResourceType.Money, 0);
+            resources.Add(ResourceType.Fuel, 0);
+            resources.Add(ResourceType.Rockets, 0);
+            resources.Add(ResourceType.Missiles, 0);
+            resources.Add(ResourceType.Bombs, 0);
 
             resourceLimits = new Dictionary<ResourceType, int>();
-            resourceLimits.Add(ResourceType.money, StartingMoneyLimit);
-            resourceLimits.Add(ResourceType.fuel, StartingFuelLimit);
+            SetResourceLimit(ResourceType.Money, MoneyLimit);
+            SetResourceLimit(ResourceType.Fuel, FuelLimit);
+            SetResourceLimit(ResourceType.Rockets, RocketLimit);
+            SetResourceLimit(ResourceType.Missiles, MissileLimit);
+            SetResourceLimit(ResourceType.Bombs, BombLimit);
 
-            AddResource(ResourceType.money, StartingMoney);
-            AddResource(ResourceType.fuel, StartingFuel);
+            UpdateResource(ResourceType.Money, StartingMoney);
+            UpdateResource(ResourceType.Fuel, StartingFuel);
+            UpdateResource(ResourceType.Rockets, StartingRockets);
+            UpdateResource(ResourceType.Missiles, StartingMissiles);
+            UpdateResource(ResourceType.Bombs, StartingBombs);
         }
 
         public void InsufficientResources(ResourceType type)
@@ -38,15 +70,20 @@ namespace Strikeforce
             Debug.Log(string.Format("{0} has insufficient {1}", name, type.ToString()));
         }
 
-        public void AddResource(ResourceType type, int amountToAdd)
+        public int UpdateResource(ResourceType type, int amount)
         {
-            resources[type] += amountToAdd;
-            if (resourceLimits.ContainsKey(type) == false)
+            int currentAmount = resources[type];
+
+            int maxAmount = int.MaxValue;
+            if (resourceLimits.ContainsKey(type) == true)
             {
-                return;
+                maxAmount = resourceLimits[type];
             }
 
-            resources[type] = Mathf.Clamp(resources[type], 0, resourceLimits[type]);
+            int adjustedAmount = Mathf.Clamp(currentAmount + amount, 0, maxAmount);
+
+            int remainder = amount - adjustedAmount + currentAmount;
+            return remainder;
         }
 
         public bool HasSufficientResources(ResourceType type, int amountRequired)
@@ -57,14 +94,14 @@ namespace Strikeforce
             return sufficientResources;
         }
 
-        public void RemoveResource(ResourceType type, int amountToRemove)
-        {
-            resources[type] -= amountToRemove;
-            resources[type] = Mathf.Clamp(resources[type], 0, resourceLimits[type]);
-        }
-
         public void SetResourceLimit(ResourceType type, int limit)
         {
+            if (resourceLimits.ContainsKey(type) == false)
+            {
+                resourceLimits.Add(type, limit);
+                return;
+            }
+
             resourceLimits[type] = limit;
         }
 
