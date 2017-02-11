@@ -13,6 +13,8 @@ namespace Strikeforce
         public int Rows;
         public int TileLength = 32;
         public string LevelName;
+        [HideInInspector]
+        public GameObject BoundingBox;
         public Vector2 HeadquartersSpawn;
         public Vector2 RaiderSpawn;
         public GameObject TilePrefab;
@@ -21,9 +23,11 @@ namespace Strikeforce
         protected float PercentObstacles;
         protected GameObject[] GroundTiles;
         protected GameObject[] ObstacleTiles;
+        protected GameObject allGridObjects;
         protected List<Vector3> gridPositions = new List<Vector3>();
         protected Rectangle[] allSectors;
         protected Vector2[] allSectorSpawns;
+        public const string BOUNDING_BOX = "BoundingBox";
 
         public void Start()
         {
@@ -60,13 +64,19 @@ namespace Strikeforce
                 return;
             }
 
-            this.RaiderSpawn = new Vector2();    // TODO
-
             int width = (int)map.MapSize.Width;
             int halfWidth = width / 2;
             int height = (int)map.MapSize.Height;
             Columns = width / TileLength;
             Rows = height / TileLength;
+
+            // Set Raider spawn and build Bounding box
+            this.RaiderSpawn = new Vector2();    // TODO
+
+            LoadBoundingBox(Columns, Rows);
+
+            allGridObjects = new GameObject("GridsObject");
+            allGridObjects.transform.parent = gameObject.transform;
 
             List<Grid> allMapGrids = map.AllMapGrids;
             foreach (Grid grid in allMapGrids)
@@ -83,13 +93,28 @@ namespace Strikeforce
                 Vector3 position = new Vector3(x, 0, z);
 
                 GameObject tile = Instantiate(TilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
-                tile.transform.parent = gameObject.transform;
+                tile.transform.parent = allGridObjects.transform;
 
                 SpriteRenderer renderer = tile.GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
 
                 allMapTiles.Add(tile);
             }
+        }
+
+        protected void LoadBoundingBox(int columns, int rows)
+        {
+            int midRow = rows / 2;
+            Vector3 position = new Vector3(0, 10, midRow);
+            GameObject boundingBoxPrefab = GlobalAssets.GetMiscPrefab(BOUNDING_BOX);
+            if (boundingBoxPrefab == null)
+            {
+                return;
+            }
+
+            this.BoundingBox = Instantiate(boundingBoxPrefab, position, Quaternion.identity) as GameObject;
+            this.BoundingBox.transform.localScale = new Vector3(columns, 20, rows);
+            this.BoundingBox.transform.parent = gameObject.transform;
         }
 
         //protected Texture2D LoadMapSprite(string filename)

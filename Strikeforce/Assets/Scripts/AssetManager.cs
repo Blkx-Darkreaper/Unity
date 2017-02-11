@@ -6,10 +6,11 @@ namespace Strikeforce
 {
     public class AssetManager : MonoBehaviour
     {
-        public GUISkin hudSkin;
-        public Texture2D healthy, damaged, critical;
-        public GameObject shot, flameburst, bolt, wave, beam;
+        public GUISkin HudSkin;
+        public Texture2D Healthy, Damaged, Critical;
+        public GameObject BasicShot, Flameburst, Bolt, Wave, Beam;
         public GameObject[] Structures, Vehicles, Misc;
+        public GameObject BoundingBox;
 
         public void Awake()
         {
@@ -20,27 +21,28 @@ namespace Strikeforce
             LoadStructurePrefabs();
             LoadVehiclePrefabs();
             LoadMiscPrefabs();
+            LoadBoundingBoxPrefab();
         }
 
         protected void LoadGuiSkins()
         {
-            GlobalAssets.SelectionBoxSkin = hudSkin;
+            GlobalAssets.SelectionBoxSkin = HudSkin;
         }
 
         protected void LoadHealthBarTextures()
         {
-            GlobalAssets.HealthBarTextures.Healthy = healthy;
-            GlobalAssets.HealthBarTextures.Damaged = damaged;
-            GlobalAssets.HealthBarTextures.Critical = critical;
+            GlobalAssets.HealthBarTextures.Healthy = Healthy;
+            GlobalAssets.HealthBarTextures.Damaged = Damaged;
+            GlobalAssets.HealthBarTextures.Critical = Critical;
         }
 
         protected void LoadWeaponPrefabs()
         {
-            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.SHOT, shot);
-            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.FLAMEBURST, flameburst);
-            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.BOLT, bolt);
-            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.WAVE, wave);
-            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.BEAM, beam);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.SHOT, BasicShot);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.FLAMEBURST, Flameburst);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.BOLT, Bolt);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.WAVE, Wave);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.BEAM, Beam);
         }
 
         protected void LoadStructurePrefabs()
@@ -82,6 +84,12 @@ namespace Strikeforce
 
                 collection.Add(name, gameObject);
             }
+        }
+
+        protected void LoadBoundingBoxPrefab()
+        {
+            string name = BoundingBox.name;
+            GlobalAssets.MiscPrefabs.Add(name, BoundingBox);
         }
 
         public void SetEntityName(GameObject gameObject, Entity entity)
