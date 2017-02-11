@@ -7,12 +7,16 @@ namespace Strikeforce
 {
     public class OptionsMenu : Menu
     {
-        protected override void SetButtonNames()
+        protected override void Awake()
         {
-            
+            // Hookup back button first
+            Button backButton = GlobalAssets.GetChildComponentWithTag<Button>(gameObject, Tags.BUTTON);
+            AddButtonHandler(backButton, BACK);
+
+            base.Awake();
         }
 
-        protected override void HandleButtonPress(string buttonName)
+        protected override void SetButtonNames()
         {
             
         }

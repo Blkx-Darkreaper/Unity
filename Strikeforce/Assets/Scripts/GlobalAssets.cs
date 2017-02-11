@@ -316,6 +316,29 @@ namespace Strikeforce
             return null;
         }
 
+        public static T GetChildComponentWithTag<T>(GameObject parent, string tagToFind) where T : Component
+        {
+            if (parent == null)
+            {
+                return null;
+            }
+
+            T[] children = parent.GetComponentsInChildren<T>();
+
+            foreach (T child in children)
+            {
+                string childTag = child.gameObject.tag;
+                if (!childTag.Equals(tagToFind))
+                {
+                    continue;
+                }
+
+                return child;
+            }
+
+            return null;
+        }
+
         public static string ReadTextFile(string filename)
         {
             string text = string.Empty;

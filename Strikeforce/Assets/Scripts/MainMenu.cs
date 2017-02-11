@@ -105,35 +105,17 @@ namespace Strikeforce
 
         private void Profile()
         {
-            if (menuManager == null)
-            {
-                Debug.LogError(string.Format("Menu manager hasn't been loaded."));
-                return;
-            }
-
-            menuManager.ShowMenu(ProfileMenu);
+            SwitchToMenu(ProfileMenu);
         }
 
         protected void Matchmaking()
         {
-            if (menuManager == null)
-            {
-                Debug.LogError(string.Format("Menu manager hasn't been loaded."));
-                return;
-            }
-
-            menuManager.ShowMenu(MatchmakingMenu);
+            SwitchToMenu(MatchmakingMenu);
         }
 
         protected void Options()
         {
-            if (menuManager == null)
-            {
-                Debug.LogError(string.Format("Menu manager hasn't been loaded."));
-                return;
-            }
-
-            menuManager.ShowMenu(OptionsMenu);
+            SwitchToMenu(OptionsMenu);
         }
 
         public override void DisableMenu()

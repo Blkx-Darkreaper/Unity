@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.Collections;
 
@@ -12,6 +13,10 @@ namespace Strikeforce
 
         protected override void Awake()
         {
+            // Hookup back button first
+            Button backButton = GlobalAssets.GetChildComponentWithTag<Button>(gameObject, Tags.BUTTON);
+            AddButtonHandler(backButton, BACK);
+
             base.Awake();
 
             networkManager = NetworkManager.singleton;
@@ -36,6 +41,10 @@ namespace Strikeforce
 
                 case JOIN_GAME:
                     JoinGame();
+                    break;
+
+                case BACK:
+                    Back();
                     break;
             }
         }

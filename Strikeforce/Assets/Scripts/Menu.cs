@@ -22,6 +22,7 @@ namespace Strikeforce
         protected CanvasGroup canvasGroup;
         protected string[] buttonNames;
         protected Dictionary<string, Button> allButtons;
+        protected const string BACK = "Back";
         protected const string EXIT = "Quit Game";
         public struct Attributes
         {
@@ -87,7 +88,7 @@ namespace Strikeforce
 
         protected virtual void SetButtonNames()
         {
-            buttonNames = new string[] { EXIT };
+            buttonNames = new string[] { BACK, EXIT };
         }
 
         protected virtual void SetMenuButtons()
@@ -99,6 +100,15 @@ namespace Strikeforce
 
             SetHeaderText();
 
+            if (buttonNames == null)
+            {
+                return;
+            }
+            if (buttonNames.Length == 0)
+            {
+                return;
+            }
+
             if (ButtonPrefab == null)
             {
                 return;
@@ -106,7 +116,10 @@ namespace Strikeforce
 
             // Get the button group
             VerticalLayoutGroup buttonGroup = GetComponentInChildren<VerticalLayoutGroup>();
-            allButtons = new Dictionary<string, Button>();
+            if (buttonGroup == null)
+            {
+                return;
+            }
 
             foreach (string buttonName in buttonNames)
             {
@@ -118,15 +131,31 @@ namespace Strikeforce
                 buttonObject.transform.localScale = buttonGroup.transform.localScale;
 
                 Button button = buttonObject.GetComponent<Button>();
-                button.name = buttonName;
-                button.onClick.AddListener(() => { HandleButtonPress(button); });
-                allButtons.Add(buttonName, button);
+                AddButtonHandler(button, buttonName);
             }
+        }
+
+        protected virtual void AddButtonHandler(Button button, string buttonName)
+        {
+            if (button == null)
+            {
+                return;
+            }
+
+            button.name = buttonName;
+            button.onClick.AddListener(() => { HandleButtonPress(button); });
+            if (allButtons == null)
+            {
+                allButtons = new Dictionary<string, Button>();
+            }
+
+            allButtons.Add(buttonName, button);
         }
 
         private void SetHeaderText()
         {
-            GameObject header = GameObject.FindGameObjectWithTag(Tags.HEADER);
+            //GameObject header = GameObject.FindGameObjectWithTag(Tags.HEADER);
+			Image header = GlobalAssets.GetChildComponentWithTag<Image>(gameObject, Tags.HEADER);
             if (header == null)
             {
                 return;
@@ -254,10 +283,40 @@ namespace Strikeforce
         {
             switch (buttonName)
             {
+                case BACK:
+                    Back();
+                    break;
+
                 case EXIT:
                     ExitGame();
                     break;
             }
+        }
+
+        public virtual void ShowMenu()
+        {
+            this.IsOpening = true;
+        }
+
+        public virtual void HideMenu()
+        {
+            this.IsOpening = false;
+        }
+
+        protected virtual void SwitchToMenu(Menu menu)
+        {
+            if (menu == null)
+            {
+                return;
+            }
+
+            if (menuManager == null)
+            {
+                Debug.LogError(string.Format("Menu manager hasn't been loaded."));
+                return;
+            }
+
+            menuManager.ShowMenu(menu);
         }
 
         protected virtual void Pause()
@@ -276,6 +335,7 @@ namespace Strikeforce
 
         protected virtual void Back()
         {
+            SwitchToMenu(PreviousMenu);
         }
 
         public virtual void EnableMenu()
@@ -294,16 +354,6 @@ namespace Strikeforce
 
             bool enabled = menu.enabled;
             menu.enabled = !enabled;
-        }
-
-        public virtual void ShowMenu()
-        {
-            this.IsOpening = true;
-        }
-
-        public virtual void HideMenu()
-        {
-            this.IsOpening = false;
         }
 
         protected virtual void ExitGame()
