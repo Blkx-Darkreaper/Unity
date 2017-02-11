@@ -90,7 +90,7 @@ namespace Strikeforce
                     return;
                 }
 
-                Owner.CurrentInventory.RemoveResource(ResourceType.Money, unit.Cost);
+                Owner.CurrentInventory.UpdateResource(ResourceType.Money, -unit.Cost);
             }
 
             buildQueue.Enqueue(unitName);

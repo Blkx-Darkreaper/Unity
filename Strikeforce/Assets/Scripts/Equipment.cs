@@ -6,7 +6,6 @@ namespace Strikeforce
 {
     public class Equipment : Entity
     {
-        public int Level = 1;
         public int Width;
         public int Height;
         public string Description = string.Empty;

@@ -41,7 +41,7 @@ namespace Strikeforce
             }
 
             Parent.UpdateEnergy(EnergyCost);
-            this.CurrentStatus = EquipmentStatus.RECHARGING;
+            this.CurrentStatus = Equipment.Status.RECHARGING;
 
             Debug.Log(string.Format("{0} fired!", Type));
 
