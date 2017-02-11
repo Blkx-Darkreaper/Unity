@@ -30,6 +30,9 @@ namespace Strikeforce
     public class Inventory : MonoBehaviour
     {
         public List<Raider> AllRaiders;
+        public List<Weapon> AllGuns;
+        public List<Weapon> AllOrdnance;
+        public List<Ordnance> AllMunitions;
         public List<Equipment> AllEquipment;
         public int StartingMoney = 1000, MoneyLimit = 9999999, StartingFuel = 500, FuelLimit = 9999,
             StartingRockets = 0, RocketLimit = 9999, StartingMissiles = 0, MissileLimit = 9999, StartingBombs = 0, BombLimit = 9999;
@@ -38,6 +41,9 @@ namespace Strikeforce
         protected void Awake()
         {
             AllRaiders = new List<Raider>();
+            AllGuns = new List<Weapon>();
+            AllOrdnance = new List<Weapon>();
+            AllMunitions = new List<Ordnance>();
             AllEquipment = new List<Equipment>();
             InitResources();
         }
