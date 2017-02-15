@@ -63,8 +63,8 @@ namespace Strikeforce
             //AudioSource blasterSound = GetComponent<AudioSource>();
             //blasterSound.Play();
 
-            //// make bullet disappear after 2 seconds
-            //Destroy(bullet, 2.0f);
+            //// make bullet disappear after 10 seconds
+            //Destroy(bullet, 10.0f);
         }
 
         //public void Start()

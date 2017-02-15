@@ -65,6 +65,22 @@ namespace Strikeforce
             }
         }
 
+        public void UnlinkWeapon(Weapon weapon)
+        {
+            weapon.SetBarrelOffset(Vector3.zero);
+
+            this.allLinkedWeapons.Remove(weapon);
+            this.currentWeaponToFire = allLinkedWeapons.First;
+
+            bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
+            if (hasType == false)
+            {
+                return;
+            }
+
+            this.allWeaponTypes[weapon.Type]--;
+        }
+
         public void ReadyWeapons()
         {
             SetFiringOrder();

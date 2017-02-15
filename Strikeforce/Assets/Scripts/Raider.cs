@@ -10,7 +10,7 @@ namespace Strikeforce
         public float MaxEnergy;
         public float CurrentEnergy { get; protected set; }
         public Dictionary<HardpointPosition, Hardpoint[]> AllHardpoints { get; protected set; }
-        public LinkedList<Armour> allArmour { get; protected set; }
+        protected LinkedList<Armour> allArmour { get; set; }
         protected LinkedListNode<Armour> nextArmourNode { get; set; }
         public TriggerLink PrimaryFire { get; protected set; }
         public TriggerLink SecondaryFire { get; protected set; }
@@ -30,7 +30,7 @@ namespace Strikeforce
 
             this.PrimaryFire = new TriggerLink();
             this.SecondaryFire = new TriggerLink();
-            this.SpecialFire = new TriggerLink();
+            this.SpecialFire = new TriggerLink(true);
             this.EquippedItem = null;
         }
 
@@ -42,7 +42,7 @@ namespace Strikeforce
                 transform.position + transform.forward,
                 Quaternion.identity);
 
-			bullet.transform.parent = gameObject.transform;
+            bullet.transform.parent = gameObject.transform;
 
             // make the bullet move away in front of the player
             bullet.GetComponentInChildren<Rigidbody>().velocity = transform.forward * 4;
@@ -68,7 +68,7 @@ namespace Strikeforce
         public override void TakeDamage(int damage)
         {
             damage = SoakDamage(damage);
-            
+
             base.TakeDamage(damage);
         }
 
@@ -142,6 +142,33 @@ namespace Strikeforce
             hardpoint.Equip(weapon, row, column, this);
 
             return true;
+        }
+
+        public void LinkWeapon(Weapon weapon, HardpointPosition hardpointPosition, TriggerLink trigger)
+        {
+            Hardpoint equippedHardpoint = null;
+            Hardpoint[] hardpoints = AllHardpoints[hardpointPosition];
+            foreach(Hardpoint hardpoint in hardpoints) {
+                if(hardpoint.Contains(weapon) == false) {
+                    continue;
+                }
+
+                equippedHardpoint = hardpoint;
+                break;
+            }
+
+            if (equippedHardpoint == null)
+            {
+                return;
+            }
+
+            Vector3 barrelOffset = equippedHardpoint.BarrelOffset;
+            trigger.LinkWeapon(weapon, barrelOffset);
+        }
+
+        public void UnlinkWeapon(Weapon weapon, TriggerLink trigger)
+        {
+            trigger.UnlinkWeapon(weapon);
         }
 
         public bool EquipArmour(Armour armour, HardpointPosition hardpointPosition, int index, int row, int column)

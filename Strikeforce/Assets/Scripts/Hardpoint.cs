@@ -25,6 +25,21 @@ namespace Strikeforce
             this.EquippedItems = new Equipment[width, height];
         }
 
+        public bool Contains(Equipment item)
+        {
+            foreach (Equipment itemToCheck in EquippedItems)
+            {
+                if (itemToCheck != item)
+                {
+                    continue;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         public bool IsEquippable(Equipment item, int row, int column)
         {
             int itemWidth = item.Width;
