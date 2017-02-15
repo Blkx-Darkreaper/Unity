@@ -12,23 +12,28 @@ namespace Strikeforce
         public static Size PixelsPerSlot = new Size(42, 42);
         public int Width { get { return EquippedItems.GetLength(1); } }
         public int Height { get { return EquippedItems.GetLength(0); } }
-		public Equipment[,] EquippedItems { get; protected set; }
-        public Transform SpawnPoint;
-		
-		public Hardpoint(int relativeToCenterX, int relativeToCenterY, int width, int height, HardpointPosition position) {
-			this.Location = new Vector2(relativeToCenterX, relativeToCenterY);
-            this.Position = position;
-			this.EquippedItems = new Equipment[width, height];
-		}
+        public Equipment[,] EquippedItems { get; protected set; }
+        public TriggerLink PrimaryFire;
+        public TriggerLink SecondaryFire;
+        public TriggerLink SpecialFire;
+        public Vector3 BarrelOffset;
 
-		public bool IsEquippable(Equipment item, int row, int column) {
-			int itemWidth = item.Width;
+        public Hardpoint(int relativeToCenterX, int relativeToCenterY, int width, int height, HardpointPosition position)
+        {
+            this.Location = new Vector2(relativeToCenterX, relativeToCenterY);
+            this.Position = position;
+            this.EquippedItems = new Equipment[width, height];
+        }
+
+        public bool IsEquippable(Equipment item, int row, int column)
+        {
+            int itemWidth = item.Width;
             if (itemWidth > this.Width)
             {
                 return false;
             }
 
-			int itemHeight = item.Height;
+            int itemHeight = item.Height;
             if (itemHeight > this.Height)
             {
                 return false;
@@ -46,19 +51,31 @@ namespace Strikeforce
             }
 
             return true;
-		}
+        }
 
-        public void Equip(Equipment item, int row, int column)
+        public void Equip(Equipment item, int row, int column, Raider parent)
         {
             int itemWidth = item.Width;
             int itemHeight = item.Height;
 
-            for(int x = column; x < itemWidth; x++) {
+            for (int x = column; x < itemWidth; x++)
+            {
                 for (int y = row; y < itemHeight; y++)
                 {
                     EquippedItems[x, y] = item;
                 }
             }
+
+            if (item.IsWeapon == false)
+            {
+                return;
+            }
+
+            // Set Parent
+            item.Parent = parent;
+
+            // Link to Primary by default
+            PrimaryFire.LinkWeapon((Weapon)item, BarrelOffset);
         }
 
         public Equipment Unequip(int row, int column)

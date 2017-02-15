@@ -5,92 +5,32 @@ using System.Collections.Generic;
 
 namespace Strikeforce
 {
-    public static class FiringGroupPatterns
-    {
-        private static Dictionary<int, int[][]> allPatterns = new Dictionary<int, int[][]>() {
-            	{1, new int[][] {
-                	    new int[] {0, 1, 2, 3, 4}
-                	}
-            	},
-            	{2, new int[][] {
-                    	new int[] {0, 2, 4},
-                    	new int[] {1, 3}
-                	}
-            	},
-            	{3, new int[][] {
-                    	new int[] {2},
-                    	new int[] {1, 3},
-                    	new int[] {0, 4}
-                	}
-            	},
-            	{4, new int[][] {
-                    	new int[] {2},
-                    	new int[] {1, 2, 3},
-                    	new int[] {1, 2, 3},
-                    	new int[] {0, 4}
-                	}
-            	},
-            	{5, new int[][] {
-                	    new int[] {2},
-                    	new int[] {1},
-                    	new int[] {3},
-                    	new int[] {0},
-                    	new int[] {4}
-                	}
-            	},
-            	{6, new int[][] {
-                	    new int[] {2},
-                    	new int[] {1, 3},
-                    	new int[] {0, 2, 4},
-                    	new int[] {1, 3},
-                    	new int[] {0, 2, 4},
-                    	new int[] {1, 3}
-                	}
-            	}
-        	};
-
-        public static int[] GetFiringPattern(int totalFiringGroups, int firingGroupIndex)
-        {
-            if (allPatterns.ContainsKey(totalFiringGroups) == false)
-            {
-                return null;
-            }
-
-            int[] pattern = allPatterns[totalFiringGroups][firingGroupIndex];
-            return pattern;
-        }
-    }
-
     public class TriggerLink
     {
         public bool IsSpecial { get; protected set; }
-        public string DominantWeaponType { get; protected set; }
-        public float AngledSpread { get; protected set; }
-        public float HorizontalSpread { get; protected set; }
-        public int FiringGroups { get; protected set; }
-        public int GroupingSize { get; protected set; }
         protected LinkedList<Weapon> allLinkedWeapons { get; set; }
-        protected List<FiringGroup> allFiringGroups { get; set; }
-        protected Dictionary<string, int> allWeaponTypes { get; set; }
-        public float CyclePeriod = 1f;
+        public float CyclePeriod = 0.5f;
         protected float cycleRemaining { get; set; }
-        protected int currentFiringGroup { get; set; }
+        protected LinkedListNode<Weapon> currentWeaponToFire { get; set; }
         public bool IsFiring { get; set; }
+        protected Dictionary<string, int> allWeaponTypes { get; set; }
+        public string DominantWeaponType { get; protected set; }
+        public int AngledSpread { get; protected set; }
+        public int HorizontalSpread { get; protected set; }
+        public int GroupingBonus { get; protected set; }
 
         public TriggerLink()
         {
             this.IsSpecial = false;
-            this.DominantWeaponType = string.Empty;
-            this.AngledSpread = 0f;
-            this.HorizontalSpread = 0f;
-            this.GroupingSize = 1;
             this.allLinkedWeapons = new LinkedList<Weapon>();
-            this.allWeaponTypes = new Dictionary<string, int>();
             this.cycleRemaining = this.CyclePeriod;
-            this.currentFiringGroup = 0;
+            this.currentWeaponToFire = null;
             this.IsFiring = false;
-
-            SetFiringGroups();
+            this.allWeaponTypes = new Dictionary<string, int>();
+            this.DominantWeaponType = string.Empty;
+            this.AngledSpread = 0;
+            this.HorizontalSpread = 0;
+            this.GroupingBonus = 0;
         }
 
         public TriggerLink(bool isSpecial)
@@ -99,7 +39,7 @@ namespace Strikeforce
             this.IsSpecial = isSpecial;
         }
 
-        public void LinkWeapon(Weapon weapon)
+        public void LinkWeapon(Weapon weapon, Vector3 barrelOffset)
         {
             if (this.IsSpecial == true)
             {
@@ -112,6 +52,8 @@ namespace Strikeforce
 
             this.allLinkedWeapons.AddFirst(weapon);
 
+            weapon.SetBarrelOffset(barrelOffset);
+
             bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
             if (hasType == false)
             {
@@ -121,16 +63,20 @@ namespace Strikeforce
             {
                 this.allWeaponTypes[weapon.Type]++;
             }
-
-            SetDominantWeaponType();
-            SetAngledSpread();
-            SetHorizontalSpread();
-            SetFiringGroups();
         }
 
-        protected void SetDominantWeaponType()
+        public void ReadyWeapons()
         {
-            int maxValue = 0;
+            SetFiringOrder();
+
+            SetAngledSpread();
+            SetHorizontalSpread();
+            SetGroupingBonus();
+        }
+
+        protected void SetFiringOrder()
+        {
+            SortedList<int, string> firingOrder = new SortedList<int, string>();
 
             foreach (string type in allWeaponTypes.Keys)
             {
@@ -143,14 +89,34 @@ namespace Strikeforce
                 int pairs = (quantity - 3 * triples) / 2;
                 int value = 100 * triples + 10 * pairs + priority;
 
-                if (value < maxValue)
-                {
-                    continue;
-                }
-
-                maxValue = value;
-                this.DominantWeaponType = type;
+                firingOrder.Add(value, type);
             }
+
+            // Set the dominant weapon type
+            this.DominantWeaponType = firingOrder[firingOrder.Keys[0]];
+
+            LinkedList<Weapon> sortedWeapons = new LinkedList<Weapon>();
+            foreach (int key in firingOrder.Keys)
+            {
+                string type = firingOrder[key];
+
+                foreach (Weapon weapon in allLinkedWeapons)
+                {
+                    string typeToCheck = weapon.Type;
+                    if (typeToCheck.Equals(type) == false)
+                    {
+                        continue;
+                    }
+
+                    sortedWeapons.AddLast(weapon);
+                }
+            }
+
+            // Weapons are now sorted into firing order based on priority values
+            this.allLinkedWeapons = sortedWeapons;
+
+            // Set first weapon to fire
+            this.currentWeaponToFire = allLinkedWeapons.First;
         }
 
         protected void SetAngledSpread()
@@ -166,7 +132,7 @@ namespace Strikeforce
             }
 
             int quantity = allWeaponTypes[Weapon.Types.BOLT];
-            this.AngledSpread = quantity * 0.05f;
+            this.AngledSpread = quantity * 5;
         }
 
         protected void SetHorizontalSpread()
@@ -182,79 +148,24 @@ namespace Strikeforce
             }
 
             int quantity = allWeaponTypes[Weapon.Types.FLAMEBURST];
-            this.HorizontalSpread = quantity * .1f;
+            this.HorizontalSpread = quantity * 10;
         }
 
-        protected void SetFiringGroups()
+        protected void SetGroupingBonus()
         {
-            int quantity = 0;
-            if (allWeaponTypes.ContainsKey(Weapon.Types.WAVE) == true)
-            {
-                quantity = allWeaponTypes[Weapon.Types.WAVE];
-            }
-
-            this.FiringGroups = quantity + 1;
-
-            allFiringGroups = new List<FiringGroup>(this.FiringGroups);
-
-            if (allLinkedWeapons.Count == 0)
+            if (DominantWeaponType.Equals(Weapon.Types.WAVE) == true)
             {
                 return;
             }
 
-            // Sort equipped weapons
-            PriorityQueue<int, Weapon>[] sortedWeapons = new PriorityQueue<int, Weapon>[5];
-
-            foreach (Weapon weapon in allLinkedWeapons)
+            if (allWeaponTypes.ContainsKey(Weapon.Types.WAVE) == false)
             {
-                int hardpoint = (int)weapon.EquippedHardpoint;
-
-                PriorityQueue<int, Weapon> hardpointWeapons = sortedWeapons[hardpoint];
-                if (hardpointWeapons == null)
-                {
-                    hardpointWeapons = new PriorityQueue<int, Weapon>();
-                    sortedWeapons[hardpoint] = hardpointWeapons;
-                }
-
-                int priority = weapon.Priority;
-                hardpointWeapons.Enqueue(priority, weapon);
+                return;
             }
 
-            // Place sorted weapons into firing groups
-            for (int i = 0; i < this.FiringGroups; i++)
-            {
-                SortedList<int, Weapon> sortedGroup = new SortedList<int, Weapon>();
-
-                int[] pattern = FiringGroupPatterns.GetFiringPattern(this.FiringGroups, i);
-                foreach (int hardpoint in pattern)
-                {
-                    PriorityQueue<int, Weapon> hardpointWeapons = sortedWeapons[hardpoint];
-                    Weapon weapon = hardpointWeapons.Dequeue();
-
-                    int priority = weapon.Priority;
-                    sortedGroup.Add(priority, weapon);
-                }
-
-                FiringGroup currentGroup = new FiringGroup(sortedGroup);
-                allFiringGroups.Add(currentGroup);
-            }
+            int quantity = allWeaponTypes[Weapon.Types.WAVE];
+            this.GroupingBonus = quantity;
         }
-
-        //protected void SetGroupingSize()
-        //{
-        //    if (DominantWeaponType.Equals(WeaponTypes.CANNON) == true)
-        //    {
-        //        return;
-        //    }
-
-        //    if (allWeaponTypes.ContainsKey(WeaponTypes.CANNON) == false)
-        //    {
-        //        return;
-        //    }
-
-        //    int quantity = allWeaponTypes[WeaponTypes.CANNON];
-        //    this.GroupingSize = quantity + 1;
-        //}
 
         public void Update()
         {
@@ -274,10 +185,13 @@ namespace Strikeforce
                 // Reset the cycle, and switch to the next firing group
                 cycleRemaining += CyclePeriod;
 
-                if (allFiringGroups.Count > 0)
+                if (allLinkedWeapons.Count > 0)
                 {
-                    currentFiringGroup++;
-                    currentFiringGroup %= allFiringGroups.Count;
+                    this.currentWeaponToFire = currentWeaponToFire.Next;
+                    if (currentWeaponToFire == null)
+                    {
+                        this.currentWeaponToFire = allLinkedWeapons.First;
+                    }
                 }
                 IsFiring = false;
             }
@@ -287,63 +201,20 @@ namespace Strikeforce
                 return;
             }
 
-            FireGroup(currentFiringGroup, CyclePeriod, cycleRemaining);
+            FireCurrentWeapon();
         }
 
-        public void FireGroup(int groupIndex, float cyclePeriod, float periodRemaining)
+        protected void FireCurrentWeapon()
         {
-            if (allFiringGroups.Count == 0)
+            Weapon weapon = currentWeaponToFire.Value;
+            string weaponType = weapon.Type;
+            if (weaponType.Equals(this.DominantWeaponType) == true)
             {
+                weapon.Fire();
                 return;
             }
 
-            FiringGroup currentGroup = allFiringGroups[groupIndex];
-
-            int totalSequences = currentGroup.Count;
-
-            float periodElapsed = cyclePeriod - periodRemaining;
-
-            int sequenceIndex = (int)Math.Round(totalSequences * periodElapsed / cyclePeriod, 0);
-            currentGroup.FireSequence(sequenceIndex);
-        }
-
-        protected class FiringGroup
-        {
-            protected List<LinkedList<Weapon>> allSequences { get; set; }
-            public int Count { get { return allSequences.Count; } }
-
-            public FiringGroup(SortedList<int, Weapon> sortedWeapons)
-            {
-                this.allSequences = new List<LinkedList<Weapon>>();
-
-                int currentPriority = 0;
-                LinkedList<Weapon> currentSequence = null;
-                foreach (KeyValuePair<int, Weapon> pair in sortedWeapons)
-                {
-                    int priority = pair.Key;
-                    Weapon weapon = pair.Value;
-
-                    if (priority != currentPriority)
-                    {
-                        currentSequence = new LinkedList<Weapon>();
-                        this.allSequences.Add(currentSequence);
-
-                        currentPriority = priority;
-                    }
-
-                    currentSequence.AddLast(weapon);
-                }
-            }
-
-            public void FireSequence(int sequenceIndex)
-            {
-                LinkedList<Weapon> sequence = allSequences[sequenceIndex];
-
-                foreach (Weapon weapon in sequence)
-                {
-                    weapon.Fire();
-                }
-            }
+            weapon.Fire(AngledSpread, HorizontalSpread, GroupingBonus);
         }
     }
 }

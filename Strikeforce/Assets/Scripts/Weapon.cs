@@ -9,6 +9,7 @@ namespace Strikeforce
         public string Type;
         public int Priority;
         public bool IsOrdnanceWeapon = false;
+        protected Vector3 barrelOffset;
         private const string FIRE = "Fire";
         public struct Types
         {
@@ -27,29 +28,31 @@ namespace Strikeforce
             this.IsWeapon = true;
         }
 
+        public void SetBarrelOffset(Vector3 barrelOffset)
+        {
+            this.barrelOffset = barrelOffset;
+        }
+
         public void Fire()
         {
-            if (Cooldown > 0)
+            Fire(0, 0, 1);
+        }
+
+        public void Fire(int angleSpread, int horizontalSpread, int groupingBonus)
+        {
+            bool active = Activate();
+            if (active == false)
             {
                 return;
             }
-
-            // Check weapon has sufficient energy
-            if (Parent.CurrentEnergy < EnergyCost)
-            {
-                return;
-            }
-
-            Parent.UpdateEnergy(EnergyCost);
-            this.CurrentStatus = Equipment.Status.RECHARGING;
 
             Debug.Log(string.Format("{0} fired!", Type));
 
             //// create the bullet object from the bullet prefab
             //GameObject bullet = (GameObject)Instantiate(
-            //    NetworkManager.singleton.spawnPrefabs[0],
-            //    Parent.transform.position + Parent.transform.forward,
-            //    Quaternion.identity);
+            //	NetworkManager.singleton.spawnPrefabs[0],
+            //	Parent.transform.position + Parent.transform.forward,
+            //	Quaternion.identity);
 
             //// make the bullet move away in front of the player
             //bullet.GetComponentInChildren<Rigidbody>().velocity = Parent.transform.forward * 4;
@@ -57,20 +60,23 @@ namespace Strikeforce
             //// spawn the bullet on the clients
             //NetworkServer.Spawn(bullet);
 
+            //AudioSource blasterSound = GetComponent<AudioSource>();
+            //blasterSound.Play();
+
             //// make bullet disappear after 2 seconds
             //Destroy(bullet, 2.0f);
         }
 
         //public void Start()
         //{
-        //    InvokeRepeating(FIRE, AttackDelay, weapon.cooldown);
+        //	InvokeRepeating(FIRE, AttackDelay, weapon.cooldown);
         //}
 
         //private void Fire()
         //{
-        //    Instantiate(weapon.projectileType, ShotSpawn.position, ShotSpawn.rotation);
-        //    var blasterSound = GetComponent<AudioSource>();
-        //    blasterSound.Play();
+        //	Instantiate(weapon.projectileType, ShotSpawn.position, ShotSpawn.rotation);
+        //	var blasterSound = GetComponent<AudioSource>();
+        //	blasterSound.Play();
         //}
     }
 }

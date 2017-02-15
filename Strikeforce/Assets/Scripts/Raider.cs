@@ -123,7 +123,7 @@ namespace Strikeforce
                 return false;
             }
 
-            hardpoint.Equip(item, row, column);
+            hardpoint.Equip(item, row, column, this);
             this.EquippedItem = item;
 
             return true;
@@ -139,8 +139,7 @@ namespace Strikeforce
                 return false;
             }
 
-            hardpoint.Equip(weapon, row, column);
-            trigger.LinkWeapon(weapon);
+            hardpoint.Equip(weapon, row, column, this);
 
             return true;
         }
@@ -155,7 +154,7 @@ namespace Strikeforce
                 return false;
             }
 
-            hardpoint.Equip(armour, row, column);
+            hardpoint.Equip(armour, row, column, this);
             allArmour.AddLast(armour);
 
             return true;
