@@ -39,7 +39,7 @@ namespace Strikeforce
             this.IsSpecial = isSpecial;
         }
 
-        public void LinkWeapon(Weapon weapon, Vector3 barrelOffset)
+        public void LinkWeapon(Weapon weapon, Vector3 firingPoint)
         {
             if (this.IsSpecial == true)
             {
@@ -52,7 +52,7 @@ namespace Strikeforce
 
             this.allLinkedWeapons.AddFirst(weapon);
 
-            weapon.SetBarrelOffset(barrelOffset);
+            weapon.SetBarrelOffset(firingPoint);
 
             bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
             if (hasType == false)
@@ -185,8 +185,6 @@ namespace Strikeforce
 
         public void Update()
         {
-            float timeElapsed = Time.deltaTime;
-
             if (IsFiring == false)
             {
                 if (cycleRemaining >= CyclePeriod)
@@ -195,6 +193,7 @@ namespace Strikeforce
                 }
             }
 
+            float timeElapsed = Time.deltaTime;
             cycleRemaining -= timeElapsed;
             if (cycleRemaining <= 0)
             {
@@ -230,6 +229,7 @@ namespace Strikeforce
                 return;
             }
 
+            // Apply Synergy effects
             weapon.Fire(AngledSpread, HorizontalSpread, GroupingBonus);
         }
     }

@@ -16,7 +16,6 @@ namespace Strikeforce
         public TriggerLink PrimaryFire;
         public TriggerLink SecondaryFire;
         public TriggerLink SpecialFire;
-        public Vector3 BarrelOffset;
 
         public Hardpoint(int relativeToCenterX, int relativeToCenterY, int width, int height, HardpointPosition position)
         {
