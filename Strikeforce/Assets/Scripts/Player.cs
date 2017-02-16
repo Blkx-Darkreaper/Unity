@@ -65,20 +65,32 @@ namespace Strikeforce
 
             CurrentRaider = raiderObject.GetComponent<Raider>();
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
-
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.LeftOuterWing,
-                new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) });
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.LeftWing,
-                new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) });
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.Center,
-                new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center), new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) });
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.RightWing,
-                new Hardpoint[] { new Hardpoint(50, -16, 1, 1, HardpointPosition.RightWing) });
-            CurrentRaider.AllHardpoints.Add(HardpointPosition.RightOuterWing,
-                new Hardpoint[] { new Hardpoint(94, -69, 1, 1, HardpointPosition.RightOuterWing) });
-
+            
             Vector3 raiderPosition = raiderObject.transform.position;
 
+            CurrentRaider.SetLayout(new Vector3[] { 
+                new Vector3(raiderPosition.x - 10, raiderPosition.y, raiderPosition.z), 
+                new Vector3(raiderPosition.x - 5, raiderPosition.y, raiderPosition.z),
+                new Vector3(raiderPosition.x, raiderPosition.y, raiderPosition.z),
+                new Vector3(raiderPosition.x + 5, raiderPosition.y, raiderPosition.z),
+                new Vector3(raiderPosition.x + 10, raiderPosition.y, raiderPosition.z)}, 
+                new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
+                new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
+                new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center), 
+                    new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) },
+                new Hardpoint[] { new Hardpoint(50, -16, 1, 1, HardpointPosition.RightWing) },
+                new Hardpoint[] { new Hardpoint(94, -69, 1, 1, HardpointPosition.RightOuterWing) });
+
+            GameObject basicShotPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BASIC_SHOT);
+            Weapon basicShot = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
+
+            bool equipped = CurrentRaider.EquipWeapon(basicShot, HardpointPosition.Center, 0, 0, 0);
+            if (equipped == true)
+            {
+                CurrentRaider.ReadyWeapons();
+            }
+
+            // Set camera overhead
             Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 10, raiderPosition.z);
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
@@ -159,7 +171,7 @@ namespace Strikeforce
                 return;
             }
 
-            raider.FirePrimary();  // Testing
+            raider.SetPrimaryFire(true);  // Testing
         }
 
         public bool IsConstructionSiteValid(Structure constructionSite)

@@ -37,6 +37,12 @@ namespace Strikeforce
 
         protected virtual void Update()
         {
+            if (cooldownRemaining <= 0)
+            {
+                cooldownRemaining = 0;
+                return;
+            }
+
             cooldownRemaining -= Time.deltaTime;
 
             if (CurrentStatus.Equals(Status.DISABLED))

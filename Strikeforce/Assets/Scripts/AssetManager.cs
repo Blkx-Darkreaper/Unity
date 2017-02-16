@@ -38,7 +38,7 @@ namespace Strikeforce
 
         protected void LoadWeaponPrefabs()
         {
-            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.SHOT, BasicShot);
+            GlobalAssets.WeaponPrefabs.Add(Weapon.Types.BASIC_SHOT, BasicShot);
             GlobalAssets.WeaponPrefabs.Add(Weapon.Types.FLAMEBURST, Flameburst);
             GlobalAssets.WeaponPrefabs.Add(Weapon.Types.BOLT, Bolt);
             GlobalAssets.WeaponPrefabs.Add(Weapon.Types.WAVE, Wave);

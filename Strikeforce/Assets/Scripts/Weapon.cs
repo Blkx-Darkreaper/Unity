@@ -9,11 +9,11 @@ namespace Strikeforce
         public string Type;
         public int Priority;
         public bool IsOrdnanceWeapon = false;
-        protected Vector3 barrelOffset;
+        protected Vector3 firingPoint;
         private const string FIRE = "Fire";
         public struct Types
         {
-            public const string SHOT = "Shot";
+            public const string BASIC_SHOT = "Basic Shot";
             public const string FLAMEBURST = "Flameburst";
             public const string CANNON = "Cannon";
             public const string BOLT = "Bolt";
@@ -28,9 +28,9 @@ namespace Strikeforce
             this.IsWeapon = true;
         }
 
-        public void SetBarrelOffset(Vector3 barrelOffset)
+        public void SetFiringPoint(Vector3 firingPoint)
         {
-            this.barrelOffset = barrelOffset;
+            this.firingPoint = firingPoint;
         }
 
         public void Fire()

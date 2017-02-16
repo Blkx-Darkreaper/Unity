@@ -274,6 +274,18 @@ namespace Strikeforce
             return entity;
         }
 
+        public static GameObject GetWeaponPrefab(string name)
+        {
+            bool exists = WeaponPrefabs.ContainsKey(name);
+            if (exists == false)
+            {
+                return null;
+            }
+
+            GameObject weapon = WeaponPrefabs[name];
+            return weapon;
+        }
+
         public static GameObject GetChildGameObjectWithName(GameObject parent, string nameToFind)
         {
             if (parent == null)

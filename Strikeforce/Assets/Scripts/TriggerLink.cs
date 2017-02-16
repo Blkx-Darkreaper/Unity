@@ -7,7 +7,7 @@ namespace Strikeforce
 {
     public class TriggerLink
     {
-        public bool IsSpecial { get; protected set; }
+        public Type TriggerType { get; protected set; }
         protected LinkedList<Weapon> allLinkedWeapons { get; set; }
         public float CyclePeriod = 0.5f;
         protected float cycleRemaining { get; set; }
@@ -18,10 +18,11 @@ namespace Strikeforce
         public int AngledSpread { get; protected set; }
         public int HorizontalSpread { get; protected set; }
         public int GroupingBonus { get; protected set; }
+        public enum Type { Primary, Secondary, Special };
 
-        public TriggerLink()
+        public TriggerLink(Type type)
         {
-            this.IsSpecial = false;
+            this.TriggerType = type;
             this.allLinkedWeapons = new LinkedList<Weapon>();
             this.cycleRemaining = this.CyclePeriod;
             this.currentWeaponToFire = null;
@@ -33,15 +34,9 @@ namespace Strikeforce
             this.GroupingBonus = 0;
         }
 
-        public TriggerLink(bool isSpecial)
-            : this()
-        {
-            this.IsSpecial = isSpecial;
-        }
-
         public void LinkWeapon(Weapon weapon, Vector3 firingPoint)
         {
-            if (this.IsSpecial == true)
+            if (TriggerType == Type.Special)
             {
                 // Only allow Ordnance weapons
                 if (weapon.IsOrdnanceWeapon == false)
@@ -52,7 +47,7 @@ namespace Strikeforce
 
             this.allLinkedWeapons.AddFirst(weapon);
 
-            weapon.SetBarrelOffset(firingPoint);
+            weapon.SetFiringPoint(firingPoint);
 
             bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
             if (hasType == false)
@@ -67,7 +62,7 @@ namespace Strikeforce
 
         public void UnlinkWeapon(Weapon weapon)
         {
-            weapon.SetBarrelOffset(Vector3.zero);
+            weapon.SetFiringPoint(Vector3.zero);
 
             this.allLinkedWeapons.Remove(weapon);
             this.currentWeaponToFire = allLinkedWeapons.First;
@@ -83,6 +78,11 @@ namespace Strikeforce
 
         public void ReadyWeapons()
         {
+            if (allLinkedWeapons.Count == 0)
+            {
+                return;
+            }
+
             SetFiringOrder();
 
             SetAngledSpread();
@@ -185,6 +185,11 @@ namespace Strikeforce
 
         public void Update()
         {
+            if (allLinkedWeapons.Count == 0)
+            {
+                return;
+            }
+
             if (IsFiring == false)
             {
                 if (cycleRemaining >= CyclePeriod)

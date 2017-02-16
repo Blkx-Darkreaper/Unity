@@ -13,10 +13,14 @@ namespace Strikeforce
         public Dictionary<HardpointPosition, Hardpoint[]> AllHardpoints { get; protected set; }
         protected LinkedList<Armour> allArmour { get; set; }
         protected LinkedListNode<Armour> nextArmourNode { get; set; }
-        public TriggerLink PrimaryFire { get; protected set; }
-        public TriggerLink SecondaryFire { get; protected set; }
-        public TriggerLink SpecialFire { get; protected set; } // Only Ordnance weapons can be linked
         public Equipment EquippedItem { get; protected set; }
+        private static HardpointPosition[] positionOrder = new HardpointPosition[] { 
+                    HardpointPosition.Center, 
+                    HardpointPosition.LeftWing, 
+                    HardpointPosition.RightWing, 
+                    HardpointPosition.LeftOuterWing, 
+                    HardpointPosition.RightOuterWing 
+                };
 
         protected override void Awake()
         {
@@ -30,9 +34,6 @@ namespace Strikeforce
             this.allArmour = new LinkedList<Armour>();
             this.nextArmourNode = allArmour.First;
 
-            this.PrimaryFire = new TriggerLink();
-            this.SecondaryFire = new TriggerLink();
-            this.SpecialFire = new TriggerLink(true);
             this.EquippedItem = null;
         }
 
@@ -47,30 +48,40 @@ namespace Strikeforce
             this.AllHardpoints.Add(HardpointPosition.RightOuterWing, rightOuterWing);
         }
 
-        public void FirePrimary()  // Testing
+        public void ReadyWeapons()
         {
-            // create the bullet object from the bullet prefab
-            GameObject bullet = (GameObject)Instantiate(
-                NetworkManager.singleton.spawnPrefabs[0],
-                transform.position + transform.forward,
-                Quaternion.identity);
+            foreach (HardpointPosition position in positionOrder)
+            {
+                Hardpoint[] hardpoints = AllHardpoints[position];
+                foreach (Hardpoint hardpoint in hardpoints)
+                {
+                    hardpoint.ReadyWeapons();
+                }
+            }
+        }
 
-            bullet.transform.parent = gameObject.transform;
-
-            // make the bullet move away in front of the player
-            bullet.GetComponentInChildren<Rigidbody>().velocity = transform.forward * 4;
-
-            // spawn the bullet on the clients
-            NetworkServer.Spawn(bullet);
-
-            // make bullet disappear after 2 seconds
-            Destroy(bullet, 2.0f);
-            //PrimaryFire.IsFiring = true;
+        public void SetPrimaryFire(bool isFiring)  // Testing
+        {
+            foreach (HardpointPosition position in positionOrder)
+            {
+                Hardpoint[] hardpoints = AllHardpoints[position];
+                foreach (Hardpoint hardpoint in hardpoints)
+                {
+                    hardpoint.SetPrimaryFire(isFiring);
+                }
+            }
         }
 
         protected override void Update()
         {
-            PrimaryFire.Update();
+            foreach (HardpointPosition position in positionOrder)
+            {
+                Hardpoint[] hardpoints = AllHardpoints[position];
+                foreach (Hardpoint hardpoint in hardpoints)
+                {
+                    hardpoint.Update();
+                }
+            }
         }
 
         public void UpdateEnergy(float amount)
@@ -155,16 +166,16 @@ namespace Strikeforce
             hardpoint.Equip(weapon, row, column, this);
 
             // Link to Primary by default
-            LinkWeapon(weapon, hardpointPosition, PrimaryFire);
-
-            return true;
+            return LinkWeapon(weapon, hardpointPosition, index, TriggerLink.Type.Primary);
         }
 
-        public void LinkWeapon(Weapon weapon, HardpointPosition hardpointPosition, TriggerLink trigger)
+        public bool LinkWeapon(Weapon weapon, HardpointPosition hardpointPosition, int index, TriggerLink.Type type)
         {
-            int index = (int)hardpointPosition;
+            int positionIndex = (int)hardpointPosition;
             Vector3 firingPoint = AllFiringPoints[index];
-            trigger.LinkWeapon(weapon, firingPoint);
+
+            Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
+            return hardpoint.LinkWeapon(weapon, firingPoint, type);
         }
 
         public void UnlinkWeapon(Weapon weapon, TriggerLink trigger)

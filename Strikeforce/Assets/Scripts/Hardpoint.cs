@@ -13,15 +13,18 @@ namespace Strikeforce
         public int Width { get { return EquippedItems.GetLength(1); } }
         public int Height { get { return EquippedItems.GetLength(0); } }
         public Equipment[,] EquippedItems { get; protected set; }
-        public TriggerLink PrimaryFire;
-        public TriggerLink SecondaryFire;
-        public TriggerLink SpecialFire;
+        protected TriggerLink primaryFire;
+        protected TriggerLink secondaryFire;
+        protected TriggerLink specialFire;
 
         public Hardpoint(int relativeToCenterX, int relativeToCenterY, int width, int height, HardpointPosition position)
         {
             this.Location = new Vector2(relativeToCenterX, relativeToCenterY);
             this.Position = position;
             this.EquippedItems = new Equipment[width, height];
+            this.primaryFire = new TriggerLink(TriggerLink.Type.Primary);
+            this.secondaryFire = new TriggerLink(TriggerLink.Type.Secondary);
+            this.specialFire = new TriggerLink(TriggerLink.Type.Special);
         }
 
         public bool Contains(Equipment item)
@@ -113,6 +116,51 @@ namespace Strikeforce
             }
 
             return item;
+        }
+
+        public bool LinkWeapon(Weapon weapon, Vector3 firingPoint, TriggerLink.Type type)
+        {
+            TriggerLink trigger = null;
+
+            switch (type)
+            {
+                case TriggerLink.Type.Primary:
+                    trigger = primaryFire;
+                    break;
+
+                case TriggerLink.Type.Secondary:
+                    trigger = secondaryFire;
+                    break;
+
+                case TriggerLink.Type.Special:
+                    trigger = specialFire;
+                    break;
+
+                default:
+                    return false;
+            }
+
+            trigger.LinkWeapon(weapon, firingPoint);
+            return true;
+        }
+
+        public void ReadyWeapons()
+        {
+            primaryFire.ReadyWeapons();
+            secondaryFire.ReadyWeapons();
+            specialFire.ReadyWeapons();
+        }
+
+        public void Update()
+        {
+            primaryFire.Update();
+            secondaryFire.Update();
+            specialFire.Update();
+        }
+
+        public void SetPrimaryFire(bool isFiring)
+        {
+            primaryFire.IsFiring = isFiring;
         }
     }
 }
