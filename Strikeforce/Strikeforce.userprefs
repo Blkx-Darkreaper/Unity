@@ -1,19 +1,16 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Level.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\UserInput.cs">
     <Files>
-      <File FileName="Assets\Scripts\GlobalAssets.cs" Line="331" Column="1" />
-      <File FileName="Assets\Scripts\Level.cs" Line="115" Column="1" />
-      <File FileName="Assets\Scripts\AssetManager.cs" Line="92" Column="1" />
+      <File FileName="Assets\Scripts\UserInput.cs" Line="321" Column="1" />
+      <File FileName="Assets\Scripts\Player.cs" Line="82" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\ProfileStorage.cs" line="33" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\UserInput.cs" line="442" />
+      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\UserInput.cs" line="444" />
       <Breakpoint file="D:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\Raider.cs" line="281" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\Level.cs" line="106" />
-      <Breakpoint file="d:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\AssetManager.cs" line="92" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches>

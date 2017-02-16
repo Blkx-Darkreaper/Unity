@@ -22,3 +22,7 @@ D:\Users\Darkreaper\Git\Unity\Strikeforce\Temp\bin\Debug\Newtonsoft.Json.xml
 D:\Users\Darkreaper\Git\Unity\Strikeforce\obj\Debug\Assembly-CSharp.csprojResolveAssemblyReference.cache
 D:\Users\Darkreaper\Git\Unity\Strikeforce\obj\Debug\Assembly-CSharp.dll
 D:\Users\Darkreaper\Git\Unity\Strikeforce\obj\Debug\Assembly-CSharp.pdb
+D:\Users\Darkreaper\Git\Unity\Strikeforce\Temp\bin\Debug\UnityEngine.Advertisements.dll
+D:\Users\Darkreaper\Git\Unity\Strikeforce\Temp\bin\Debug\UnityEngine.Analytics.dll
+D:\Users\Darkreaper\Git\Unity\Strikeforce\Temp\bin\Debug\UnityEngine.Advertisements.xml
+D:\Users\Darkreaper\Git\Unity\Strikeforce\Temp\bin\Debug\UnityEngine.Analytics.xml
