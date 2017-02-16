@@ -47,7 +47,7 @@ namespace Strikeforce
             }
 
             // Get the main camera
-            mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
+            this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
 
             SpawnRaider();
             CurrentInventory = GetComponent<Inventory>();
@@ -99,6 +99,8 @@ namespace Strikeforce
         {
             CmdMovePlayer(x, y, z);
         }
+
+        public void RightStick(float x, float y, float z) { }
 
         [Command]
         protected void CmdMovePlayer(float x, float y, float z)

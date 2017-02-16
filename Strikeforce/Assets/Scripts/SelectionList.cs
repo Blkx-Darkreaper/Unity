@@ -155,7 +155,7 @@ namespace Strikeforce
                 float sliderMin = 0f;
                 float sliderMax = selectionHeight - listHeight;
                 scrollValue = GUI.VerticalSlider(new Rect(sliderX, y, sliderWidth, listHeight), scrollValue, sliderMin, sliderMax);
-                scrollValue -= Input.GetAxis(KeyMappings.SCROLL_WHEEL) * rowHeight;
+                scrollValue -= Input.GetAxis(MouseControls.SCROLL_WHEEL) * rowHeight;
                 scrollValue = Mathf.Clamp(scrollValue, 0f, sliderMax);
             }
 

@@ -7,11 +7,17 @@ namespace Strikeforce
 {
     public enum ActionKey { Action1, Action2, Special1, Special2, LeftTrigger, RightTrigger, Menu, Back, LeftStick, RightStick }
 
-    public struct KeyMappings
+    public struct MouseControls
     {
-        public const string MOUSE_X_AXIS = "Mouse X";
-        public const string MOUSE_Y_AXIS = "Mouse Y";
+        public const string X_AXIS = "Mouse X";
+        public const string Y_AXIS = "Mouse Y";
         public const string SCROLL_WHEEL = "Mouse ScrollWheel";
+    }
+
+    public struct Direction
+    {
+        public const string LEFT = "Left";
+        public const string RIGHT = "Right";
     }
 
     public class UserInput : NetworkBehaviour
@@ -24,6 +30,7 @@ namespace Strikeforce
         protected Queue<KeyEvent> allKeyEvents { get; set; }
         protected bool rightTriggerDown = false;
         protected bool leftTriggerDown = false;
+        public const string TRIGGER = "Trigger";
         public struct KeyMap
         {
             public KeyCode Action1;
@@ -48,11 +55,6 @@ namespace Strikeforce
         {
             public const string HORIZONTAL = "Horizontal";
             public const string VERTICAL = "Vertical";
-        }
-        public struct Side
-        {
-            public const string LEFT = "Left";
-            public const string RIGHT = "Right";
         }
 
         protected void Awake()
@@ -139,7 +141,9 @@ namespace Strikeforce
             //}
 
             LeftStick();
+            RightStick();
 
+            LeftTrigger();
             RightTrigger();
 
             CheckForPressedKeys();
@@ -258,8 +262,8 @@ namespace Strikeforce
 
         protected void LeftStick()
         {
-            string leftStickHor = string.Format("{0} {1}", Side.LEFT, Axis.HORIZONTAL);
-            string leftStickVert = string.Format("{0} {1}", Side.LEFT, Axis.VERTICAL);
+            string leftStickHor = string.Format("{0} {1}", Direction.LEFT, Axis.HORIZONTAL);
+            string leftStickVert = string.Format("{0} {1}", Direction.LEFT, Axis.VERTICAL);
 
             float x = Input.GetAxis(leftStickHor) * 0.1f;
             float z = Input.GetAxis(leftStickVert) * 0.1f;
@@ -270,14 +274,61 @@ namespace Strikeforce
                 return;
             }
 
-            profile.Player.LeftStick(x, 0, z);
+            player.LeftStick(x, 0, z);
+        }
+
+        protected void RightStick()
+        {
+            string rightStickHor = string.Format("{0} {1}", Direction.RIGHT, Axis.HORIZONTAL);
+            string rightStickVert = string.Format("{0} {1}", Direction.RIGHT, Axis.VERTICAL);
+
+            float x = Input.GetAxis(rightStickHor) * 0.1f;
+            float z = Input.GetAxis(rightStickVert) * 0.1f;
+
+            Player player = profile.Player;
+            if (player == null)
+            {
+                return;
+            }
+
+            player.RightStick(x, 0, z);
+        }
+
+        protected void LeftTrigger()
+        {
+            KeyEvent keyEvent = null;
+
+			string leftTrigger = string.Format ("{0} {1}", Direction.LEFT, TRIGGER);
+            int trigger = (int)Input.GetAxis(leftTrigger);
+            if (trigger == 0)
+            {
+                if (leftTriggerDown == false)
+                {
+                    return;
+                }
+
+                leftTriggerDown = false;
+                keyEvent = GetKeyEvent(ActionKey.LeftTrigger, false);
+                allKeyEvents.Enqueue(keyEvent);
+                return;
+            }
+
+            if (leftTriggerDown == true)
+            {
+                return;
+            }
+
+            leftTriggerDown = true;
+            keyEvent = GetKeyEvent(ActionKey.LeftTrigger, true);
+            allKeyEvents.Enqueue(keyEvent);
         }
 
         protected void RightTrigger()
         {
             KeyEvent keyEvent = null;
 
-            float trigger = Input.GetAxisRaw("Right Trigger");
+			string rightTrigger = string.Format ("{0} {1}", Direction.RIGHT, TRIGGER);
+            int trigger = (int)Input.GetAxis(rightTrigger);
             if (trigger == 0)
             {
                 if (rightTriggerDown == false)
@@ -344,7 +395,7 @@ namespace Strikeforce
                 allKeyEvents.Enqueue(keyEvent);
             }
 
-            if (Input.GetKeyUp(gamepadBinds.RightTrigger) || Input.GetKeyUp(keyboardBinds.RightTrigger))
+            if (Input.GetKeyUp(keyboardBinds.RightTrigger))
             {
                 keyEvent = GetKeyEvent(ActionKey.RightTrigger, false);
                 allKeyEvents.Enqueue(keyEvent);
