@@ -87,9 +87,6 @@ namespace Strikeforce
 
             // Set Parent
             item.Parent = parent;
-
-            // Link to Primary by default
-            PrimaryFire.LinkWeapon((Weapon)item, BarrelOffset);
         }
 
         public Equipment Unequip(int row, int column)

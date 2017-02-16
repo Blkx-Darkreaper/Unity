@@ -142,7 +142,7 @@ namespace Strikeforce
             return true;
         }
 
-        public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int index, int row, int column, TriggerLink trigger)
+        public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int index, int row, int column)
         {
             Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
 
@@ -153,6 +153,9 @@ namespace Strikeforce
             }
 
             hardpoint.Equip(weapon, row, column, this);
+
+            // Link to Primary by default
+            LinkWeapon(weapon, hardpointPosition, PrimaryFire);
 
             return true;
         }
