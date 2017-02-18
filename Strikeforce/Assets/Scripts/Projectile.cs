@@ -11,6 +11,10 @@ namespace Strikeforce
         public bool IsIndestructible;
         public float CurrentRangeToTarget { get; set; }
         public Entity Target { get; set; }
+        public struct Type
+        {
+
+        }
 
         protected override void Update() { }
 

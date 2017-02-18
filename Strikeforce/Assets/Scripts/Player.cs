@@ -69,11 +69,11 @@ namespace Strikeforce
             Vector3 raiderPosition = raiderObject.transform.position;
 
             CurrentRaider.SetLayout(new Vector3[] { 
-                new Vector3(raiderPosition.x - 10, raiderPosition.y, raiderPosition.z), 
-                new Vector3(raiderPosition.x - 5, raiderPosition.y, raiderPosition.z),
-                new Vector3(raiderPosition.x, raiderPosition.y, raiderPosition.z),
-                new Vector3(raiderPosition.x + 5, raiderPosition.y, raiderPosition.z),
-                new Vector3(raiderPosition.x + 10, raiderPosition.y, raiderPosition.z)}, 
+                new Vector3(-10, 0, 1), 
+                new Vector3(-5, 0, 1),
+                new Vector3(0, 0, 1),
+                new Vector3(5, 0, 1),
+                new Vector3(10, 0, 1)}, 
                 new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
                 new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
                 new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center), 
@@ -151,18 +151,21 @@ namespace Strikeforce
                     }
                     else
                     {
-                        bool charging = keyEvent.IsBeingHeld;
-                        if (charging == false)
+                        KeyEvent.Type eventType = keyEvent.EventType;
+                        if (eventType == KeyEvent.Type.Released)
                         {
-                            CmdFirePrimary();
+                            CmdSetPrimaryFiring(false);
+                            break;
                         }
+
+                        CmdSetPrimaryFiring(true);
                     }
                     break;
             }
         }
 
         [Command]
-        protected void CmdFirePrimary()
+        protected void CmdSetPrimaryFiring(bool isFiring)
         {
             // Command function is called from the client, but invoked on the server
             Raider raider = CurrentRaider;
@@ -171,7 +174,7 @@ namespace Strikeforce
                 return;
             }
 
-            raider.SetPrimaryFire(true);  // Testing
+            raider.SetPrimaryFire(isFiring);
         }
 
         public bool IsConstructionSiteValid(Structure constructionSite)

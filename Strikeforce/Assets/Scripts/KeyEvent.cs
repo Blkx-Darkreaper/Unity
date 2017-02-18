@@ -1,24 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Strikeforce
 {
     public class KeyEvent
     {
         public ActionKey Key { get; protected set; }
-        public bool IsBeingHeld { get; protected set; }
+        public Type EventType { get; protected set; }
         public float HoldDuration { get; protected set; }
+        public enum Type { Pressed, Held, Released }
 
-        public KeyEvent(ActionKey key, bool isBeingHeld)
+        public KeyEvent(ActionKey key, Type type)
         {
             this.Key = key;
-            this.IsBeingHeld = isBeingHeld;
+            this.EventType = type;
         }
 
         public KeyEvent(ActionKey key, float duration)
-            : this(key, false)
+            : this(key, Type.Released)
         {
             this.HoldDuration = duration;
         }

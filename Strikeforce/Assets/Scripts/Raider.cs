@@ -172,7 +172,7 @@ namespace Strikeforce
         public bool LinkWeapon(Weapon weapon, HardpointPosition hardpointPosition, int index, TriggerLink.Type type)
         {
             int positionIndex = (int)hardpointPosition;
-            Vector3 firingPoint = AllFiringPoints[index];
+            Vector3 firingPoint = AllFiringPoints[positionIndex];
 
             Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
             return hardpoint.LinkWeapon(weapon, firingPoint, type);

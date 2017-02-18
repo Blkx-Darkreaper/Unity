@@ -47,7 +47,7 @@ namespace Strikeforce
 
             this.allLinkedWeapons.AddFirst(weapon);
 
-            weapon.SetFiringPoint(firingPoint);
+            weapon.SetFiringPointOffset(firingPoint);
 
             bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
             if (hasType == false)
@@ -62,7 +62,7 @@ namespace Strikeforce
 
         public void UnlinkWeapon(Weapon weapon)
         {
-            weapon.SetFiringPoint(Vector3.zero);
+            weapon.SetFiringPointOffset(Vector3.zero);
 
             this.allLinkedWeapons.Remove(weapon);
             this.currentWeaponToFire = allLinkedWeapons.First;
@@ -213,7 +213,8 @@ namespace Strikeforce
                         this.currentWeaponToFire = allLinkedWeapons.First;
                     }
                 }
-                IsFiring = false;
+
+                //IsFiring = false;
             }
 
             if (IsFiring == false)

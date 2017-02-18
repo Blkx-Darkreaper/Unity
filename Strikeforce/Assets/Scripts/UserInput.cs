@@ -420,7 +420,7 @@ namespace Strikeforce
             if (keyDownEvent == true)
             {
                 // On key down
-                keyEvent = new KeyEvent(key, true);
+                keyEvent = new KeyEvent(key, KeyEvent.Type.Pressed);
                 return keyEvent;
             }
 
@@ -431,7 +431,7 @@ namespace Strikeforce
             float duration = Time.time - downTime;
             if (duration < KeyHoldDuration)
             {
-                keyEvent = new KeyEvent(key, false);
+                keyEvent = new KeyEvent(key, KeyEvent.Type.Released);
             }
             else
             {
