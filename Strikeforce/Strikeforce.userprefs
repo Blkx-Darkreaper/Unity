@@ -1,9 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\AssetManager.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Vehicle.cs">
     <Files>
-      <File FileName="Assets\Scripts\GlobalAssets.cs" Line="361" Column="1" />
-      <File FileName="Assets\Scripts\AssetManager.cs" Line="90" Column="1" />
+      <File FileName="Assets\Scripts\Vehicle.cs" Line="26" Column="2" />
+      <File FileName="D:\Users\Darkreaper\Git\Unity\Strikeforce\Assets\Scripts\GameManager.cs" Line="48" Column="1" />
+      <File FileName="Assets\Scripts\Level.cs" Line="249" Column="2" />
+      <File FileName="Assets\Scripts\UserInput.cs" Line="274" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

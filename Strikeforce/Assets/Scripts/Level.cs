@@ -7,6 +7,28 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
+    public struct RectangularPrism
+    {
+        public float X { get; private set; }
+        public float Y { get; private set; }
+        public float Z { get; private set; }
+        public float Width { get; private set; }
+        public float Height { get; private set; }
+        public float Depth { get; private set; }
+
+        public RectangularPrism(Vector3 position, Vector3 size) : this(position.x, position.y, position.z, size.x, size.y, size.z) { }
+
+        public RectangularPrism(float x, float y, float z, float width, float height, float depth)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
+            this.Width = width;
+            this.Height = height;
+            this.Depth = depth;
+        }
+    }
+
     public class Level : MonoBehaviour
     {
         public int Columns;
@@ -15,6 +37,7 @@ namespace Strikeforce
         public string LevelName;
         [HideInInspector]
         public GameObject BoundingBox;
+        public Rectangle Bounds { get { return new Rectangle(0, 0, Columns, Rows); } }
         public Vector2 HeadquartersSpawn;
         public Vector2 RaiderSpawn;
         public GameObject TilePrefab;
@@ -67,8 +90,8 @@ namespace Strikeforce
             int width = (int)map.MapSize.Width;
             int halfWidth = width / 2;
             int height = (int)map.MapSize.Height;
-            Columns = width / TileLength;
-            Rows = height / TileLength;
+            this.Columns = width / TileLength;
+            this.Rows = height / TileLength;
 
             // Set Raider spawn and build Bounding box
             this.RaiderSpawn = new Vector2();    // TODO
@@ -115,6 +138,18 @@ namespace Strikeforce
             this.BoundingBox = Instantiate(boundingBoxPrefab, position, Quaternion.identity) as GameObject;
             this.BoundingBox.transform.localScale = new Vector3(columns, 20, rows);
             this.BoundingBox.transform.parent = gameObject.transform;
+        }
+
+        public void KeepInBounds(float x, float z, ref float deltaX, ref float deltaZ)
+        {
+            // Keep in level bounds
+            float finalX = x + deltaX;
+            float finalZ = z + deltaZ;
+
+            float halfWidth = Bounds.Width / 2;
+
+            deltaX = Mathf.Clamp(finalX, -halfWidth, halfWidth) - x;
+            deltaZ = Mathf.Clamp(finalZ, 0, Bounds.Height) - z;
         }
 
         //protected Texture2D LoadMapSprite(string filename)

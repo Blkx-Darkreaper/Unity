@@ -267,6 +267,13 @@ namespace Strikeforce
 
             float x = Input.GetAxis(leftStickHor) * 0.1f;
             float z = Input.GetAxis(leftStickVert) * 0.1f;
+            if (x == 0f)
+            {
+                if (z == 0f)
+                {
+                    return;
+                }
+            }
 
             Player player = profile.Player;
             if (player == null)

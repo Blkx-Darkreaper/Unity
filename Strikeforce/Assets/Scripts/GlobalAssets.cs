@@ -20,6 +20,8 @@ namespace Strikeforce
         public const string NETWORK_MANAGER = "NetworkManager";
         public const string HEADER = "Header";
         public const string BUTTON = "Button";
+        public const string LEVEL = "Level";
+        public const string SCENE = "Scene";
     }
 
     public struct Hooks

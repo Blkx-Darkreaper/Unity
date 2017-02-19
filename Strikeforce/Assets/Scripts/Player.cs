@@ -84,6 +84,7 @@ namespace Strikeforce
 
             GameObject basicShotPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BASIC_SHOT);
             Weapon basicShot = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
+            basicShot.transform.parent = CurrentRaider.transform;
 
             bool equipped = CurrentRaider.EquipWeapon(basicShot, HardpointPosition.Center, 0, 0, 0);
             if (equipped == true)
@@ -121,6 +122,7 @@ namespace Strikeforce
         protected void CmdMovePlayer(float x, float y, float z)
         {
             isInBuildMode = false;	//testing
+            Vector3 cameraPosition = Vector3.zero;
             if (isInBuildMode == true)
             {
                 Cursor.transform.Translate(x, 0, z);
@@ -128,9 +130,27 @@ namespace Strikeforce
             else
             {
                 CurrentRaider.Move(x, z);
+                cameraPosition = CurrentRaider.transform.position;
             }
 
-            mainCamera.transform.Translate(x, z, 0);	//testing
+            //MoveCamera(x, y, z);
+            SetCameraPosition(cameraPosition);
+        }
+
+        protected void MoveCamera(float x, float y, float z)
+        {
+            Vector3 currentPosition = transform.position;
+            Level currentLevel = GameManager.Singleton.CurrentLevel;
+
+            currentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
+
+            mainCamera.transform.Translate(x, z, y);
+        }
+
+        protected void SetCameraPosition(Vector3 position)
+        {
+            float y = mainCamera.transform.position.y;
+            mainCamera.transform.position = new Vector3(position.x, y, position.z);
         }
 
         public void RespondToKeyEvent(KeyEvent keyEvent)

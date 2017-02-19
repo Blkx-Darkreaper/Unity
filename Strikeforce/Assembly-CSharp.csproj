@@ -134,17 +134,11 @@
      <Compile Include="Assets\Scripts\_RandomRotator.cs" />
      <Compile Include="Assets\Scripts\_SetParticleSortLayer.cs" />
      <None Include="Assets\Scripts\Newtonsoft.Json.xml" />
- <Reference Include="UnityEngine.Advertisements">
- <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>P:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
  <HintPath>D:/Users/Darkreaper/Git/Unity/Strikeforce/Assets/Scripts/Newtonsoft.Json.dll</HintPath>

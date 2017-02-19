@@ -14,8 +14,9 @@ namespace Strikeforce
         public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
         public string CurrentGameName { get; protected set; }
         public string CurrentLevelName { get; protected set; }
+        public Level CurrentLevel { get; protected set; }
         public Color DefaultColour;
-        protected int nextId = 0;
+        protected int nextEntityId = 0;
         protected Dictionary<int, Entity> allGameEntities;
         public int MaxEntities = 1000;
 
@@ -32,7 +33,18 @@ namespace Strikeforce
                 return;
             }
 
-            allGameEntities = new Dictionary<int, Entity>();
+            this.allGameEntities = new Dictionary<int, Entity>();
+        }
+
+        protected void Start()
+        {
+            GameObject level = GameObject.FindGameObjectWithTag(Tags.LEVEL);
+            if (level == null)
+            {
+                return;
+            }
+
+            this.CurrentLevel = level.GetComponent<Level>();
         }
 
         protected void Update()
@@ -191,11 +203,11 @@ namespace Strikeforce
 
         public int GetNextUniqueId()
         {
-            int id = Singleton.nextId;
-            Singleton.nextId++;
-            if (Singleton.nextId >= int.MaxValue)
+            int id = Singleton.nextEntityId;
+            Singleton.nextEntityId++;
+            if (Singleton.nextEntityId >= int.MaxValue)
             {
-                Singleton.nextId = 0;
+                Singleton.nextEntityId = 0;
             }
 
             return id;
