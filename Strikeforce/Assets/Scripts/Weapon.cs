@@ -37,8 +37,7 @@ namespace Strikeforce
 
         protected void LoadProjectilePrefab()
         {
-            string projectileName = string.Format("{0} {1}", Type, PROJECTILE);
-            this.projectilePrefab = GlobalAssets.GetMiscPrefab(projectileName);
+            this.projectilePrefab = GlobalAssets.GetProjectilePrefab(ProjectileType);
         }
 
         public void SetFiringPointOffset(Vector3 offset)
@@ -67,7 +66,6 @@ namespace Strikeforce
             float z = parentLocation.z;
             Vector3 firingPoint = new Vector3(x, y, z) + firingPointOffset;
 
-            GameObject projectilePrefab = NetworkManager.singleton.spawnPrefabs[0];
             // create the bullet object from the bullet prefab
             GameObject bullet = Instantiate(projectilePrefab, firingPoint, Quaternion.identity) as GameObject;
 

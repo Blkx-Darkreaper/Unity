@@ -27,6 +27,7 @@ namespace Strikeforce
         public bool IsSettingConstructionPoint;
         public Material NotAllowedMaterial, AllowedMaterial;
         public Color Colour;
+        public string RaiderPrefabName = "Raider";
 
         protected struct PlayerProperties
         {
@@ -58,7 +59,7 @@ namespace Strikeforce
             //TODO: get spawn point from level
             Vector3 spawn = new Vector3(0, 5, 5);
             GameObject raiderObject = Instantiate(
-                NetworkManager.singleton.spawnPrefabs[3],
+                GlobalAssets.GetVehiclePrefab(RaiderPrefabName),
                 spawn,
                 Quaternion.identity) as GameObject;
             raiderObject.transform.parent = gameObject.transform;
@@ -89,6 +90,8 @@ namespace Strikeforce
             {
                 CurrentRaider.ReadyWeapons();
             }
+
+            NetworkServer.Spawn(CurrentRaider.gameObject);
 
             // Set camera overhead
             Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 10, raiderPosition.z);
