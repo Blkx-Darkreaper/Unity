@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,8 @@ namespace Strikeforce
         public const string NETWORK_MANAGER = "NetworkManager";
         public const string HEADER = "Header";
         public const string BUTTON = "Button";
+        public const string LEVEL = "Level";
+        public const string SCENE = "Scene";
     }
 
     public struct Hooks
@@ -83,10 +86,21 @@ namespace Strikeforce
             new KeyValuePair<string, string>(ResourceProperties.BOMBS, ResourceProperties.BOMBS_LIMIT),
             new KeyValuePair<string, string>(ResourceProperties.MATERIEL, ResourceProperties.MATERIEL_LIMIT)
 	    };
-        public static Dictionary<string, GameObject> WeaponPrefabs = new Dictionary<string, GameObject>();
-        public static Dictionary<string, GameObject> StructurePrefabs = new Dictionary<string, GameObject>();
-        public static Dictionary<string, GameObject> VehiclePrefabs = new Dictionary<string, GameObject>();
-        public static Dictionary<string, GameObject> MiscPrefabs = new Dictionary<string, GameObject>();
+        private static int nextPrefabIndex = 0;
+        private static Dictionary<string, int> weaponPrefabs = new Dictionary<string, int>();
+        private static Dictionary<string, int> structurePrefabs = new Dictionary<string, int>();
+        private static Dictionary<string, int> vehiclePrefabs = new Dictionary<string, int>();
+        private static Dictionary<string, int> projectilePrefabs = new Dictionary<string, int>();
+        private static Dictionary<string, int> miscPrefabs = new Dictionary<string, int>();
+
+        public struct Prefabs
+        {
+            public const string WEAPONS = "Weapons";
+            public const string STRUCTURES = "Structures";
+            public const string VEHICLES = "Vehicles";
+            public const string PROJECTILES = "Projectiles";
+            public const string MISC = "Misc";
+        }
 
         public struct Camera
         {
@@ -220,6 +234,72 @@ namespace Strikeforce
             }
         }
 
+        public static void RegisterPrefab(string name, GameObject prefab, string collectionName)
+        {
+            switch (collectionName)
+            {
+                case Prefabs.WEAPONS:
+                    RegisterWeaponPrefab(name, prefab);
+                    break;
+
+                case Prefabs.STRUCTURES:
+                    RegisterStructurePrefab(name, prefab);
+                    break;
+
+                case Prefabs.VEHICLES:
+                    RegisterVehiclePrefab(name, prefab);
+                    break;
+
+                case Prefabs.PROJECTILES:
+                    RegisterProjectilePrefab(name, prefab);
+                    break;
+
+                case Prefabs.MISC:
+                default:
+                    RegisterMiscPrefab(name, prefab);
+                    break;
+            }
+        }
+
+        public static void RegisterWeaponPrefab(string name, GameObject prefab)
+        {
+            registerPrefab(name, prefab, weaponPrefabs);
+        }
+
+        public static void RegisterStructurePrefab(string name, GameObject prefab)
+        {
+            registerPrefab(name, prefab, structurePrefabs);
+        }
+
+        public static void RegisterVehiclePrefab(string name, GameObject prefab)
+        {
+            registerPrefab(name, prefab, vehiclePrefabs);
+        }
+
+        public static void RegisterProjectilePrefab(string name, GameObject prefab)
+        {
+            registerPrefab(name, prefab, projectilePrefabs);
+        }
+
+        public static void RegisterMiscPrefab(string name, GameObject prefab)
+        {
+            registerPrefab(name, prefab, miscPrefabs);
+        }
+
+        private static void registerPrefab(string name, GameObject prefab, Dictionary<string, int> collection)
+        {
+            if (prefab == null)
+            {
+                return;
+            }
+
+            ClientScene.RegisterPrefab(prefab);
+            NetworkManager.singleton.spawnPrefabs.Add(prefab);
+            int index = nextPrefabIndex++;
+
+            collection.Add(name, index);
+        }
+
         public static GameObject GetPrefab(string name)
         {
             GameObject entity = GetStructurePrefab(name);
@@ -238,52 +318,49 @@ namespace Strikeforce
             return entity;
         }
 
+        public static GameObject GetWeaponPrefab(string name)
+        {
+            return getPrefabFromCollection(name, weaponPrefabs);
+        }
+
         public static GameObject GetStructurePrefab(string name)
         {
-            bool exists = StructurePrefabs.ContainsKey(name);
-            if (exists == false)
-            {
-                return null;
-            }
-
-            GameObject structure = StructurePrefabs[name];
-            return structure;
+            return getPrefabFromCollection(name, structurePrefabs);
         }
 
         public static GameObject GetVehiclePrefab(string name)
         {
-            bool exists = VehiclePrefabs.ContainsKey(name);
-            if (exists == false)
-            {
-                return null;
-            }
+            return getPrefabFromCollection(name, vehiclePrefabs);
+        }
 
-            GameObject unit = VehiclePrefabs[name];
-            return unit;
+        public static GameObject GetProjectilePrefab(string name)
+        {
+            return getPrefabFromCollection(name, projectilePrefabs);
         }
 
         public static GameObject GetMiscPrefab(string name)
         {
-            bool exists = MiscPrefabs.ContainsKey(name);
-            if (exists == false)
-            {
-                return null;
-            }
-
-            GameObject entity = MiscPrefabs[name];
-            return entity;
+            return getPrefabFromCollection(name, miscPrefabs);
         }
 
-        public static GameObject GetWeaponPrefab(string name)
+        private static GameObject getPrefabFromCollection(string name, Dictionary<string, int> collection)
         {
-            bool exists = WeaponPrefabs.ContainsKey(name);
+            bool exists = collection.ContainsKey(name);
             if (exists == false)
             {
                 return null;
             }
 
-            GameObject weapon = WeaponPrefabs[name];
-            return weapon;
+            int index = collection[name];
+
+            int totalPrefabs = NetworkManager.singleton.spawnPrefabs.Count;
+            if (index >= totalPrefabs)
+            {
+                return null;
+            }
+
+            GameObject prefab = NetworkManager.singleton.spawnPrefabs[index];
+            return prefab;
         }
 
         public static GameObject GetChildGameObjectWithName(GameObject parent, string nameToFind)

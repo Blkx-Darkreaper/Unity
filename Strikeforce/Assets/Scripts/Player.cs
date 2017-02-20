@@ -27,6 +27,7 @@ namespace Strikeforce
         public bool IsSettingConstructionPoint;
         public Material NotAllowedMaterial, AllowedMaterial;
         public Color Colour;
+        public string RaiderPrefabName = "Raider";
 
         protected struct PlayerProperties
         {
@@ -58,7 +59,7 @@ namespace Strikeforce
             //TODO: get spawn point from level
             Vector3 spawn = new Vector3(0, 5, 5);
             GameObject raiderObject = Instantiate(
-                NetworkManager.singleton.spawnPrefabs[3],
+                GlobalAssets.GetVehiclePrefab(RaiderPrefabName),
                 spawn,
                 Quaternion.identity) as GameObject;
             raiderObject.transform.parent = gameObject.transform;
@@ -69,11 +70,11 @@ namespace Strikeforce
             Vector3 raiderPosition = raiderObject.transform.position;
 
             CurrentRaider.SetLayout(new Vector3[] { 
-                new Vector3(raiderPosition.x - 10, raiderPosition.y, raiderPosition.z), 
-                new Vector3(raiderPosition.x - 5, raiderPosition.y, raiderPosition.z),
-                new Vector3(raiderPosition.x, raiderPosition.y, raiderPosition.z),
-                new Vector3(raiderPosition.x + 5, raiderPosition.y, raiderPosition.z),
-                new Vector3(raiderPosition.x + 10, raiderPosition.y, raiderPosition.z)}, 
+                new Vector3(-10, 0, 1), 
+                new Vector3(-5, 0, 1),
+                new Vector3(0, 0, 1),
+                new Vector3(5, 0, 1),
+                new Vector3(10, 0, 1)}, 
                 new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
                 new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
                 new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center), 
@@ -83,12 +84,15 @@ namespace Strikeforce
 
             GameObject basicShotPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BASIC_SHOT);
             Weapon basicShot = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
+            basicShot.transform.parent = CurrentRaider.transform;
 
             bool equipped = CurrentRaider.EquipWeapon(basicShot, HardpointPosition.Center, 0, 0, 0);
             if (equipped == true)
             {
                 CurrentRaider.ReadyWeapons();
             }
+
+            NetworkServer.Spawn(CurrentRaider.gameObject);
 
             // Set camera overhead
             Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 10, raiderPosition.z);
@@ -118,6 +122,7 @@ namespace Strikeforce
         protected void CmdMovePlayer(float x, float y, float z)
         {
             isInBuildMode = false;	//testing
+            Vector3 cameraPosition = Vector3.zero;
             if (isInBuildMode == true)
             {
                 Cursor.transform.Translate(x, 0, z);
@@ -125,9 +130,27 @@ namespace Strikeforce
             else
             {
                 CurrentRaider.Move(x, z);
+                cameraPosition = CurrentRaider.transform.position;
             }
 
-            mainCamera.transform.Translate(x, z, 0);	//testing
+            //MoveCamera(x, y, z);
+            SetCameraPosition(cameraPosition);
+        }
+
+        protected void MoveCamera(float x, float y, float z)
+        {
+            Vector3 currentPosition = transform.position;
+            Level currentLevel = GameManager.Singleton.CurrentLevel;
+
+            currentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
+
+            mainCamera.transform.Translate(x, z, y);
+        }
+
+        protected void SetCameraPosition(Vector3 position)
+        {
+            float y = mainCamera.transform.position.y;
+            mainCamera.transform.position = new Vector3(position.x, y, position.z);
         }
 
         public void RespondToKeyEvent(KeyEvent keyEvent)
@@ -151,18 +174,21 @@ namespace Strikeforce
                     }
                     else
                     {
-                        bool charging = keyEvent.IsBeingHeld;
-                        if (charging == false)
+                        KeyEvent.Type eventType = keyEvent.EventType;
+                        if (eventType == KeyEvent.Type.Released)
                         {
-                            CmdFirePrimary();
+                            CmdSetPrimaryFiring(false);
+                            break;
                         }
+
+                        CmdSetPrimaryFiring(true);
                     }
                     break;
             }
         }
 
         [Command]
-        protected void CmdFirePrimary()
+        protected void CmdSetPrimaryFiring(bool isFiring)
         {
             // Command function is called from the client, but invoked on the server
             Raider raider = CurrentRaider;
@@ -171,7 +197,7 @@ namespace Strikeforce
                 return;
             }
 
-            raider.SetPrimaryFire(true);  // Testing
+            raider.SetPrimaryFire(isFiring);
         }
 
         public bool IsConstructionSiteValid(Structure constructionSite)

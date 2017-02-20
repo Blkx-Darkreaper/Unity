@@ -9,8 +9,12 @@ namespace Strikeforce
         public string Type;
         public int Priority;
         public bool IsOrdnanceWeapon = false;
-        protected Vector3 firingPoint;
-        private const string FIRE = "Fire";
+        protected Vector3 firingPointOffset;
+        protected AudioSource firingSound;
+        public string ProjectileType;
+        protected GameObject projectilePrefab;
+        //protected const string FIRE = "Fire";
+        protected const string PROJECTILE = "Projectile";
         public struct Types
         {
             public const string BASIC_SHOT = "Basic Shot";
@@ -26,11 +30,19 @@ namespace Strikeforce
             base.Awake();
 
             this.IsWeapon = true;
+            firingSound = GetComponent<AudioSource>();
+
+            LoadProjectilePrefab();
         }
 
-        public void SetFiringPoint(Vector3 firingPoint)
+        protected void LoadProjectilePrefab()
         {
-            this.firingPoint = firingPoint;
+            this.projectilePrefab = GlobalAssets.GetProjectilePrefab(ProjectileType);
+        }
+
+        public void SetFiringPointOffset(Vector3 offset)
+        {
+            this.firingPointOffset = offset;
         }
 
         public void Fire()
@@ -48,23 +60,25 @@ namespace Strikeforce
 
             Debug.Log(string.Format("{0} fired!", Type));
 
-            //// create the bullet object from the bullet prefab
-            //GameObject bullet = (GameObject)Instantiate(
-            //	NetworkManager.singleton.spawnPrefabs[0],
-            //	Parent.transform.position + Parent.transform.forward,
-            //	Quaternion.identity);
+            Vector3 parentLocation = Parent.transform.position;
+            float x = parentLocation.x;
+            float y = parentLocation.y;
+            float z = parentLocation.z;
+            Vector3 firingPoint = new Vector3(x, y, z) + firingPointOffset;
 
-            //// make the bullet move away in front of the player
-            //bullet.GetComponentInChildren<Rigidbody>().velocity = Parent.transform.forward * 4;
+            // create the bullet object from the bullet prefab
+            GameObject bullet = Instantiate(projectilePrefab, firingPoint, Quaternion.identity) as GameObject;
 
-            //// spawn the bullet on the clients
-            //NetworkServer.Spawn(bullet);
+            // make the bullet move away in front of the player
+            bullet.GetComponentInChildren<Rigidbody>().velocity = Parent.transform.forward * 4;
 
-            //AudioSource blasterSound = GetComponent<AudioSource>();
-            //blasterSound.Play();
+            // spawn the bullet on the clients
+            NetworkServer.Spawn(bullet);
 
-            //// make bullet disappear after 10 seconds
-            //Destroy(bullet, 10.0f);
+            firingSound.Play();
+
+            // make bullet disappear after 10 seconds
+            Destroy(bullet, 10.0f);
         }
 
         //public void Start()
