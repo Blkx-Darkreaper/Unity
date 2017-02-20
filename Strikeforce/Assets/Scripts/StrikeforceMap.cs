@@ -15,19 +15,18 @@ namespace Strikeforce
         // Map data
         public string TilesetFilename { get; set; }
         public int TileLength { get; set; }
-        public int NextSector { get; set; }
         public Size MapSize { get; set; }
         public List<Grid> AllMapGrids { get; set; }
         public List<Checkpoint> AllCheckpoints { get; set; }
 
         [JsonConstructor]
-        public StrikeforceMap(string author, DateTime dateCreated, string tilesetFilename, int tileLength, int nextSector, int nextZone, Size mapSize, List<Grid> allMapGrids, List<Checkpoint> allCheckpoints)
+        public StrikeforceMap(string author, DateTime dateCreated, string tilesetFilename, int tileLength, int nextSector, int nextZone, 
+            Size mapSize, List<Grid> allMapGrids, List<Checkpoint> allCheckpoints)
         {
             this.Author = author;
             this.DateCreated = dateCreated;
             this.TilesetFilename = tilesetFilename;
             this.TileLength = tileLength;
-            this.NextSector = nextSector;
             this.MapSize = mapSize;
             this.AllMapGrids = allMapGrids;
             this.AllCheckpoints = allCheckpoints;

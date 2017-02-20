@@ -1,18 +1,18 @@
-﻿using System.Drawing;
+﻿using UnityEngine;
+using System.Drawing;
 using Newtonsoft.Json;
 
 namespace Strikeforce
 {
     public class Spawnpoint
     {
-        public Point Location;
-        public int ParentSectorId;
+        public Vector2 Location;
         public bool IsHeadquartersLocation;
 
-        [JsonConstructor]
-        public Spawnpoint(Point location, Size size, int parentSectorId, bool isHeadquartersLocation)
+        public Spawnpoint(int x, int y, bool isHQLocation)
         {
-            this.ParentSectorId = parentSectorId;
+            this.Location = new Vector2(x, y);
+            this.IsHeadquartersLocation = isHQLocation;
         }
     }
 }

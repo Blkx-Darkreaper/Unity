@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using UnityEngine;
+using System.Drawing;
 using Newtonsoft.Json;
 
 namespace Strikeforce
@@ -6,22 +7,29 @@ namespace Strikeforce
         public class Grid
         {
             public int Id { get; protected set; }
-            public Point Corner { get; protected set; }
+            public Vector2 Location { get; protected set; }
             public bool AllowsDriving { get; protected set; }
             public bool AllowsFlying { get; protected set; }
             public bool AllowsConstruction { get; protected set; }
-            public int SectorId { get; set; }
+            public bool IsHeadquartersSpawn { get; protected set; }
+            public bool IsSectorSpawn { get; protected set; }
+            public int SectorId { get; protected set; }
+            public int ZoneId { get; protected set; }
             public Tile Tile { get; set; }
 
             [JsonConstructor]
-            public Grid(int id, Point corner, bool allowsDriving, bool allowsFlying, bool allowsConstruction, int sector, int zone, Tile tile)
+            public Grid(int id, Point location, bool allowsDriving, bool allowsFlying, bool allowsConstruction, 
+                bool isHQSpawn, bool isSectorSpawn, int sectorId, int zoneId, Tile tile)
             {
                 this.Id = id;
-                this.Corner = corner;
+                this.Location = new Vector2(location.X, location.Y);
                 this.AllowsDriving = allowsDriving;
                 this.AllowsFlying = allowsFlying;
                 this.AllowsConstruction = allowsConstruction;
-                this.SectorId = sector;
+                this.IsHeadquartersSpawn = isHQSpawn;
+                this.IsSectorSpawn = isSectorSpawn;
+                this.SectorId = sectorId;
+                this.ZoneId = zoneId;
                 this.Tile = tile;
             }
         }

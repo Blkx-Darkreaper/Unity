@@ -84,11 +84,11 @@ namespace Strikeforce
                 int tileIndex = grid.Tile.TilesetIndex;
                 Sprite sprite = Tileset[tileIndex];
 
-                int x = grid.Corner.X;
+                int x = grid.Location.X;
                 x -= halfWidth;
                 x /= TileLength;
 
-                int z = height - grid.Corner.Y;
+                int z = height - grid.Location.Y;
                 z /= TileLength;
                 Vector3 position = new Vector3(x, 0, z);
 
