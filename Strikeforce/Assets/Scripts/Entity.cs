@@ -6,6 +6,7 @@ namespace Strikeforce
     public class Entity : NetworkBehaviour
     {
         public int EntityId { get; set; }
+        public Level CurrentLevel { get; protected set; }
         //public static string nameProperty { get { return ItemProperties.NAME; } }
         public struct EntityProperties
         {
@@ -16,6 +17,8 @@ namespace Strikeforce
         protected virtual void Awake()
         {
             GameManager.Singleton.RegisterEntity(this);
+
+            this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
         }
 
         protected virtual void DestroyEntity()

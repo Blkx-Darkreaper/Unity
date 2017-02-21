@@ -14,6 +14,8 @@ namespace Strikeforce
         [HideInInspector]
         public Hud PlayerHud;
         [HideInInspector]
+        public Level CurrentLevel { get; protected set; }
+        [HideInInspector]
         public BuildCursor Cursor;
         [HideInInspector]
         public Raider CurrentRaider;
@@ -66,6 +68,8 @@ namespace Strikeforce
 
             CurrentRaider = raiderObject.GetComponent<Raider>();
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
+
+            this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
             
             Vector3 raiderPosition = raiderObject.transform.position;
 
@@ -140,7 +144,7 @@ namespace Strikeforce
         protected void MoveCamera(float x, float y, float z)
         {
             Vector3 currentPosition = transform.position;
-            Level currentLevel = GameManager.Singleton.CurrentLevel;
+            Level currentLevel = GameManager.Singleton.CurrentLevels;
 
             currentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
 

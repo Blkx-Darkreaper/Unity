@@ -16,9 +16,8 @@ namespace Strikeforce
             }
 
             Vector3 currentPosition = transform.position;
-            Level currentLevel = GameManager.Singleton.CurrentLevel;
 
-            currentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
+            CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
 
             transform.Translate(x, 0, z);
         }

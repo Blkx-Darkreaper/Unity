@@ -14,7 +14,7 @@ namespace Strikeforce
         public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
         public string CurrentGameName { get; protected set; }
         public string CurrentLevelName { get; protected set; }
-        public Level CurrentLevel { get; protected set; }
+        public Level[] CurrentLevels { get; protected set; }
         public Color DefaultColour;
         protected int nextEntityId = 0;
         protected Dictionary<int, Entity> allGameEntities;
@@ -33,18 +33,20 @@ namespace Strikeforce
                 return;
             }
 
+            this.CurrentLevels = new Level[2];
             this.allGameEntities = new Dictionary<int, Entity>();
         }
 
         protected void Start()
         {
-            GameObject level = GameObject.FindGameObjectWithTag(Tags.LEVEL);
-            if (level == null)
+            GameObject[] levels = GameObject.FindGameObjectsWithTag(Tags.LEVEL);
+            if (levels == null)
             {
                 return;
             }
 
-            this.CurrentLevel = level.GetComponent<Level>();
+            this.CurrentLevels[0] = levels[0].GetComponent<Level>();
+            this.CurrentLevels[1] = levels[1].GetComponent<Level>();
         }
 
         protected void Update()
