@@ -33,29 +33,28 @@ namespace Strikeforce
     {
         public int Columns;
         public int Rows;
-        public int TileLength = 32;
+        public static int TileLength = 32;
         public string LevelName;
         [HideInInspector]
         public GameObject BoundingBox;
         public Rectangle Bounds { get { return new Rectangle(0, 0, Columns, Rows); } }
-        public Vector2 HeadquartersSpawn;
-        public Vector2 RaiderSpawn;
+        public Spawnpoint HeadquartersSpawn;
+        public Spawnpoint RaiderSpawn;
         public GameObject TilePrefab;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
-        protected float PercentObstacles;
-        protected GameObject[] GroundTiles;
-        protected GameObject[] ObstacleTiles;
+        //protected GameObject[] GroundTiles;
+        //protected GameObject[] ObstacleTiles;
         protected GameObject allGridObjects;
-        protected List<Vector3> gridPositions = new List<Vector3>();
-        protected Rectangle[] allSectors;
-        protected Vector2[] allSectorSpawns;
+        //protected List<Vector3> gridPositions = new List<Vector3>();
+        protected Dictionary<int, Zone> allZones;
         public const string BOUNDING_BOX = "BoundingBox";
 
         public void Start()
         {
             //InitGrid();
-            allMapTiles = new List<GameObject>();
+            this.allMapTiles = new List<GameObject>();
+            this.allZones = new Dictionary<int, Zone>();
 
             LoadMap();
         }
@@ -87,6 +86,8 @@ namespace Strikeforce
                 return;
             }
 
+            TileLength = map.TileLength;
+
             int width = (int)map.MapSize.Width;
             int halfWidth = width / 2;
             int height = (int)map.MapSize.Height;
@@ -107,11 +108,11 @@ namespace Strikeforce
                 int tileIndex = grid.Tile.TilesetIndex;
                 Sprite sprite = Tileset[tileIndex];
 
-                int x = grid.Location.X;
+                int x = (int)grid.Location.x;
                 x -= halfWidth;
                 x /= TileLength;
 
-                int z = height - grid.Location.Y;
+                int z = height - (int)grid.Location.y;
                 z /= TileLength;
                 Vector3 position = new Vector3(x, 0, z);
 
@@ -122,7 +123,44 @@ namespace Strikeforce
                 renderer.sprite = sprite;
 
                 allMapTiles.Add(tile);
+
+                AddGridToZones(grid);
             }
+        }
+
+        protected void AddGridToZones(Grid grid)
+        {
+            int zoneId = grid.ZoneId;
+
+            Zone zone;
+            bool zoneExists = allZones.ContainsKey(zoneId);
+            if (zoneExists == false)
+            {
+                zone = new Zone(zoneId);
+                allZones.Add(zoneId, zone);
+            }
+
+            zone = allZones[zoneId];
+
+            zone.AddGrid(grid);
+
+            AddHeadquartersSpawn(grid);
+        }
+
+        protected void AddHeadquartersSpawn(Grid grid)
+        {
+            if (grid.IsHeadquartersSpawn == false)
+            {
+                return;
+            }
+
+            int zoneId = grid.ZoneId;
+            int sectorId = grid.SectorId;
+
+            Zone zone = allZones[zoneId];
+            Sector sector = zone.AllSectors[sectorId];
+
+            this.HeadquartersSpawn = sector.Spawn;
         }
 
         protected void LoadBoundingBox(int columns, int rows)
@@ -150,100 +188,6 @@ namespace Strikeforce
 
             deltaX = Mathf.Clamp(finalX, -halfWidth, halfWidth) - x;
             deltaZ = Mathf.Clamp(finalZ, 0, Bounds.Height) - z;
-        }
-
-        //protected Texture2D LoadMapSprite(string filename)
-        //{
-        //    string json = GlobalAssets.ReadTextFile(filename);
-        //    StrikeforceMap map = JsonConvert.DeserializeObject<StrikeforceMap>(json);
-        //    Texture2D mapImage = GetMapImage(map.MapSize, map.AllMapGrids);
-        //    return mapImage;
-        //}
-
-        //public Texture2D GetMapImage(Size mapSize, List<Grid> allMapGrids)
-        //{
-        //    int width = mapSize.Width;
-        //    int height = mapSize.Height;
-
-        //    Columns = width / TileLength;
-        //    Rows = height / TileLength;
-
-        //    Texture2D displayImage = new Texture2D(width, height);
-        //    DrawAllGridsOntoImage(ref displayImage, allMapGrids, Columns);
-
-        //    return displayImage;
-        //}
-
-        //public void DrawAllGridsOntoImage(ref Texture2D image, List<Grid> allMapGrids, int columns)
-        //{
-        //    for (int i = 0; i < allMapGrids.Count; i++)
-        //    {
-        //        Grid grid = allMapGrids[i];
-
-        //        int x = grid.Corner.X;
-        //            int y = grid.Corner.Y;
-
-        //        Tile tile = grid.Tile;
-
-        //        DrawTileOntoImage(ref image, tile, x, y);
-        //    }
-        //}
-
-        //public void DrawTileOntoImage(ref Bitmap image, Tile tile, int x, int y)
-        //{
-        //    using (Graphics g = Graphics.FromImage(image))
-        //    {
-        //        Image tileImage = GetTileImage(tile);
-        //        g.DrawImage(tileImage, x, y, TileLength, TileLength);
-        //    }
-        //}
-
-        //public Bitmap GetTileImage(Tile tile)
-        //{
-        //    if (tilesetImage == null)
-        //    {
-        //        throw new NullReferenceException("No image loaded");
-        //    }
-
-        //    Point corner = tile.Corner;
-        //    int x = corner.X;
-        //    int y = corner.Y;
-
-        //    Rectangle bounds = new Rectangle(x, y, TileLength, TileLength);
-        //    Bitmap tileImage = tilesetImage.Clone(bounds, PixelFormat.Format24bppRgb);
-        //    return tileImage;
-        //}
-
-        protected void InitGrid()
-        {
-            gridPositions.Clear();
-
-            int columnOffset = Columns / 2;
-            int rowOffset = Rows / 2 + 1;
-            for (int x = 0; x < Columns; x++)
-            {
-                for (int z = 0; z < Rows; z++)
-                {
-                    Vector3 position = new Vector3(x - columnOffset, 0.1f, z - rowOffset);
-                    gridPositions.Add(position);
-
-                    GameObject tilePrefab;
-
-                    float random = Random.Range(0, 100) / 100f;
-                    if (random <= PercentObstacles)
-                    {
-                        tilePrefab = ObstacleTiles[Random.Range(0, ObstacleTiles.Length)];
-                    }
-                    else
-                    {
-                        tilePrefab = GroundTiles[Random.Range(0, GroundTiles.Length)];
-                    }
-
-                    GameObject tile = Instantiate(tilePrefab, position, Quaternion.identity) as GameObject;
-                    tile.transform.eulerAngles = new Vector3(90, 0, 0);
-                    tile.transform.SetParent(gameObject.transform);
-                }
-            }
         }
     }
 }
