@@ -7,28 +7,6 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
-    public struct RectangularPrism
-    {
-        public float X { get; private set; }
-        public float Y { get; private set; }
-        public float Z { get; private set; }
-        public float Width { get; private set; }
-        public float Height { get; private set; }
-        public float Depth { get; private set; }
-
-        public RectangularPrism(Vector3 position, Vector3 size) : this(position.x, position.y, position.z, size.x, size.y, size.z) { }
-
-        public RectangularPrism(float x, float y, float z, float width, float height, float depth)
-        {
-            this.X = x;
-            this.Y = y;
-            this.Z = z;
-            this.Width = width;
-            this.Height = height;
-            this.Depth = depth;
-        }
-    }
-
     public class Level : MonoBehaviour
     {
         public int Columns;
@@ -95,7 +73,7 @@ namespace Strikeforce
             this.Rows = height / TileLength;
 
             // Set Raider spawn and build Bounding box
-            this.RaiderSpawn = new Vector2();    // TODO
+            //this.RaiderSpawn = new Spawnpoint();    // TODO
 
             LoadBoundingBox(Columns, Rows);
 

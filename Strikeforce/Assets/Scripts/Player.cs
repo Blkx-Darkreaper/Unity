@@ -144,9 +144,8 @@ namespace Strikeforce
         protected void MoveCamera(float x, float y, float z)
         {
             Vector3 currentPosition = transform.position;
-            Level currentLevel = GameManager.Singleton.CurrentLevels;
 
-            currentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
+            CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
 
             mainCamera.transform.Translate(x, z, y);
         }
