@@ -49,18 +49,18 @@ namespace Strikeforce
             }
         }
 
-        protected virtual void HostGame()
+        protected void HostGame()
         {
-            Resume();
+            menuManager.ToggleLoadingScreen(true);
 
             networkManager.StartHost();
         }
 
-        protected virtual void JoinGame()
+        protected void JoinGame()
         {
-            Resume();
+            menuManager.ToggleLoadingScreen(true);
 
-            //networkManager.StartClient();
+            networkManager.StartClient();
         }
     }
 }

@@ -57,7 +57,7 @@ namespace Strikeforce
                 switch (buttonName)
                 {
                     case "Resume":
-                        Resume();
+                        menuManager.Resume();
                         break;
 
                     case "Exit":

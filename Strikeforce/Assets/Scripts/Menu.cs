@@ -174,7 +174,7 @@ namespace Strikeforce
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Resume();
+                menuManager.Resume();
             }
         }
 
@@ -317,20 +317,6 @@ namespace Strikeforce
             }
 
             menuManager.ShowMenu(menu);
-        }
-
-        protected virtual void Pause()
-        {
-            Time.timeScale = 0f;
-            Cursor.visible = true;
-            IsOpening = true;
-        }
-
-        protected virtual void Resume()
-        {
-            Time.timeScale = 1f;
-            //Cursor.visible = false;
-            IsOpening = false;
         }
 
         protected virtual void Back()

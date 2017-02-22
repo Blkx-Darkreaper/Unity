@@ -21,16 +21,12 @@ namespace Strikeforce
         public GameObject TilePrefab;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
-        //protected GameObject[] GroundTiles;
-        //protected GameObject[] ObstacleTiles;
         protected GameObject allGridObjects;
-        //protected List<Vector3> gridPositions = new List<Vector3>();
         protected Dictionary<int, Zone> allZones;
         public const string BOUNDING_BOX = "BoundingBox";
 
         public void Start()
         {
-            //InitGrid();
             this.allMapTiles = new List<GameObject>();
             this.allZones = new Dictionary<int, Zone>();
 
