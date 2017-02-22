@@ -39,8 +39,6 @@ namespace Strikeforce
             DrawSelection();
         }
 
-        protected virtual void Update() { }
-
         public virtual void SetSpawner(Structure spawner)
         {
         }
@@ -133,55 +131,55 @@ namespace Strikeforce
 
         public virtual void MouseClick(GameObject hitGameObject, Vector3 hitPoint, Player player)
         {
-        //    if (isSelected == false)
-        //    {
-        //        return;
-        //    }
-        //    if (hitGameObject == null)
-        //    {
-        //        return;
-        //    }
-        //    bool isGround = hitGameObject.CompareTag(Tags.GROUND);
-        //    if (isGround == true)
-        //    {
-        //        return;
-        //    }
+            //	if (isSelected == false)
+            //	{
+            //    	return;
+            //	}
+            //	if (hitGameObject == null)
+            //	{
+            //    	return;
+            //	}
+            //	bool isGround = hitGameObject.CompareTag(Tags.GROUND);
+            //	if (isGround == true)
+            //	{
+            //    	return;
+            //	}
 
-        //    Destructible hitEntity = hitGameObject.GetComponentInParent<Destructible>();
-        //    if (hitEntity == null)
-        //    {
-        //        return;
-        //    }
-        //    if (hitEntity == this)
-        //    {
-        //        return;
-        //    }
+            //	Destructible hitEntity = hitGameObject.GetComponentInParent<Destructible>();
+            //	if (hitEntity == null)
+            //	{
+            //    	return;
+            //	}
+            //	if (hitEntity == this)
+            //	{
+            //    	return;
+            //	}
 
-        //    bool readyToAttack = IsAbleToAttack();
-        //    if (readyToAttack == false)
-        //    {
-        //        ChangeSelection(hitEntity, player);
-        //        return;
-        //    }
+            //	bool readyToAttack = IsAbleToAttack();
+            //	if (readyToAttack == false)
+            //	{
+            //    	ChangeSelection(hitEntity, player);
+            //    	return;
+            //	}
 
-        //    if (hitEntity.MaxHitPoints == 0)
-        //    {
-        //        ChangeSelection(hitEntity, player);
-        //        return;
-        //    }
+            //	if (hitEntity.MaxHitPoints == 0)
+            //	{
+            //    	ChangeSelection(hitEntity, player);
+            //    	return;
+            //	}
 
-        //    Player hitEntityOwner = hitEntity.Owner;
-        //    if (hitEntityOwner != null)
-        //    {
-        //        bool samePlayer = Owner.PlayerId == hitEntityOwner.PlayerId;
-        //        if (samePlayer == true)
-        //        {
-        //            ChangeSelection(hitEntity, player);
-        //            return;
-        //        }
-        //    }
+            //	Player hitEntityOwner = hitEntity.Owner;
+            //	if (hitEntityOwner != null)
+            //	{
+            //    	bool samePlayer = Owner.PlayerId == hitEntityOwner.PlayerId;
+            //    	if (samePlayer == true)
+            //    	{
+            //        	ChangeSelection(hitEntity, player);
+            //        	return;
+            //    	}
+            //	}
 
-        //    SetAttackTarget(hitEntity);
+            //	SetAttackTarget(hitEntity);
         }
 
         private void ChangeSelection(Selectable otherEntity, Player player)
@@ -204,55 +202,55 @@ namespace Strikeforce
 
         public virtual void SetHoverState(GameObject gameObjectUnderMouse)
         {
-        //    if (Owner == null)
-        //    {
-        //        return;
-        //    }
-        //    if (Owner.IsNPC == true)
-        //    {
-        //        return;
-        //    }
-        //    if (isSelected == false)
-        //    {
-        //        return;
-        //    }
+            //	if (Owner == null)
+            //	{
+            //    	return;
+            //	}
+            //	if (Owner.IsNPC == true)
+            //	{
+            //    	return;
+            //	}
+            //	if (isSelected == false)
+            //	{
+            //    	return;
+            //	}
 
-        //    bool isGround = gameObjectUnderMouse.CompareTag(Tags.GROUND);
-        //    if (isGround == true)
-        //    {
-        //        return;
-        //    }
+            //	bool isGround = gameObjectUnderMouse.CompareTag(Tags.GROUND);
+            //	if (isGround == true)
+            //	{
+            //    	return;
+            //	}
 
-        //    Owner.PlayerHud.SetCursorState(CursorState.select);
+            //	Owner.PlayerHud.SetCursorState(CursorState.select);
 
-        //    bool canAttack = IsAbleToAttack();
-        //    if (canAttack == false)
-        //    {
-        //        return;
-        //    }
+            //	bool canAttack = IsAbleToAttack();
+            //	if (canAttack == false)
+            //	{
+            //    	return;
+            //	}
 
-        //    Destructible entityUnderMouse = gameObjectUnderMouse.GetComponentInParent<Destructible>();
-        //    if (entityUnderMouse == null)
-        //    {
-        //        return;
-        //    }
+            //	Destructible entityUnderMouse = gameObjectUnderMouse.GetComponentInParent<Destructible>();
+            //	if (entityUnderMouse == null)
+            //	{
+            //    	return;
+            //	}
 
-        //    if (entityUnderMouse.MaxHitPoints == 0)
-        //    {
-        //        return;
-        //    }
+            //	if (entityUnderMouse.MaxHitPoints == 0)
+            //	{
+            //    	return;
+            //	}
 
-        //    Player entityOwner = entityUnderMouse.Owner;
-        //    if (entityOwner != null)
-        //    {
-        //        bool samePlayer = Owner.PlayerId == entityOwner.PlayerId;
-        //        if (samePlayer == true)
-        //        {
-        //            return;
-        //        }
-        //    }
+            //	Player entityOwner = entityUnderMouse.Owner;
+            //	if (entityOwner != null)
+            //	{
+            //    	bool samePlayer = Owner.PlayerId == entityOwner.PlayerId;
+            //    	if (samePlayer == true)
+            //    	{
+            //        	return;
+            //    	}
+            //	}
 
-        //    Owner.PlayerHud.SetCursorState(CursorState.attack);
+            //	Owner.PlayerHud.SetCursorState(CursorState.attack);
         }
 
         public void SetTransparencyMaterial(Material transparencyMaterial, bool saveCurrentMaterial)

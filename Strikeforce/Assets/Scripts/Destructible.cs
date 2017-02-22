@@ -5,12 +5,16 @@ namespace Strikeforce
 {
     public class Destructible : Selectable
     {
+        public const int MAX_DAMAGE = 999;
         public int MaxHitPoints;
-        [HideInInspector] [SyncVar] public int CurrentHitPoints;
+        [HideInInspector]
+        [SyncVar]
+        public int CurrentHitPoints;
         protected float healthPercentage { get; set; }
         protected GUIStyle healthStyle { get; set; }
         private const int HEALTH_BAR_VERTICAL_OFFSET = 7;
         private const int HEALTH_BAR_HEIGHT = 5;
+        [SyncVar]
         public Orbit CurrentOrbit;
         public enum Orbit { Ground, Air }
         protected struct DestructibleProperties
@@ -26,12 +30,12 @@ namespace Strikeforce
             CurrentHitPoints = MaxHitPoints;
         }
 
-		protected override void Start ()
-		{
-			base.Start();
+        protected override void Start()
+        {
+            base.Start();
 
-			UpdateHealthPercentage();
-		}
+            UpdateHealthPercentage();
+        }
 
         protected void DrawHealthBar(Rect selectionBox)
         {
