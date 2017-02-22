@@ -50,8 +50,8 @@ namespace Strikeforce
 
         protected void SpawnRaider()	// Testing
         {
-            //TODO: get spawn point from level
-            Vector3 spawn = new Vector3(0, 5, 5);
+            // Get spawn point from level
+            Vector3 spawn = CurrentLevel.RaiderSpawn.Location;
             GameObject raiderObject = Instantiate(
                 GlobalAssets.GetVehiclePrefab(RaiderPrefabName),
                 spawn,

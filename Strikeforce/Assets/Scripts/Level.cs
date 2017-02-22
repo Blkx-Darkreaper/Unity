@@ -73,7 +73,10 @@ namespace Strikeforce
             this.Rows = height / TileLength;
 
             // Set Raider spawn and build Bounding box
-            this.RaiderSpawn = new Spawnpoint(Columns / 2, 5);	// TODO
+            int spawnX = 0;
+            int spawnY = 5;
+            int spawnZ = 5;
+            this.RaiderSpawn = new Spawnpoint(spawnX, spawnY, spawnZ);
 
             LoadBoundingBox(Columns, Rows);
 
