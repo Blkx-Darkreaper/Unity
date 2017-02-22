@@ -14,32 +14,23 @@ namespace Strikeforce
         [HideInInspector]
         public Hud PlayerHud;
         [HideInInspector]
-        public Level CurrentLevel { get; protected set; }
-        [HideInInspector]
-        public BuildCursor Cursor;
+        public bool IsMenuOpen { get; set; }
         [HideInInspector]
         public Raider CurrentRaider;
+        public string RaiderPrefabName = "Raider";
+        [HideInInspector]
+        public Inventory CurrentInventory;
         [HideInInspector]
         protected bool isInBuildMode = true;
         [HideInInspector]
-        public bool IsMenuOpen { get; set; }
-        [HideInInspector]
-        public Inventory CurrentInventory;
+        public BuildCursor Cursor;
+        public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
         public bool IsSettingConstructionPoint;
         public Material NotAllowedMaterial, AllowedMaterial;
         public Color Colour;
-        public string RaiderPrefabName = "Raider";
-
-        protected struct PlayerProperties
-        {
-            public const string USERNAME = "Username";
-            public const string IS_NPC = "IsNPC";
-            public const string FACTION_COLOUR = "TeamColour";
-            public const string RESOURCES = "Resources";
-            public const string STRUCTURES = "Structures";
-            public const string UNITS = "Units";
-        }
+        protected const string UNIT = "Unit";
+        protected const string STRUCTURE = "Structure";
 
         protected override void Awake()
         {
@@ -54,9 +45,10 @@ namespace Strikeforce
 
             SpawnRaider();
             CurrentInventory = GetComponent<Inventory>();
+            Sectors = new LinkedList<Sector>();
         }
 
-        protected void SpawnRaider()    // Testing
+        protected void SpawnRaider()	// Testing
         {
             //TODO: get spawn point from level
             Vector3 spawn = new Vector3(0, 5, 5);
@@ -70,19 +62,19 @@ namespace Strikeforce
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
 
             this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
-            
+
             Vector3 raiderPosition = raiderObject.transform.position;
 
-            CurrentRaider.SetLayout(new Vector3[] { 
-                new Vector3(-10, 0, 1), 
-                new Vector3(-5, 0, 1),
-                new Vector3(0, 0, 1),
-                new Vector3(5, 0, 1),
-                new Vector3(10, 0, 1)}, 
+            CurrentRaider.SetLayout(new Vector3[] {
+            	new Vector3(-10, 0, 1),
+            	new Vector3(-5, 0, 1),
+            	new Vector3(0, 0, 1),
+            	new Vector3(5, 0, 1),
+            	new Vector3(10, 0, 1)},
                 new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
                 new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
-                new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center), 
-                    new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) },
+                new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center),
+                	new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) },
                 new Hardpoint[] { new Hardpoint(50, -16, 1, 1, HardpointPosition.RightWing) },
                 new Hardpoint[] { new Hardpoint(94, -69, 1, 1, HardpointPosition.RightOuterWing) });
 
@@ -125,7 +117,7 @@ namespace Strikeforce
         [Command]
         protected void CmdMovePlayer(float x, float y, float z)
         {
-            isInBuildMode = false;	//testing
+            isInBuildMode = false;    //testing
             Vector3 cameraPosition = Vector3.zero;
             if (isInBuildMode == true)
             {
@@ -244,37 +236,37 @@ namespace Strikeforce
 
         //public void StartConstruction()
         //{
-        //    IsSettingConstructionPoint = false;
-        //    GameObject allStructures = transform.Find(PlayerProperties.STRUCTURES).gameObject;
-        //    if (allStructures == null)
-        //    {
-        //        return;
-        //    }
+        //	IsSettingConstructionPoint = false;
+        //	GameObject allStructures = transform.Find(PlayerProperties.STRUCTURES).gameObject;
+        //	if (allStructures == null)
+        //	{
+        //    	return;
+        //	}
 
-        //    bool sufficientFunds = HasSufficientResources(ResourceType.Money, constructionSite.Cost);
-        //    if (sufficientFunds == false)
-        //    {
-        //        InsufficientResources(ResourceType.Money);
-        //        return;
-        //    }
+        //	bool sufficientFunds = HasSufficientResources(ResourceType.Money, constructionSite.Cost);
+        //	if (sufficientFunds == false)
+        //	{
+        //    	InsufficientResources(ResourceType.Money);
+        //    	return;
+        //	}
 
-        //    RemoveResource(ResourceType.Money, constructionSite.Cost);
-        //    constructionSite.transform.parent = allStructures.transform;
-        //    constructionSite.Owner = this;
-        //    constructionSite.SetColliders(true);
-        //    constructionSite.StartConstruction();
+        //	RemoveResource(ResourceType.Money, constructionSite.Cost);
+        //	constructionSite.transform.parent = allStructures.transform;
+        //	constructionSite.Owner = this;
+        //	constructionSite.SetColliders(true);
+        //	constructionSite.StartConstruction();
         //}
 
         //public void CancelConstruction()
         //{
-        //    IsSettingConstructionPoint = false;
-        //    Destroy(constructionSite.gameObject);
-        //    constructionSite = null;
+        //	IsSettingConstructionPoint = false;
+        //	Destroy(constructionSite.gameObject);
+        //	constructionSite = null;
         //}
 
         public void SpawnUnit(string unitName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation)
         {
-            GameObject allUnits = transform.Find(PlayerProperties.UNITS).gameObject;
+            GameObject allUnits = transform.Find(UNIT).gameObject;
             if (allUnits == null)
             {
                 return;
@@ -304,7 +296,7 @@ namespace Strikeforce
 
         public void SpawnUnit(string vehicleName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation, Structure spawner)
         {
-            GameObject allUnits = transform.Find(PlayerProperties.UNITS).gameObject;
+            GameObject allUnits = transform.Find(UNIT).gameObject;
             if (allUnits == null)
             {
                 return;
@@ -337,28 +329,28 @@ namespace Strikeforce
 
         //public void SpawnStructure(string structureName, Vector3 buildPoint, Selectable builder, Rect playingArea)
         //{
-        //    GameObject structureToSpawn = (GameObject)Instantiate(GameManager.ActiveInstance.GetStructurePrefab(structureName),
-        //        buildPoint, new Quaternion());
+        //	GameObject structureToSpawn = (GameObject)Instantiate(GameManager.ActiveInstance.GetStructurePrefab(structureName),
+        //    	buildPoint, new Quaternion());
 
-        //    constructionSite = structureToSpawn.GetComponent<Structure>();
-        //    if (constructionSite != null)
-        //    {
-        //        IsSettingConstructionPoint = true;
-        //        constructionSite.SetTransparencyMaterial(NotAllowedMaterial, true);
-        //        constructionSite.SetColliders(false);
-        //        constructionSite.playingArea = playingArea;
-        //    }
-        //    else
-        //    {
-        //        Destroy(structureToSpawn);
-        //    }
+        //	constructionSite = structureToSpawn.GetComponent<Structure>();
+        //	if (constructionSite != null)
+        //	{
+        //    	IsSettingConstructionPoint = true;
+        //    	constructionSite.SetTransparencyMaterial(NotAllowedMaterial, true);
+        //    	constructionSite.SetColliders(false);
+        //    	constructionSite.playingArea = playingArea;
+        //	}
+        //	else
+        //	{
+        //    	Destroy(structureToSpawn);
+        //	}
         //}
 
         //public void SetConstructionPoint()
         //{
-        //    Vector3 constructionPosition = UserInput.GetHitPoint();
-        //    constructionPosition.y = 0;
-        //    constructionSite.transform.position = constructionPosition;
+        //	Vector3 constructionPosition = UserInput.GetHitPoint();
+        //	constructionPosition.y = 0;
+        //	constructionSite.transform.position = constructionPosition;
         //}
 
         protected void TakeOwnershipOfEntity(Selectable selectable, string entityType)
@@ -371,7 +363,7 @@ namespace Strikeforce
         {
             switch (entityType)
             {
-                case PlayerProperties.STRUCTURES:
+                case STRUCTURE:
                     Structure structure = (Structure)entity;
                     if (structure.IsConstructionComplete == false)
                     {

@@ -73,7 +73,7 @@ namespace Strikeforce
             this.Rows = height / TileLength;
 
             // Set Raider spawn and build Bounding box
-            //this.RaiderSpawn = new Spawnpoint();    // TODO
+            this.RaiderSpawn = new Spawnpoint(Columns / 2, 5);	// TODO
 
             LoadBoundingBox(Columns, Rows);
 
@@ -104,6 +104,8 @@ namespace Strikeforce
 
                 AddGridToZones(grid);
             }
+
+            LinkZones();
         }
 
         protected void AddGridToZones(Grid grid)
@@ -123,6 +125,28 @@ namespace Strikeforce
             zone.AddGrid(grid);
 
             AddHeadquartersSpawn(grid);
+        }
+
+        protected void LinkZones()
+        {
+            Zone currentZone = allZones[1];
+
+            int nextZoneId = 2;
+            while (allZones.ContainsKey(nextZoneId) == true)
+            {
+                Zone nextZone = allZones[nextZoneId];
+
+                currentZone.SetNextZone(nextZone);
+                currentZone = nextZone;
+                nextZoneId++;
+            }
+
+            if ((nextZoneId - 1) == allZones.Count)
+            {
+                return;
+            }
+
+            throw new InvalidOperationException(string.Format("Only {0} Zones linked out of {1}", nextZoneId - 2, allZones.Count));
         }
 
         protected void AddHeadquartersSpawn(Grid grid)
