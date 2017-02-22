@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -7,11 +8,13 @@ namespace Strikeforce
     public class Structure : Destructible
     {
         protected Queue<string> buildQueue;
-        private float currentBuildProgress = 0f;
+        protected float currentBuildProgress = 0f;
         public float ConstructionTime;
+        protected float currentConstructionProgress = 0f;
         public bool IsConstructionComplete { get; protected set; }
-        private const string CONSTRUCTION_MESSAGE = "Building...";
-        private Vector3 spawnPoint;
+        protected const string CONSTRUCTION_MESSAGE = "Building...";
+        public bool IsDamaged { get; protected set; }
+        protected Vector3 spawnPoint;
         protected Vector3 rallyPoint;
         public Texture2D RallyPointIcon;
         public Texture2D SellIcon;
@@ -27,12 +30,13 @@ namespace Strikeforce
         protected override void Awake()
         {
             base.Awake();
-            buildQueue = new Queue<string>();
+            this.buildQueue = new Queue<string>();
             float spawnX = SelectionBounds.center.x + transform.forward.x * SelectionBounds.extents.x + transform.forward.x * 10;
             float spawnZ = SelectionBounds.center.z + transform.forward.z * SelectionBounds.extents.z + transform.forward.z * 10;
-            spawnPoint = new Vector3(spawnX, 0f, spawnZ);
-            rallyPoint = spawnPoint;
-            IsConstructionComplete = true;
+            this.spawnPoint = new Vector3(spawnX, 0f, spawnZ);
+            this.rallyPoint = spawnPoint;
+            this.IsConstructionComplete = false;
+            this.IsDamaged = false;
         }
 
         protected override void Start()
@@ -70,6 +74,16 @@ namespace Strikeforce
             DrawHealthBarWithLabel(selectionBox, CONSTRUCTION_MESSAGE);
 
             GUI.EndGroup();
+        }
+
+        public int GetTotalRepairCost()
+        {
+            int damage = MaxHitPoints - CurrentHitPoints;
+
+            int repairCost = Math.Max(1, Cost / MaxHitPoints);
+
+            int totalCost = repairCost * damage;
+            return totalCost;
         }
 
         protected void AddVehicleToBuildQueue(string unitName)
@@ -295,6 +309,27 @@ namespace Strikeforce
             IsConstructionComplete = true;
             RestoreMaterials();
             SetTeamColour();
+        }
+
+        public void Repair(int amount)
+        {
+            CurrentHitPoints += amount;
+
+            SetIsDamaged();
+
+            if (CurrentHitPoints < MaxHitPoints)
+            {
+                return;
+            }
+
+            CurrentHitPoints = MaxHitPoints;
+        }
+
+        public void SetIsDamaged()
+        {
+            int damageThreshold = 2 * MaxHitPoints / 3;
+
+            this.IsDamaged = CurrentHitPoints > damageThreshold;
         }
     }
 }
