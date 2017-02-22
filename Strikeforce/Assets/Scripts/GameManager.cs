@@ -35,18 +35,22 @@ namespace Strikeforce
 
             this.CurrentLevels = new Level[2];
             this.allGameEntities = new Dictionary<int, Entity>();
-        }
 
-        protected void Start()
-        {
             GameObject[] levels = GameObject.FindGameObjectsWithTag(Tags.LEVEL);
             if (levels == null)
             {
                 return;
             }
 
-            this.CurrentLevels[0] = levels[0].GetComponent<Level>();
-            this.CurrentLevels[1] = levels[1].GetComponent<Level>();
+            for (int i = 0; i < levels.Length; i++)
+            {
+                this.CurrentLevels[i] = levels[i].GetComponent<Level>();
+            }
+        }
+
+        protected void Start()
+        {
+
         }
 
         protected void Update()

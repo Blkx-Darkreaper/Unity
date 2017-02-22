@@ -42,10 +42,21 @@ namespace Strikeforce
 
             // Get the main camera
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
+            this.CurrentInventory = GetComponent<Inventory>();
+            this.Sectors = new LinkedList<Sector>();
+            this.CurrentLevel = GameManager.Singleton.CurrentLevels[0];
+        }
 
+        public override void OnStartLocalPlayer()
+        {
+            //CurrentRaider.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
+        }
+
+        protected void Start()
+        {
+            PlayerHud = GetComponentInChildren<Hud>();
+            IsSettingConstructionPoint = false;
             SpawnRaider();
-            CurrentInventory = GetComponent<Inventory>();
-            Sectors = new LinkedList<Sector>();
         }
 
         protected void SpawnRaider()	// Testing
@@ -94,17 +105,6 @@ namespace Strikeforce
             Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 10, raiderPosition.z);
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
-        }
-
-        public override void OnStartLocalPlayer()
-        {
-            //CurrentRaider.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
-        }
-
-        protected void Start()
-        {
-            PlayerHud = GetComponentInChildren<Hud>();
-            IsSettingConstructionPoint = false;
         }
 
         public void LeftStick(float x, float y, float z)

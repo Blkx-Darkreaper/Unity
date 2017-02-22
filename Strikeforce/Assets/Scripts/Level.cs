@@ -75,7 +75,7 @@ namespace Strikeforce
             // Set Raider spawn and build Bounding box
             int spawnX = 0;
             int spawnY = 5;
-            int spawnZ = 5;
+            int spawnZ = 9;
             this.RaiderSpawn = new Spawnpoint(spawnX, spawnY, spawnZ);
 
             LoadBoundingBox(Columns, Rows);
@@ -114,6 +114,10 @@ namespace Strikeforce
         protected void AddGridToZones(Grid grid)
         {
             int zoneId = grid.ZoneId;
+            if (zoneId == 0)
+            {
+                return;
+            }
 
             Zone zone;
             bool zoneExists = allZones.ContainsKey(zoneId);
