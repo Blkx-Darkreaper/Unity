@@ -7,11 +7,7 @@ namespace Strikeforce
     public class Aircraft : Vehicle
     {
         public int StallSpeed = 3;
-        //[SyncVar]
-        //public float BankAngle = 0f;
         public float MaxBank = 30f;
-        //[SyncVar]
-        //public float PitchAngle = 0f;
         [SyncVar]
         protected float altitude;
         public const int MAX_ALTITUDE = 5;
@@ -48,7 +44,9 @@ namespace Strikeforce
                 return;
             }
 
-            if (CurrentMoveSpeed < StallSpeed)
+            Rigidbody rigidbody = gameObject.GetComponentInChildren<Rigidbody>();
+            float velocity = rigidbody.velocity.z;
+            if (velocity < StallSpeed)
             {
                 return;
             }
@@ -68,7 +66,7 @@ namespace Strikeforce
                 return;
             }
 
-            if (CurrentMoveSpeed > StallSpeed)
+            if (MaxVelocity > StallSpeed)
             {
                 return;
             }
