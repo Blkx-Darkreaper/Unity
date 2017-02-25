@@ -7,11 +7,11 @@ namespace Strikeforce
     public class Aircraft : Vehicle
     {
         public int StallSpeed = 3;
-        [SyncVar]
-        public float BankAngle = 0f;
+        //[SyncVar]
+        //public float BankAngle = 0f;
         public float MaxBank = 30f;
-        [SyncVar]
-        public float PitchAngle = 0f;
+        //[SyncVar]
+        //public float PitchAngle = 0f;
         [SyncVar]
         protected float altitude;
         public const int MAX_ALTITUDE = 5;
@@ -85,55 +85,34 @@ namespace Strikeforce
 
         public void BankLeft(float amount)
         {
-            Bank(-amount);
+            Bank(Vector3.left, amount);
         }
 
         public void BankRight(float amount)
         {
-            Bank(amount);
+            Bank(Vector3.right, amount);
         }
 
-        protected void Bank(float amount)
+        protected void Bank(Vector3 direction, float amount)
         {
-            float amount = Mathf.Clamp(amount, -MaxBank, MaxBank);
+            amount = Mathf.Clamp(amount, -MaxBank, MaxBank);
 
-            this.BankAngle += amount;
-
-            if (Math.Abs(BankAngle) <= 180)
-            {
-                return;
-            }
-
-            if (BankAngle < 0)
-            {
-                this.BankAngle += 180;
-                return;
-            }
-
-            this.BankAngle += -180;
+            transform.Rotate(direction * amount);
         }
 
         public void PitchUp(float amount)
         {
-            Pitch(amount);
+            Pitch(Vector3.up, amount);
         }
 
         public void PitchDown(float amount)
         {
-            Pitch(-amount);
+            Pitch(Vector3.down, amount);
         }
 
-        protected void Pitch(float amount)
+        protected void Pitch(Vector3 direction, float amount)
         {
-            this.PitchAngle += amount;
-
-            if (Math.Abs(PitchAngle) <= 90)
-            {
-                return;
-            }
-
-            // TODO
-            throw new NotImplementedException("Pitch handling incomplete");
+            transform.Rotate(direction * amount);
         }
 
         public override void TakeDamage(int damage)
