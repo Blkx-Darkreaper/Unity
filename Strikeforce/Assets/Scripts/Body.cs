@@ -8,6 +8,7 @@ namespace Strikeforce
     public class Body : Entity
     {
         protected bool isLoadedFromSave = false;
+        [HideInInspector]
         [SyncVar]
         public float CurrentMoveSpeed, CurrentTurnSpeed;
         [SyncVar]
