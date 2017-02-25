@@ -18,7 +18,8 @@ namespace Strikeforce
 
         protected override void Update() { }
 
-        protected virtual bool HasHitTarget(Entity target) {
+        protected virtual bool HasHitTarget(Entity target)
+        {
             return false;
         }
 
@@ -32,18 +33,17 @@ namespace Strikeforce
             base.TakeDamage(damage);
         }
 
-        protected virtual void DealDamageToTarget(Destructible target) {
+        protected virtual void DealDamageToTarget(Destructible target)
+        {
             bool anti = false;
 
-            switch (target.CurrentOrbit)
+            if (target.IsAirborne == false)
             {
-                case Orbit.Ground:
-                    anti = IsAntiGround;
-                    break;
-
-                case Orbit.Air:
-                    anti = IsAntiAir;
-                    break;
+                anti = IsAntiGround;
+            }
+            else
+            {
+                anti = IsAntiAir;
             }
 
             if (anti == false)

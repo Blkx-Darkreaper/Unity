@@ -15,8 +15,7 @@ namespace Strikeforce
         private const int HEALTH_BAR_VERTICAL_OFFSET = 7;
         private const int HEALTH_BAR_HEIGHT = 5;
         [SyncVar]
-        public Orbit CurrentOrbit;
-        public enum Orbit { Ground, Air }
+        public bool IsAirborne = false;
         protected struct DestructibleProperties
         {
             public const string HIT_POINTS = "HitPoints";

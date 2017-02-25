@@ -1,12 +1,17 @@
 using UnityEngine;
 using UnityEngine.Networking;
-using Strikeforce;
+using System;
 
 namespace Strikeforce
 {
     public class Aircraft : Vehicle
     {
         public int StallSpeed = 3;
+        [SyncVar]
+        public float BankAngle = 0f;
+        public float MaxBank = 30f;
+        [SyncVar]
+        public float PitchAngle = 0f;
         [SyncVar]
         protected float altitude;
         public const int MAX_ALTITUDE = 5;
@@ -31,14 +36,14 @@ namespace Strikeforce
             ChangeAltitude(-Time.deltaTime);
         }
 
-        protected void TakeOff()
+        public void TakeOff()
         {
             if (isServer == false)
             {
                 return;
             }
 
-            if (CurrentOrbit == Orbit.Air)
+            if (IsAirborne == true)
             {
                 return;
             }
@@ -48,17 +53,17 @@ namespace Strikeforce
                 return;
             }
 
-            this.CurrentOrbit = Orbit.Air;
+            this.IsAirborne = true;
         }
 
-        protected void Land()
+        public void Land()
         {
             if (isServer == false)
             {
                 return;
             }
 
-            if (CurrentOrbit != Orbit.Air)
+            if (IsAirborne == false)
             {
                 return;
             }
@@ -68,7 +73,7 @@ namespace Strikeforce
                 return;
             }
 
-            this.CurrentOrbit = Orbit.Ground;
+            this.IsAirborne = false;
 
             if (LandingSound == null)
             {
@@ -76,6 +81,59 @@ namespace Strikeforce
             }
 
             LandingSound.Play();
+        }
+
+        public void BankLeft(float amount)
+        {
+            Bank(-amount);
+        }
+
+        public void BankRight(float amount)
+        {
+            Bank(amount);
+        }
+
+        protected void Bank(float amount)
+        {
+            float amount = Mathf.Clamp(amount, -MaxBank, MaxBank);
+
+            this.BankAngle += amount;
+
+            if (Math.Abs(BankAngle) <= 180)
+            {
+                return;
+            }
+
+            if (BankAngle < 0)
+            {
+                this.BankAngle += 180;
+                return;
+            }
+
+            this.BankAngle += -180;
+        }
+
+        public void PitchUp(float amount)
+        {
+            Pitch(amount);
+        }
+
+        public void PitchDown(float amount)
+        {
+            Pitch(-amount);
+        }
+
+        protected void Pitch(float amount)
+        {
+            this.PitchAngle += amount;
+
+            if (Math.Abs(PitchAngle) <= 90)
+            {
+                return;
+            }
+
+            // TODO
+            throw new NotImplementedException("Pitch handling incomplete");
         }
 
         public override void TakeDamage(int damage)
@@ -128,9 +186,9 @@ namespace Strikeforce
             rigidBody.useGravity = true;
         }
 
-        protected void ChangeAltitude(float amount)
+        public void ChangeAltitude(float amount)
         {
-            if (CurrentOrbit != Orbit.Air)
+            if (IsAirborne == false)
             {
                 return;
             }
