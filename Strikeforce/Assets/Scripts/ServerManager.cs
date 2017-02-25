@@ -8,6 +8,9 @@ namespace Strikeforce
         protected void Awake()
         {
             this.showGUI = false;
+
+            Initialize();
+            StartAsClient();
         }
 
         public override void OnReceivedBroadcast(string fromAddress, string data)

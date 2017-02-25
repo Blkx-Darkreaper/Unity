@@ -124,9 +124,8 @@ namespace Strikeforce
             foreach (string buttonName in buttonNames)
             {
                 GameObject buttonObject = Instantiate(ButtonPrefab) as GameObject;
-                buttonObject.transform.SetParent(buttonGroup.transform);
+                buttonObject.transform.SetParent(buttonGroup.transform, false);
                 buttonObject.GetComponentInChildren<Text>().text = buttonName;
-                //buttonObject.transform.rotation = buttonGroup.transform.rotation;
                 buttonObject.transform.localRotation = buttonGroup.transform.localRotation;
                 buttonObject.transform.localScale = buttonGroup.transform.localScale;
 

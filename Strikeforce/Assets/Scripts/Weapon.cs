@@ -52,6 +52,7 @@ namespace Strikeforce
 
         public void Fire(int angleSpread, int horizontalSpread, int groupingBonus)
         {
+            // Command function is called from the client, but invoked on the server
             bool active = Activate();
             if (active == false)
             {
@@ -69,8 +70,10 @@ namespace Strikeforce
             // create the bullet object from the bullet prefab
             GameObject bullet = Instantiate(projectilePrefab, firingPoint, Quaternion.identity) as GameObject;
 
+            Projectile projectile = bullet.GetComponent<Projectile>();
+
             // make the bullet move away in front of the player
-            bullet.GetComponentInChildren<Rigidbody>().velocity = Parent.transform.forward * 4;
+            bullet.GetComponentInChildren<Rigidbody>().velocity = Parent.transform.forward * projectile.MaxVelocity;
 
             // spawn the bullet on the clients
             NetworkServer.Spawn(bullet);

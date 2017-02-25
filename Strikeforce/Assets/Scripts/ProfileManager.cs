@@ -34,6 +34,15 @@ namespace Strikeforce
             CurrentProfile = null;
 
             string fullPath = string.Format("{0}/{1}", Application.dataPath, ProfileSaveFile);
+
+            // Check if file exists
+            if (System.IO.File.Exists(fullPath) == false)
+            {
+                // if no file is found create one
+                System.IO.File.WriteAllText(fullPath, string.Empty);
+                return;
+            }
+
             string json = GlobalAssets.ReadTextFile(fullPath);
             if (json.Equals(string.Empty) == true)
             {

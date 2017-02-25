@@ -30,11 +30,7 @@ namespace Strikeforce
             if (serverManager == null)
             {
                 Debug.Log(string.Format("ServerManager failed to load."));
-                return;
             }
-
-            serverManager.Initialize();
-            serverManager.StartAsClient();
         }
 
         protected override void Update()
@@ -83,7 +79,7 @@ namespace Strikeforce
         {
             menuManager.ToggleLoadingScreen(true);
 
-            serverManager.StartAsServer();
+            //serverManager.StartAsServer();
             networkManager.StartHost();
         }
 
