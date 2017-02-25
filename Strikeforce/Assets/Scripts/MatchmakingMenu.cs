@@ -10,6 +10,7 @@ namespace Strikeforce
         public const string HOST_GAME = "Host Game";
         public const string JOIN_GAME = "Join Game";
         protected NetworkManager networkManager;
+        protected ServerManager serverManager;
 
         protected override void Awake()
         {
@@ -19,11 +20,40 @@ namespace Strikeforce
 
             base.Awake();
 
-            networkManager = NetworkManager.singleton;
+            this.networkManager = NetworkManager.singleton;
             if (networkManager == null)
             {
                 Debug.Log(string.Format("NetworkManager failed to load."));
             }
+
+            this.serverManager = networkManager.gameObject.GetComponent<ServerManager>() as ServerManager;
+            if (serverManager == null)
+            {
+                Debug.Log(string.Format("ServerManager failed to load."));
+                return;
+            }
+
+            serverManager.Initialize();
+            serverManager.StartAsClient();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Button joinGameButton = allButtons[JOIN_GAME];
+            joinGameButton.enabled = false;
+
+            if (serverManager == null)
+            {
+                return;
+            }
+            if (serverManager.broadcastsReceived.Count == 0)
+            {
+                return;
+            }
+
+            joinGameButton.enabled = true;
         }
 
         protected override void SetButtonNames()
@@ -53,6 +83,7 @@ namespace Strikeforce
         {
             menuManager.ToggleLoadingScreen(true);
 
+            serverManager.StartAsServer();
             networkManager.StartHost();
         }
 

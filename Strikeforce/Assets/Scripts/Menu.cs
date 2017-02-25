@@ -58,7 +58,7 @@ namespace Strikeforce
             //account = transform.root.GetComponent<PlayerAccount>();
         }
 
-        protected void Update()
+        protected virtual void Update()
         {
             if (IsOpen == false)
             {
