@@ -13,6 +13,8 @@ namespace Strikeforce
         protected float currentConstructionProgress = 0f;
         public bool IsConstructionComplete { get; protected set; }
         protected const string CONSTRUCTION_MESSAGE = "Building...";
+        public bool IsRepairing = false;
+        public int RepairCost;
         public bool IsDamaged { get; protected set; }
         protected Vector3 spawnPoint;
         protected Vector3 rallyPoint;
@@ -47,7 +49,7 @@ namespace Strikeforce
         protected override void Update()
         {
             base.Update();
-            BuildVehicles();
+            Build();
         }
 
         protected override void OnGUI()
@@ -110,7 +112,7 @@ namespace Strikeforce
             buildQueue.Enqueue(unitName);
         }
 
-        protected void BuildVehicles()
+        protected void Build()
         {
             if (buildQueue.Count <= 0)
             {
@@ -313,6 +315,22 @@ namespace Strikeforce
 
         public void Repair(int amount)
         {
+            if (IsRepairing == false)
+            {
+                return;
+            }
+
+            // Check if there are sufficient funds
+            int fundsRequired = amount / 2 * RepairCost;
+            bool sufficientFunds = Owner.CurrentInventory.HasSufficientResources(ResourceType.Money, fundsRequired);
+            if (sufficientFunds == false)
+            {
+                IsRepairing = false;
+                return;
+            }
+
+            Owner.CurrentInventory.UpdateResource(ResourceType.Money, -fundsRequired);
+
             CurrentHitPoints += amount;
 
             SetIsDamaged();
@@ -323,6 +341,13 @@ namespace Strikeforce
             }
 
             CurrentHitPoints = MaxHitPoints;
+        }
+
+        public override void TakeDamage(int damage)
+        {
+            base.TakeDamage(damage);
+
+            SetIsDamaged();
         }
 
         public void SetIsDamaged()

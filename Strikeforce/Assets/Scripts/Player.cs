@@ -121,7 +121,7 @@ namespace Strikeforce
             Vector3 cameraPosition = Vector3.zero;
             if (isInBuildMode == true)
             {
-                Cursor.transform.Translate(x, 0, z);
+                Cursor.Move(x, z);
             }
             else
             {
