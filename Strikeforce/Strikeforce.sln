@@ -1,7 +1,7 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{A8C4C50B-A009-0634-D52E-8F996EAD5F11}") = "Strikeforce", "Assembly-CSharp.csproj", "{E8058335-4212-BB53-1193-1A37BC73A221}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strikeforce", "Strikeforce.csproj", "{243C8E98-393D-0802-BAAE-1356271FFB8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,31 +9,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E8058335-4212-BB53-1193-1A37BC73A221}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8058335-4212-BB53-1193-1A37BC73A221}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8058335-4212-BB53-1193-1A37BC73A221}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8058335-4212-BB53-1193-1A37BC73A221}.Release|Any CPU.Build.0 = Release|Any CPU
+		{243C8E98-393D-0802-BAAE-1356271FFB8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{243C8E98-393D-0802-BAAE-1356271FFB8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{243C8E98-393D-0802-BAAE-1356271FFB8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{243C8E98-393D-0802-BAAE-1356271FFB8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-																																																																																																																																																																																																																																																																																											GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
-		Policies = $0
-		$0.TextStylePolicy = $3
-		$1.inheritsSet = null
-		$1.scope = text/x-csharp
-		$0.CSharpFormattingPolicy = $2
-		$2.inheritsSet = Mono
-		$2.inheritsScope = text/x-csharp
-		$2.scope = text/x-csharp
-		$3.FileWidth = 120
-		$3.TabWidth = 4
-		$3.IndentWidth = 4
-		$3.EolMarker = Unix
-		$3.inheritsSet = Mono
-		$3.inheritsScope = text/plain
-		$3.scope = text/plain
-	EndGlobalSection
-
 EndGlobal

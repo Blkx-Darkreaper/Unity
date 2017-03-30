@@ -77,11 +77,11 @@ namespace Strikeforce
             Vector3 raiderPosition = raiderObject.transform.position;
 
             CurrentRaider.SetLayout(new Vector3[] {
-            	new Vector3(-10, 0, 1),
-            	new Vector3(-5, 0, 1),
-            	new Vector3(0, 0, 1),
-            	new Vector3(5, 0, 1),
-            	new Vector3(10, 0, 1)},
+            	new Vector3(-2, 0, 0),
+            	new Vector3(-1, 0, 0),
+            	new Vector3(0, 0, 0),
+            	new Vector3(1, 0, 0),
+            	new Vector3(2, 0, 0)},
                 new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
                 new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
                 new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center),
@@ -99,7 +99,7 @@ namespace Strikeforce
                 CurrentRaider.ReadyWeapons();
             }
 
-            NetworkServer.Spawn(CurrentRaider.gameObject);
+            NetworkServer.SpawnWithClientAuthority(CurrentRaider.gameObject, gameObject);
 
             // Set camera overhead
             Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 10, raiderPosition.z);
@@ -109,13 +109,12 @@ namespace Strikeforce
 
         public void LeftStick(float x, float y, float z)
         {
-            CmdMovePlayer(x, y, z);
+            MovePlayer(x, y, z);
         }
 
         public void RightStick(float x, float y, float z) { }
 
-        [Command]
-        protected void CmdMovePlayer(float x, float y, float z)
+        protected void MovePlayer(float x, float y, float z)
         {
             isInBuildMode = false;    //testing
             Vector3 cameraPosition = Vector3.zero;
@@ -125,6 +124,9 @@ namespace Strikeforce
             }
             else
             {
+                x *= 0.3f;
+                z *= 0.3f;
+
                 CurrentRaider.Move(x, z);
                 cameraPosition = CurrentRaider.transform.position;
             }
@@ -172,20 +174,23 @@ namespace Strikeforce
                         KeyEvent.Type eventType = keyEvent.EventType;
                         if (eventType == KeyEvent.Type.Released)
                         {
-                            CmdSetPrimaryFiring(false);
+                            SetPrimaryFiring(false);
                             break;
                         }
 
-                        CmdSetPrimaryFiring(true);
+                        SetPrimaryFiring(true);
                     }
                     break;
             }
         }
 
-        [Command]
-        protected void CmdSetPrimaryFiring(bool isFiring)
+        protected void SetPrimaryFiring(bool isFiring)
         {
-            // Command function is called from the client, but invoked on the server
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
             Raider raider = CurrentRaider;
             if (raider == null)
             {
