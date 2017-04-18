@@ -2,10 +2,11 @@
 using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace Strikeforce
 {
-    public enum ActionKey { Action1, Action2, Special1, Special2, LeftTrigger, RightTrigger, Menu, Back, LeftStick, RightStick }
+    public enum ActionKey { Action1, Action2, Special1, Special2, LeftTrigger, RightTrigger, DUp, DDown, DLeft, DRight, Menu, Back, LeftStick, RightStick }
 
     public struct MouseControls
     {
@@ -26,8 +27,9 @@ namespace Strikeforce
         protected KeyMap gamepadBinds;
         protected KeyMap keyboardBinds;
         public float KeyHoldDuration = 1f;
-        protected Dictionary<ActionKey, float> allPressedKeys { get; set; }
-        protected Queue<KeyEvent> allKeyEvents { get; set; }
+        public float KeyDoubleTapDelay = 0.5f;
+        protected Dictionary<ActionKey, KeyEvent> incompleteKeyEvents { get; set; }
+        protected Queue<KeyEvent> completeKeyEvents { get; set; }
         protected bool rightTriggerDown = false;
         protected bool leftTriggerDown = false;
         public const string TRIGGER = "Trigger";
@@ -41,6 +43,10 @@ namespace Strikeforce
             public KeyCode RightTrigger;
             public KeyCode Menu;
             public KeyCode Back;
+            public KeyCode DUp;
+            public KeyCode DDown;
+            public KeyCode DLeft;
+            public KeyCode DRight;
             public AxisBind LeftStick;
             public AxisBind RightStick;
         }
@@ -59,8 +65,8 @@ namespace Strikeforce
 
         protected void Awake()
         {
-            allPressedKeys = new Dictionary<ActionKey, float>();
-            allKeyEvents = new Queue<KeyEvent>();
+            incompleteKeyEvents = new SortedList<float, KeyEvent>();
+            completeKeyEvents = new Queue<KeyEvent>();
 
             InitKeyBinds();
         }
@@ -103,6 +109,10 @@ namespace Strikeforce
             gamepadBinds.Special2 = KeyCode.Joystick1Button3;
             gamepadBinds.LeftTrigger = KeyCode.Joystick1Button9;
             gamepadBinds.RightTrigger = KeyCode.Joystick1Button10;
+            gamepadBinds.DUp = KeyCode.
+            gamepadBinds.DDown = KeyCode.
+            gamepadBinds.DLeft = KeyCode.
+            gamepadBinds.DRight = KeyCode.
             gamepadBinds.Menu = KeyCode.Joystick1Button7;
             gamepadBinds.Back = KeyCode.Joystick1Button6;
 
@@ -316,7 +326,7 @@ namespace Strikeforce
 
                 leftTriggerDown = false;
                 keyEvent = GetKeyEvent(ActionKey.LeftTrigger, false);
-                allKeyEvents.Enqueue(keyEvent);
+                completeKeyEvents.Enqueue(keyEvent);
                 return;
             }
 
@@ -327,7 +337,7 @@ namespace Strikeforce
 
             leftTriggerDown = true;
             keyEvent = GetKeyEvent(ActionKey.LeftTrigger, true);
-            allKeyEvents.Enqueue(keyEvent);
+            completeKeyEvents.Enqueue(keyEvent);
         }
 
         protected void RightTrigger()
@@ -345,7 +355,7 @@ namespace Strikeforce
 
                 rightTriggerDown = false;
                 keyEvent = GetKeyEvent(ActionKey.RightTrigger, false);
-                allKeyEvents.Enqueue(keyEvent);
+                completeKeyEvents.Enqueue(keyEvent);
                 return;
             }
 
@@ -356,7 +366,7 @@ namespace Strikeforce
 
             rightTriggerDown = true;
             keyEvent = GetKeyEvent(ActionKey.RightTrigger, true);
-            allKeyEvents.Enqueue(keyEvent);
+            completeKeyEvents.Enqueue(keyEvent);
         }
 
         protected void CheckForPressedKeys()
@@ -375,20 +385,17 @@ namespace Strikeforce
 
             if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
             {
-                keyEvent = GetKeyEvent(ActionKey.Action1, true);
-                allKeyEvents.Enqueue(keyEvent);
+                AddKeyEvent(ActionKey.Action1);
             }
 
             if (Input.GetKeyDown(keyboardBinds.RightTrigger))
             {
-                keyEvent = GetKeyEvent(ActionKey.RightTrigger, true);
-                allKeyEvents.Enqueue(keyEvent);
+                AddKeyEvent(ActionKey.RightTrigger);
             }
 
             if (Input.GetKeyDown(gamepadBinds.Menu) || Input.GetKeyDown(keyboardBinds.Menu))
             {
-                keyEvent = GetKeyEvent(ActionKey.Menu, true);
-                allKeyEvents.Enqueue(keyEvent);
+                AddKeyEvent(ActionKey.Menu);
             }
         }
 
@@ -399,13 +406,13 @@ namespace Strikeforce
             if (Input.GetKeyUp(gamepadBinds.Action1) || Input.GetKeyUp(keyboardBinds.Action1))
             {
                 keyEvent = GetKeyEvent(ActionKey.Action1, false);
-                allKeyEvents.Enqueue(keyEvent);
+                completeKeyEvents.Enqueue(keyEvent);
             }
 
             if (Input.GetKeyUp(keyboardBinds.RightTrigger))
             {
                 keyEvent = GetKeyEvent(ActionKey.RightTrigger, false);
-                allKeyEvents.Enqueue(keyEvent);
+                completeKeyEvents.Enqueue(keyEvent);
             }
 
             if (Input.GetKeyUp(gamepadBinds.Menu) || Input.GetKeyUp(keyboardBinds.Menu))
@@ -415,46 +422,60 @@ namespace Strikeforce
             }
         }
 
+        // KeyDown
+        protected void AddKeyEvent(ActionKey key)
+        {
+            KeyEvent keyEvent = new KeyEvent(key, KeyEvent.Type.Pressed, Time.time);
+            incompleteKeyEvents.Add(key, keyEvent);
+        }
+
+        // KeyUp
         protected KeyEvent GetKeyEvent(ActionKey key, bool keyDownEvent)
         {
-            if (allPressedKeys.ContainsKey(key) == false)
-            {
-                allPressedKeys.Add(key, Time.time);
-            }
-
             KeyEvent keyEvent;
 
-            if (keyDownEvent == true)
+            if(incompleteKeyEvents.ContainsKey(key) == false)
             {
-                // On key down
-                keyEvent = new KeyEvent(key, KeyEvent.Type.Pressed);
-                return keyEvent;
+                keyEvent = new KeyEvent(key, KeyEvent.Type.Pressed, Time.time);
+            } else
+            {
+                keyEvent = incompleteKeyEvents[key];
             }
 
-            // On key up
-            float downTime = allPressedKeys[key];
-            allPressedKeys.Remove(key);
-
-            float duration = Time.time - downTime;
-            if (duration < KeyHoldDuration)
-            {
-                keyEvent = new KeyEvent(key, KeyEvent.Type.Released);
-            }
-            else
-            {
-                keyEvent = new KeyEvent(key, duration);
-            }
+            keyEvent.Release(Time.time);
 
             return keyEvent;
         }
 
         protected void HandleKeyEvents()
         {
-            while (allKeyEvents.Count > 0)
+            while (completeKeyEvents.Count > 0)
             {
-                KeyEvent keyEvent = allKeyEvents.Dequeue();
+                KeyEvent keyEvent = completeKeyEvents.Dequeue();
+
+                CheckForDoubleTap(ref keyEvent);
+
                 PlayerHandleKeyEvent(keyEvent);
             }
+        }
+
+        protected void CheckForDoubleTap(ref KeyEvent current)
+        {
+            KeyEvent next = completeKeyEvents.Peek();
+
+            if(next.Key != current.Key)
+            {
+                return;
+            }
+
+            float delay = next.PressedTime - current.PressedTime;
+            if(delay > KeyDoubleTapDelay)
+            {
+                return;
+            }
+
+            current.DoubleTap();
+            completeKeyEvents.Dequeue();
         }
 
         protected void PlayerHandleKeyEvent(KeyEvent keyEvent)

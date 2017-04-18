@@ -5,25 +5,44 @@ namespace Strikeforce
     {
         public ActionKey Key { get; protected set; }
         public Type EventType { get; protected set; }
-        public float HoldDuration { get; protected set; }
-        public enum Type { Pressed, Held, Released }
+        public float PressedTime { get; protected set; }
+        public float? ReleasedTime { get; set; }
+        public float HoldDuration
+        {
+            get
+            {
+                if (ReleasedTime == null)
+                {
+                    return 0;
+                }
 
-        public KeyEvent(ActionKey key, Type type)
+                float duration = (float)ReleasedTime - PressedTime;
+                return duration;
+            }
+        }
+        public enum Type { Pressed, DoubleTapped, Held }
+
+        public KeyEvent(ActionKey key, Type type, float pressedTime)
         {
             this.Key = key;
             this.EventType = type;
-        }
-
-        public KeyEvent(ActionKey key, float duration)
-            : this(key, Type.Released)
-        {
-            this.HoldDuration = duration;
+            this.PressedTime = pressedTime;
         }
 
         public override string ToString()
         {
             string output = string.Format("{0}", Key.ToString());
             return output;
+        }
+
+        public void Release(float releasedTime)
+        {
+            this.ReleasedTime = releasedTime;
+        }
+
+        public void DoubleTap()
+        {
+            this.EventType = Type.DoubleTapped;
         }
     }
 }
