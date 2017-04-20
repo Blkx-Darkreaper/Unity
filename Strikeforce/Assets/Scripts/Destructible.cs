@@ -115,6 +115,18 @@ namespace Strikeforce
             DestroyEntity();
         }
 
+        protected void Explode()
+        {
+            string explosionName = "";
+            GameObject explosion = GlobalAssets.GetMiscPrefab(explosionName);
+            if(explosion == null)
+            {
+                return;
+            }
+
+            Instantiate(explosion, transform.position, transform.rotation);
+        }
+
         protected override void DestroyEntity()
         {
             GameManager.Singleton.DestroyEntity(this);
