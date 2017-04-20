@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Strikeforce
 {
-    public class BuildCursor : Entity
+    public class GridCursor : Entity
     {
         protected virtual void Awake()
         {
@@ -20,6 +20,14 @@ namespace Strikeforce
             }
 
             Vector3 currentPosition = transform.position;
+
+            int signX = Mathf.Sign(x);
+            //x = signX * Level.TileLength;
+            x = signX;
+
+            int signZ = Mathf.Sign(z);
+            //z = signZ * Level.TileLength;
+            z = signZ;
 
             CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
 
