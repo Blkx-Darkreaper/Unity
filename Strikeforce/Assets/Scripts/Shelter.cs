@@ -14,7 +14,7 @@ namespace Strikeforce
         protected float scrambleProgress = 0f;
         public float ScrambleDelay = 1f;
         protected Queue<Vehicle> storage { get; set; }
-        public int StorageCapacity = 0;
+        public int MaxStorageCapacity = 0;
         public bool CanStoreAircraft = false;
         protected float fuelRemaining;
         public int MaxFuelCapacity = 0;
@@ -23,7 +23,7 @@ namespace Strikeforce
         {
             base.Awake();
 
-            this.storage = new Queue<Vehicle>(StorageCapacity);
+            this.storage = new Queue<Vehicle>(MaxStorageCapacity);
         }
 
         protected override void Update()
@@ -135,12 +135,26 @@ namespace Strikeforce
 
         protected void DeployVehicle(Vehicle vehicleToDeploy)
         {
+            // Set proper direction
+            // Assign rally point as waypoint
+            // enable vehicle renderer
+            // When vehicle reaches waypoint enable collision between this shelter and vehicle
+
             throw new NotImplementedException();
         }
 
         protected void StoreVehicle(Vehicle vehicleToStore)
         {
-            throw new NotImplementedException();
+            if(storage.Count == MaxStorageCapacity)
+            {
+                return;
+            }
+
+            // Assign waypoint
+            // disable collision between this shelter and vehicle
+            // When vehicle reaches waypoint disable vehicle renderer
+
+            storage.Enqueue(vehicleToStore);
         }
     }
 }
