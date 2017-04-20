@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Networking;
 using System.Drawing;
+using System;
 
 namespace Strikeforce
 {
@@ -45,6 +46,24 @@ namespace Strikeforce
             CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
 
             transform.Translate(x, 0, z);
+        }
+
+        public virtual float GetFuelPercentage()
+        {
+            if(MaxFuelCapacity == 0)
+            {
+                return 1f;
+            }
+
+            float fuelPercentage = fuelRemaining / (float)MaxFuelCapacity;
+            return fuelPercentage;
+        }
+
+        public virtual void Refuel(float amount)
+        {
+            fuelRemaining += amount;
+
+            fuelRemaining = Mathf.Clamp(fuelRemaining, 0, MaxFuelCapacity);
         }
     }
 }
