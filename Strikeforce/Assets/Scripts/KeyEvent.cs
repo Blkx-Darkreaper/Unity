@@ -40,7 +40,7 @@ namespace Strikeforce
             this.ReleasedTime = releasedTime;
         }
 
-        public void DoubleTap()
+        public void DoubleTap(float secondPressedTime, float? secondReleasedTime)
         {
             this.EventType = Type.DoubleTapped;
         }

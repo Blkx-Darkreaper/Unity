@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace Strikeforce
 {
@@ -23,14 +24,18 @@ namespace Strikeforce
         [HideInInspector]
         protected bool isInBuildMode = true;
         [HideInInspector]
-        public BuildCursor Cursor;
+        public GridCursor BuildCursor;
+        public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
         public bool IsSettingConstructionPoint;
         public Material NotAllowedMaterial, AllowedMaterial;
         public Color Colour;
+        protected Color savedMaterialColour { get; set; }
         protected const string UNIT = "Unit";
         protected const string STRUCTURE = "Structure";
+        protected LinkedList<Vehicle> allUnits { get; set; }
+        protected LinkedList<Structure> allStructures { get; set; }
 
         protected override void Awake()
         {
@@ -112,7 +117,14 @@ namespace Strikeforce
             MovePlayer(x, y, z);
         }
 
-        public void RightStick(float x, float y, float z) { }
+        public void RightStick(float x, float y, float z) {
+            if(isInBuildMode == false)
+            {
+                return;
+            }
+
+            BuyCursor.Move(x, z);
+        }
 
         protected void MovePlayer(float x, float y, float z)
         {
@@ -120,7 +132,7 @@ namespace Strikeforce
             Vector3 cameraPosition = Vector3.zero;
             if (isInBuildMode == true)
             {
-                Cursor.Move(x, z);
+                BuildCursor.Move(x, z);
             }
             else
             {
@@ -159,9 +171,42 @@ namespace Strikeforce
                 case ActionKey.Action1:
                     if (isInBuildMode == true)
                     {
+                        Select();
                     }
-                    else
+                    break;
+
+                case ActionKey.Action2:
+                    if(isInBuildMode == true)
                     {
+                        ShowInfo();
+                    }
+                    break;
+
+                case ActionKey.Special1:
+                    if(isInBuildMode == true)
+                    {
+                        ToggleRepair(keyEvent.EventType, keyEvent.HoldDuration);
+                    }
+                    break;
+
+                case ActionKey.Special2:
+                    if(isInBuildMode == true)
+                    {
+                        Purchase();
+                    }
+                    break;
+
+                case ActionKey.DUp:
+                    if(isInBuildMode == true)
+                    {
+                        PageUp();
+                    }
+                    break;
+
+                case ActionKey.DDown:
+                    if (isInBuildMode == true)
+                    {
+                        PageDown();
                     }
                     break;
 
@@ -182,6 +227,207 @@ namespace Strikeforce
                     }
                     break;
             }
+        }
+
+        protected GameObject GetHighlightedByBuildCursor()
+        {
+            return GetHighlighted(BuildCursor);
+        }
+
+        protected GameObject GetHighlightedByBuyCursor()
+        {
+            return GetHighlighted(BuyCursor);
+        }
+
+        protected GameObject GetHighlighted(GridCursor cursor)
+        {
+            Ray ray = camera.main.ScreenPointToRay(cursor.transform);
+            RaycastHit hit;
+
+            if(Physics.Raycast(ray.origin, ray.direction, hit, 100) == false)
+            {
+                return null;
+            }
+
+            if(hit.collider.tag != "Object")
+            {
+                return null;
+            }
+
+            GameObject gameObject = hit.collider.gameObject;
+            return gameObject;
+        }
+
+        protected List<GameObject> GetOnScreen()
+        {
+
+        }
+
+        protected List<GameObject> GetAllOwned()
+        {
+
+        }
+
+        public void ActionFailed()
+        {
+
+        }
+
+        protected void SetSelected(Selectable selectable)
+        {
+            if (SelectedEntity != null)
+            {
+                SelectedEntity.SetSelection(false);
+                SelectedEntity.GetComponentInChildren<MeshRenderer>().material.color = savedMaterialColour;
+            }
+
+            this.SelectedEntity = selectable;
+            if(selectable == null)
+            {
+                return;
+            }
+
+            selectable.SetSelection(true);
+            Color selectedColour = selectable.GetComponentInChildren<MeshRenderer>().material.color;
+            this.savedMaterialColour = selectedColour;
+
+            selectedColour = Color.red;
+        }
+
+        protected void Select()
+        {
+            GameObject selected = GetHighlightedByBuildCursor();
+            if (selected == null)
+            {
+                return;
+            }
+
+            Selectable selectable = selected.getComponent<Selectable>();
+            if (selectable == null)
+            {
+                return;
+            }
+
+            SetSelected(selectable);
+        }
+
+        protected void ShowInfo()
+        {
+
+        }
+
+        protected void ToggleRepair(KeyEvent.Type eventType, float holdDuration)
+        {
+            switch (eventType)
+            {
+                case KeyEvent.Type.Pressed:
+                    ToggleRepairHighlighted();
+                    break;
+
+                case KeyEvent.Type.DoubleTapped:
+                    ToggleRepairOnScreen();
+                    break;
+
+                case KeyEvent.Type.Held:
+                    ToggleRepairAll();
+                    break;
+            }
+        }
+
+        protected void ToggleRepairing(GameObject gameObject)
+        {
+            if (gameObject == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            Structure structure = gameObject.getComponent<Structure>();
+            if (structure == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            structure.IsRepairing = !structure.IsRepairing;
+        }
+
+        protected void ToggleRepairHighlighted()
+        {
+            GameObject highlighted = GetHighlightedByBuildCursor();
+            ToggleRepairing(highlighted);
+        }
+
+        protected void ToggleRepairOnScreen()
+        {
+            List<GameObject> onScreen = GetOnScreen();
+            foreach(GameObject gameObject in onScreen)
+            {
+                ToggleRepairing(gameObject);
+            }
+        }
+
+        protected void ToggleRepairAll()
+        {
+            List<GameObject> owned = GetAllOwned();
+            foreach (GameObject gameObject in owned)
+            {
+                ToggleRepairing(gameObject);
+            }
+        }
+
+        protected void Purchase()
+        {
+            GameObject gameObject = GetHighlightedByBuyCursor();
+            if(gameObject == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            Structure structure = gameObject.GetComponent<Structure>();
+            if(structure == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            int cost = structure.Cost;
+
+            bool hasSufficientFunds = CurrentInventory.HasSufficientResources(ResourceType.Money, cost);
+            if(hasSufficientFunds == false)
+            {
+                ActionFailed();
+                return;
+            }
+
+            Vector3 spawnPoint = BuildCursor.transform;
+            GameObject gameObjectToBuild = Instantiate(gameObject, spawnPoint, Quaternion.Identity) as GameObject;
+            if(gameObjectToBuild == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            Selectable selectable = gameObjectToBuild.GetComponent<Selectable>();
+            if(selectable == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            SetSelected(selectable);
+            IsSettingConstructionPoint = true;
+        }
+
+        protected void PageUp()
+        {
+
+        }
+
+        protected void PageDown()
+        {
+
         }
 
         protected void SetPrimaryFiring(bool isFiring)

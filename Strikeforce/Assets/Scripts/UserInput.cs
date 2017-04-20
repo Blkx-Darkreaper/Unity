@@ -474,7 +474,7 @@ namespace Strikeforce
                 return;
             }
 
-            current.DoubleTap();
+            current.DoubleTap(next.PressedTime, next.ReleasedTime);
             completeKeyEvents.Dequeue();
         }
 
