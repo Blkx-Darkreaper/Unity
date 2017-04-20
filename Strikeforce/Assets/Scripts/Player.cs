@@ -28,7 +28,8 @@ namespace Strikeforce
         public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
-        public bool IsSettingConstructionPoint;
+        public bool IsSettingConstructionPoint = false;
+        public bool IsSellingStructure = false;
         public Material NotAllowedMaterial, AllowedMaterial;
         public Color Colour;
         protected Color savedMaterialColour { get; set; }
@@ -171,42 +172,42 @@ namespace Strikeforce
                 case ActionKey.Action1:
                     if (isInBuildMode == true)
                     {
-                        Select();
+                        Action1();
                     }
                     break;
 
                 case ActionKey.Action2:
                     if(isInBuildMode == true)
                     {
-                        ShowInfo();
+                        Action2();
                     }
                     break;
 
                 case ActionKey.Special1:
                     if(isInBuildMode == true)
                     {
-                        ToggleRepair(keyEvent.EventType, keyEvent.HoldDuration);
+                        Special1(keyEvent);
                     }
                     break;
 
                 case ActionKey.Special2:
                     if(isInBuildMode == true)
                     {
-                        Purchase();
+                        Special2();
                     }
                     break;
 
                 case ActionKey.DUp:
                     if(isInBuildMode == true)
                     {
-                        PageUp();
+                        DpadUp();
                     }
                     break;
 
                 case ActionKey.DDown:
                     if (isInBuildMode == true)
                     {
-                        PageDown();
+                        DpadDown();
                     }
                     break;
 
@@ -229,6 +230,96 @@ namespace Strikeforce
             }
         }
 
+        protected void Action1()
+        {
+            if(IsSellingStructure == true)
+            {
+                ConfirmSale();
+                return;
+            }
+
+            if(SelectedEntity != null)
+            {
+                ShowOptions();
+                return;
+            }
+
+            Select();
+        }
+
+        protected void Action2()
+        {
+            if(IsSellingStructure == true)
+            {
+                CancelSale();
+                return;
+            }
+
+            if (SelectedEntity != null)
+            {
+                SellStructure();
+                return;
+            }
+
+            ShowInfo();
+        }
+
+        protected void Special1(KeyEvent keyEvent)
+        {
+            if (SelectedEntity == null)
+            {
+                ToggleRepair(keyEvent.EventType, keyEvent.HoldDuration);
+                return;
+            }
+
+            if (IsSettingConstructionPoint == true)
+            {
+                RotateStructure();
+                return;
+            }
+
+            Scramble();
+        }
+
+        protected void Special2()
+        {
+            if (SelectedEntity == null)
+            {
+                BuyStructure();
+                return;
+            }
+
+            if (IsSettingConstructionPoint == true)
+            {
+                ToggleContextOption();
+                return;
+            }
+
+            Deselect();
+        }
+
+        protected void DpadUp()
+        {
+            if(SelectedEntity != null)
+            {
+                SetAlertStatus();
+                return;
+            }
+
+            PageUp();
+        }
+
+        protected void DpadDown()
+        {
+            if(SelectedEntity != null)
+            {
+                SetPatrolStatus();
+                return;
+            }
+
+            PageDown();
+        }
+
         protected GameObject GetHighlightedByBuildCursor()
         {
             return GetHighlighted(BuildCursor);
@@ -249,7 +340,7 @@ namespace Strikeforce
                 return null;
             }
 
-            if(hit.collider.tag != "Object")
+            if(hit.collider.tag != Tags.STRUCTURE)
             {
                 return null;
             }
@@ -311,9 +402,71 @@ namespace Strikeforce
             SetSelected(selectable);
         }
 
+        protected void ShowOptions()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected void ConfirmSale()
+        {
+            Structure structure = SelectedEntity.GetComponent<Structure>();
+            if (structure == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            structure.Sell();
+        }
+
+        protected void ConfirmBuy()
+        {
+            Structure structure = SelectedEntity.GetComponent<Structure>();
+            if (structure == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            IsSettingConstructionPoint = false;
+
+            GameManager.Singleton.RegisterEntity(structure);
+            structure.Owner = this;
+            structure.StartConstruction();
+        }
+
         protected void ShowInfo()
         {
 
+        }
+
+        protected void SellStructure()
+        {
+            Structure structure = SelectedEntity.GetComponent<Structure>();
+            if(structure == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            IsSellingStructure = true;
+        }
+
+        protected void CancelSale()
+        {
+            IsSellingStructure = false;
+        }
+
+        protected void CancelBuy()
+        {
+            Structure structure = SelectedEntity.GetComponent<Structure>();
+            int cost = structure.Cost;
+
+            IsSettingConstructionPoint = false;
+            CurrentInventory.UpdateResource(ResourceType.Money, cost);
+            Deselect();
+
+            structure.Destroy();
         }
 
         protected void ToggleRepair(KeyEvent.Type eventType, float holdDuration)
@@ -376,7 +529,30 @@ namespace Strikeforce
             }
         }
 
-        protected void Purchase()
+        protected void Scramble()
+        {
+            Shelter shelter = SelectedEntity.GetComponent<Shelter>();
+            if(shelter == null)
+            {
+                return;
+            }
+
+            shelter.ToggleScrambling();
+        }
+
+        protected void RotateStructure()
+        {
+            Structure structure = SelectedEntity.GetComponent<Structure>();
+            if(structure == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            structure.transform.Rotate(0, 90, 0);
+        }
+
+        protected void BuyStructure()
         {
             GameObject gameObject = GetHighlightedByBuyCursor();
             if(gameObject == null)
@@ -397,6 +573,7 @@ namespace Strikeforce
             bool hasSufficientFunds = CurrentInventory.HasSufficientResources(ResourceType.Money, cost);
             if(hasSufficientFunds == false)
             {
+                // Insufficient funds
                 ActionFailed();
                 return;
             }
@@ -418,16 +595,59 @@ namespace Strikeforce
 
             SetSelected(selectable);
             IsSettingConstructionPoint = true;
+
+            CurrentInventory.UpdateResource(ResourceType.Money, -cost);
+        }
+
+        protected void Deselect()
+        {
+            SetSelected(null);
+        }
+
+        protected void ToggleContextOption()
+        {
+            Structure structure = SelectedEntity.GetComponent<Structure>();
+            if(structure == null)
+            {
+                return;
+            }
+
+            structure.ToggleContextOption();
+        }
+
+        protected void SetAlertStatus()
+        {
+            Shelter shelter = SelectedEntity.GetComponent<Shelter>();
+            if (shelter == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            shelter.SetPatrolStatus(false);
         }
 
         protected void PageUp()
         {
+            throw new NotImplementedException();
+            mainCamera.transform.Translate(0, 0, screenHeight);
+        }
 
+        protected void SetPatrolStatus()
+        {
+            Shelter shelter = SelectedEntity.GetComponent<Shelter>();
+            if (shelter == null)
+            {
+                ActionFailed();
+                return;
+            }
+
+            shelter.SetPatrolStatus(true);
         }
 
         protected void PageDown()
         {
-
+            throw new NotImplementedException();
         }
 
         protected void SetPrimaryFiring(bool isFiring)
@@ -515,7 +735,7 @@ namespace Strikeforce
         //	constructionSite = null;
         //}
 
-        public void SpawnUnit(string unitName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation)
+        public void SpawnUnit(string vehicleName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation)
         {
             GameObject allUnits = transform.Find(UNIT).gameObject;
             if (allUnits == null)
@@ -523,9 +743,9 @@ namespace Strikeforce
                 return;
             }
             //Units allUnits = GetComponentInChildren<Units>();
-            GameObject unitToSpawn = (GameObject)Instantiate(GlobalAssets.GetVehiclePrefab(unitName), spawnPoint, startingOrientation);
-            unitToSpawn.transform.parent = allUnits.transform;
-            Debug.Log(string.Format("Spawned {0} for player {1}", unitName, PlayerId));
+            GameObject vehicleToSpawn = (GameObject)Instantiate(GlobalAssets.GetVehiclePrefab(vehicleName), spawnPoint, startingOrientation);
+            vehicleToSpawn.transform.parent = allUnits.transform;
+            Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId));
 
             if (rallyPoint == GlobalAssets.InvalidPoint)
             {
@@ -536,13 +756,13 @@ namespace Strikeforce
                 return;
             }
 
-            Selectable controller = unitToSpawn.GetComponent<Selectable>();
-            if (controller == null)
+            Selectable selectable = vehicleToSpawn.GetComponent<Selectable>();
+            if (selectable == null)
             {
                 return;
             }
 
-            controller.SetWaypoint(rallyPoint);
+            selectable.SetWaypoint(rallyPoint);
         }
 
         public void SpawnUnit(string vehicleName, Vector3 spawnPoint, Vector3 rallyPoint, Quaternion startingOrientation, Structure spawner)
@@ -553,8 +773,8 @@ namespace Strikeforce
                 return;
             }
 
-            GameObject unitToSpawn = (GameObject)Instantiate(GlobalAssets.GetVehiclePrefab(vehicleName), spawnPoint, startingOrientation);
-            unitToSpawn.transform.parent = allUnits.transform;
+            GameObject vehicleToSpawn = (GameObject)Instantiate(GlobalAssets.GetVehiclePrefab(vehicleName), spawnPoint, startingOrientation);
+            vehicleToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId.ToString()));
 
             if (rallyPoint == GlobalAssets.InvalidPoint)
@@ -562,20 +782,20 @@ namespace Strikeforce
                 return;
             }
 
-            Selectable controller = unitToSpawn.GetComponent<Selectable>();
-            if (controller == null)
+            Selectable selectable = vehicleToSpawn.GetComponent<Selectable>();
+            if (selectable == null)
             {
                 return;
             }
 
-            controller.SetSpawner(spawner);
+            selectable.SetSpawner(spawner);
 
             if (spawnPoint == rallyPoint)
             {
                 return;
             }
 
-            controller.SetWaypoint(rallyPoint);
+            selectable.SetWaypoint(rallyPoint);
         }
 
         //public void SpawnStructure(string structureName, Vector3 buildPoint, Selectable builder, Rect playingArea)
