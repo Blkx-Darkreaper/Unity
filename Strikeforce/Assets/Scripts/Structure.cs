@@ -9,6 +9,7 @@ namespace Strikeforce
     {
         protected Queue<string> buildQueue;
         protected float currentBuildProgress = 0f;
+        protected bool contextOptionSelected = false;
         public float ConstructionTime;
         protected float currentConstructionProgress = 0f;
         public bool IsConstructionComplete { get; protected set; }
@@ -288,7 +289,12 @@ namespace Strikeforce
                 SetSelection(false);
             }
 
-            Destroy(this.gameObject);
+            GameManager.Singleton.RemoveEntity(this);
+        }
+
+        public virtual void ToggleContextOption()
+        {
+            contextOptionSelected = !contextOptionSelected;
         }
 
         public void StartConstruction()
