@@ -32,8 +32,6 @@ namespace Strikeforce
 
             float timeElapsed = Time.time;
 
-            RefuelVehicles(timeElapsed);
-
             if (isScrambling == true)
             {
                 Scramble(timeElapsed);
@@ -42,6 +40,8 @@ namespace Strikeforce
             {
                 Patrol(timeElapsed);
             }
+
+            RefuelVehicles(timeElapsed);
         }
 
         public void ToggleScrambling()
@@ -104,7 +104,7 @@ namespace Strikeforce
 
             Vehicle vehicle = storage.Dequeue();
             vehicle.SetOrder(Order.Attack);
-            DeployVehicle(vehicle);
+            MobilizeVehicle(vehicle);
         }
 
         protected void Patrol(float timeElapsed)
@@ -130,10 +130,10 @@ namespace Strikeforce
             }
 
             vehicle.SetOrder(Order.Patrol);
-            DeployVehicle(vehicle);
+            MobilizeVehicle(vehicle);
         }
 
-        protected void DeployVehicle(Vehicle vehicleToDeploy)
+        protected void MobilizeVehicle(Vehicle vehicleToMobilize)
         {
             // Set proper direction
             // Assign rally point as waypoint
