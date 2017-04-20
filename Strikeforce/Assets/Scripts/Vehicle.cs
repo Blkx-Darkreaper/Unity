@@ -5,8 +5,15 @@ using System;
 
 namespace Strikeforce
 {
+    public enum Order
+    {
+        None, Patrol, Attack
+    }
+
     public class Vehicle : Destructible
     {
+        [SyncVar]
+        protected Order currentOrder;
         public int RepairCost = 1;
         public int MaxSpeed = 5;
         public int Acceleration = 1;
@@ -22,6 +29,7 @@ namespace Strikeforce
         {
             base.Awake();
 
+            this.currentOrder = Order.None;
             this.distanceTravelled = 0f;
             this.fuelRemaining = 0f;
         }
@@ -46,6 +54,11 @@ namespace Strikeforce
             CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
 
             transform.Translate(x, 0, z);
+        }
+
+        public virtual void SetOrder(Order order)
+        {
+            this.currentOrder = order;
         }
 
         public virtual float GetFuelPercentage()

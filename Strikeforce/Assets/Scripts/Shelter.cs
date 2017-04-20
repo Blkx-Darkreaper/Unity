@@ -103,8 +103,8 @@ namespace Strikeforce
             }
 
             Vehicle vehicle = storage.Dequeue();
-
-            throw new NotImplementedException();
+            vehicle.SetOrder(Order.Attack);
+            DeployVehicle(vehicle);
         }
 
         protected void Patrol(float timeElapsed)
@@ -129,6 +129,17 @@ namespace Strikeforce
                 return;
             }
 
+            vehicle.SetOrder(Order.Patrol);
+            DeployVehicle(vehicle);
+        }
+
+        protected void DeployVehicle(Vehicle vehicleToDeploy)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected void StoreVehicle(Vehicle vehicleToStore)
+        {
             throw new NotImplementedException();
         }
     }
