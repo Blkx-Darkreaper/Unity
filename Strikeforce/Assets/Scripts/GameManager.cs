@@ -158,7 +158,7 @@ namespace Strikeforce
                 int count = allGameEntities.Count;
                 if (count > MaxEntities)
                 {
-                    DestroyEntity(spawnedItem);
+                    RemoveEntity(spawnedItem);
                     Debug.Log(string.Format("Entity limit reached"));
                     return;
                 }
@@ -181,30 +181,30 @@ namespace Strikeforce
             return entity;
         }
 
-        public void DestroyEntity(GameObject gameObjectToDestroy)
+        public void RemoveEntity(GameObject gameObjectToRemove)
         {
-            Entity entityToDestroy = gameObjectToDestroy.GetComponent<Entity>();
-            if (entityToDestroy == null)
+            Entity entityToRemove = gameObjectToRemove.GetComponent<Entity>();
+            if (entityToRemove == null)
             {
                 return;
             }
 
-            DestroyEntity(entityToDestroy);
+            RemoveEntity(entityToRemove);
         }
 
-        public void DestroyEntity(Entity entityToDestroy)
+        public void RemoveEntity(Entity entityToRemove)
         {
-            int id = entityToDestroy.EntityId;
+            int id = entityToRemove.EntityId;
 
             Entity toCheck = allGameEntities[id];
-            if (toCheck != entityToDestroy)
+            if (toCheck != entityToRemove)
             {
-                Debug.Log(string.Format("{0} entity does not match registered entity with id: {1}", entityToDestroy.name, id));
+                Debug.Log(string.Format("{0} entity does not match registered entity with id: {1}", entityToRemove.name, id));
                 return;
             }
 
             allGameEntities.Remove(id);
-            Destroy(entityToDestroy.gameObject);
+            Destroy(entityToRemove.gameObject);
         }
 
         public int GetNextUniqueId()

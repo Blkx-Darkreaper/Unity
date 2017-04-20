@@ -23,7 +23,7 @@ namespace Strikeforce
 
         protected virtual void DestroyEntity()
         {
-            GameManager.Singleton.DestroyEntity(this);
+            GameManager.Singleton.RemoveEntity(this);
 
             Debug.Log(string.Format("{0} has been destroyed", name));
         }
