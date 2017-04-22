@@ -4,7 +4,7 @@ namespace Strikeforce
 {
     public class GridCursor : Entity
     {
-        protected virtual void Awake()
+        protected override void Awake()
         {
             base.Awake();
         }
