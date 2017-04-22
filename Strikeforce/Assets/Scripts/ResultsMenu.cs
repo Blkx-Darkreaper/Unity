@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 namespace Strikeforce
@@ -50,7 +51,7 @@ namespace Strikeforce
             {
                 Time.timeScale = 1f;
                 IsOpening = false;
-                Application.LoadLevel(Scenes.Game);
+                SceneManager.LoadScene(Scenes.Game);
             }
 
             x += padding + buttonWidth;
@@ -59,7 +60,7 @@ namespace Strikeforce
             if (buttonPressed == true)
             {
                 GameManager.Singleton.LoadLevel(string.Empty);
-                Application.LoadLevel(Scenes.MainMenu);
+                SceneManager.LoadScene(Scenes.MainMenu);
                 Cursor.visible = true;
             }
 
