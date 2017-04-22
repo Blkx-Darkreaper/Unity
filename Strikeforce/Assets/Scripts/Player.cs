@@ -367,17 +367,44 @@ namespace Strikeforce
 
         protected List<GameObject> GetOnScreen()
         {
+            List<GameObject> allOwned = GetAllOwned();
+            List<GameObject> allOnScreen = new List<GameObject>();
 
+            foreach(GameObject gameObject in allOwned)
+            {
+                Renderer renderer = gameObject.GetComponent<Renderer>();
+                if(renderer == null)
+                {
+                    continue;
+                }
+
+                if(renderer.isVisible == false)
+                {
+                    continue;
+                }
+
+                allOnScreen.Add(gameObject);
+            }
+
+            return allOnScreen;
         }
 
         protected List<GameObject> GetAllOwned()
         {
+            List<GameObject> allOwned = new List<GameObject>();
 
+            foreach(Structure structure in allStructures)
+            {
+                GameObject gameObject = structure.gameObject;
+                allOwned.Add(gameObject);
+            }
+
+            return allOwned;
         }
 
         public void ActionFailed()
         {
-
+            Debug.Log(string.Format("Action failed"));
         }
 
         protected void SetSelected(Selectable selectable)
