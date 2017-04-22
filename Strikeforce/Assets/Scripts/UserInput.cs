@@ -10,15 +10,19 @@ namespace Strikeforce
 
     public struct MouseControls
     {
-        public const string X_AXIS = "Mouse X";
-        public const string Y_AXIS = "Mouse Y";
-        public const string SCROLL_WHEEL = "Mouse ScrollWheel";
+        public const string MOUSE = "Mouse";
+        public const string SCROLL_WHEEL = "ScrollWheel";
+        //public const string X_AXIS = "Mouse X";
+        //public const string Y_AXIS = "Mouse Y";
+        //public const string SCROLL_WHEEL = "Mouse ScrollWheel";
     }
 
     public struct Direction
     {
         public const string LEFT = "Left";
         public const string RIGHT = "Right";
+        public const string X = "X";
+        public const string Y = "Y";
     }
 
     public class UserInput : NetworkBehaviour
@@ -47,6 +51,8 @@ namespace Strikeforce
             public KeyCode DDown;
             public KeyCode DLeft;
             public KeyCode DRight;
+            public AxisBind DVert;
+            public AxisBind DHor;
             public AxisBind LeftStick;
             public AxisBind RightStick;
         }
@@ -61,11 +67,12 @@ namespace Strikeforce
         {
             public const string HORIZONTAL = "Horizontal";
             public const string VERTICAL = "Vertical";
+            public const string DIRECTION_PAD = "Dpad";
         }
 
         protected void Awake()
         {
-            incompleteKeyEvents = new SortedList<float, KeyEvent>();
+            incompleteKeyEvents = new Dictionary<ActionKey, KeyEvent>();
             completeKeyEvents = new Queue<KeyEvent>();
 
             InitKeyBinds();
@@ -86,6 +93,10 @@ namespace Strikeforce
             keyboardBinds.Special2 = KeyCode.O;
             keyboardBinds.LeftTrigger = KeyCode.J;
             keyboardBinds.RightTrigger = KeyCode.Semicolon;
+            keyboardBinds.DUp = KeyCode.Keypad8;
+            keyboardBinds.DDown = KeyCode.Keypad2;
+            keyboardBinds.DLeft = KeyCode.Keypad4;
+            keyboardBinds.DRight = KeyCode.Keypad6;
             keyboardBinds.Menu = KeyCode.Escape;
             keyboardBinds.Back = KeyCode.Backspace;
 
@@ -109,10 +120,10 @@ namespace Strikeforce
             gamepadBinds.Special2 = KeyCode.Joystick1Button3;
             gamepadBinds.LeftTrigger = KeyCode.Joystick1Button9;
             gamepadBinds.RightTrigger = KeyCode.Joystick1Button10;
-            gamepadBinds.DUp = KeyCode.
-            gamepadBinds.DDown = KeyCode.
-            gamepadBinds.DLeft = KeyCode.
-            gamepadBinds.DRight = KeyCode.
+            //gamepadBinds.DUp = KeyCode.
+            //gamepadBinds.DDown = KeyCode.
+            //gamepadBinds.DLeft = KeyCode.
+            //gamepadBinds.DRight = KeyCode.
             gamepadBinds.Menu = KeyCode.Joystick1Button7;
             gamepadBinds.Back = KeyCode.Joystick1Button6;
 
@@ -300,7 +311,7 @@ namespace Strikeforce
             string rightStickVert = string.Format("{0} {1}", Direction.RIGHT, Axis.VERTICAL);
 
             float x = Input.GetAxis(rightStickHor) * 0.1f;
-            float z = Input.GetAxis(rightStickVert) * 0.1f;
+            float y = Input.GetAxis(rightStickVert) * 0.1f;
 
             Player player = profile.Player;
             if (player == null)
@@ -308,7 +319,24 @@ namespace Strikeforce
                 return;
             }
 
-            player.RightStick(x, 0, z);
+            player.RightStick(x, 0, y);
+        }
+
+        protected void DPad()
+        {
+            string dpadX = string.Format("{0}{1}", Axis.DIRECTION_PAD, Direction.X);
+            string dpadY = string.Format("{0}{1}", Axis.DIRECTION_PAD, Direction.Y);
+
+            float x = Input.GetAxis(dpadX);
+            float y = Input.GetAxis(dpadY);
+
+            Player player = profile.Player;
+            if(player == null)
+            {
+                return;
+            }
+
+            player.DPad(x, 0, y);
         }
 
         protected void LeftTrigger()
@@ -380,8 +408,6 @@ namespace Strikeforce
             {
                 return;
             }
-
-            KeyEvent keyEvent = null;
 
             if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
             {

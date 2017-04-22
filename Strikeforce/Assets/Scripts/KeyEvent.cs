@@ -20,7 +20,7 @@ namespace Strikeforce
                 return duration;
             }
         }
-        public enum Type { Pressed, DoubleTapped, Held }
+        public enum Type { Pressed, DoubleTapped, Held, Released }
 
         public KeyEvent(ActionKey key, Type type, float pressedTime)
         {
@@ -38,6 +38,7 @@ namespace Strikeforce
         public void Release(float releasedTime)
         {
             this.ReleasedTime = releasedTime;
+            this.EventType = Type.Released;
         }
 
         public void DoubleTap(float secondPressedTime, float? secondReleasedTime)

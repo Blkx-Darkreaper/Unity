@@ -127,6 +127,24 @@ namespace Strikeforce
             BuyCursor.Move(x, z);
         }
 
+        public void DPad(float x, int y, float z)
+        {
+            if(isInBuildMode == false)
+            {
+                return;
+            }
+
+            if(z == 1)
+            {
+                DpadUp();
+            }
+
+            if(z == -1)
+            {
+                DpadDown();
+            }
+        }
+
         protected void MovePlayer(float x, float y, float z)
         {
             isInBuildMode = false;    //testing
@@ -332,10 +350,8 @@ namespace Strikeforce
 
         protected GameObject GetHighlighted(GridCursor cursor)
         {
-            Ray ray = camera.main.ScreenPointToRay(cursor.transform);
             RaycastHit hit;
-
-            if(Physics.Raycast(ray.origin, ray.direction, hit, 100) == false)
+            if(Physics.Raycast(cursor.transform.position, Vector3.down, out hit) == false)
             {
                 return null;
             }
@@ -393,7 +409,7 @@ namespace Strikeforce
                 return;
             }
 
-            Selectable selectable = selected.getComponent<Selectable>();
+            Selectable selectable = selected.GetComponent<Selectable>();
             if (selectable == null)
             {
                 return;
@@ -466,7 +482,7 @@ namespace Strikeforce
             CurrentInventory.UpdateResource(ResourceType.Money, cost);
             Deselect();
 
-            structure.Destroy();
+            structure.OnNetworkDestroy();
         }
 
         protected void ToggleRepair(KeyEvent.Type eventType, float holdDuration)
@@ -495,7 +511,7 @@ namespace Strikeforce
                 return;
             }
 
-            Structure structure = gameObject.getComponent<Structure>();
+            Structure structure = gameObject.GetComponent<Structure>();
             if (structure == null)
             {
                 ActionFailed();
@@ -578,8 +594,8 @@ namespace Strikeforce
                 return;
             }
 
-            Vector3 spawnPoint = BuildCursor.transform;
-            GameObject gameObjectToBuild = Instantiate(gameObject, spawnPoint, Quaternion.Identity) as GameObject;
+            Vector3 spawnPoint = BuildCursor.transform.position;
+            GameObject gameObjectToBuild = Instantiate(gameObject, spawnPoint, Quaternion.identity) as GameObject;
             if(gameObjectToBuild == null)
             {
                 ActionFailed();
@@ -630,7 +646,7 @@ namespace Strikeforce
         protected void PageUp()
         {
             throw new NotImplementedException();
-            mainCamera.transform.Translate(0, 0, screenHeight);
+            //mainCamera.transform.Translate(0, 0, screenHeight);
         }
 
         protected void SetPatrolStatus()
