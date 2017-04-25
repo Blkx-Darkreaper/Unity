@@ -113,14 +113,14 @@ namespace Strikeforce
             transform.Rotate(direction * amount);
         }
 
-        public override void TakeDamage(int damage)
+        public override void TakeDamage(int amount, RaycastHit hit)
         {
             if (isServer == false)
             {
                 return;
             }
 
-            CurrentHitPoints -= damage;
+            CurrentHitPoints -= amount;
 
             string ownersName = "Neutral";
             if (Owner != null)
@@ -128,7 +128,7 @@ namespace Strikeforce
                 ownersName = string.Format("{0}'s", Owner.PlayerId.ToString());
             }
 
-            Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, damage));
+            Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, amount));
 
             if (CurrentHitPoints > 0)
             {
@@ -183,7 +183,7 @@ namespace Strikeforce
                 return;
             }
 
-            TakeDamage(Destructible.MAX_DAMAGE);
+            TakeDamage(Destructible.MAX_DAMAGE, new RaycastHit());
         }
     }
 }

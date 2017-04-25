@@ -349,9 +349,9 @@ namespace Strikeforce
             CurrentHitPoints = MaxHitPoints;
         }
 
-        public override void TakeDamage(int damage)
+        public override void TakeDamage(int amount, RaycastHit hit)
         {
-            base.TakeDamage(damage);
+            base.TakeDamage(amount, hit);
 
             SetIsDamaged();
         }

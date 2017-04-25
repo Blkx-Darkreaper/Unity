@@ -23,17 +23,17 @@ namespace Strikeforce
             return false;
         }
 
-        public override void TakeDamage(int damage)
+        public override void TakeDamage(int amount, RaycastHit hit)
         {
             if (IsIndestructible == true)
             {
                 return;
             }
 
-            base.TakeDamage(damage);
+            base.TakeDamage(amount, hit);
         }
 
-        protected virtual void DealDamageToTarget(Destructible target)
+        protected virtual void DealDamageToTarget(Destructible target, RaycastHit hit)
         {
             bool anti = false;
 
@@ -60,7 +60,7 @@ namespace Strikeforce
                 }
             }
 
-            target.TakeDamage(Damage);
+            target.TakeDamage(Damage, hit);
         }
 
         protected virtual void OnCollisionEnter(Collision collision)
@@ -72,8 +72,11 @@ namespace Strikeforce
                 return;
             }
 
-            this.TakeDamage(Damage);
-            hitDestructible.TakeDamage(Damage);
+            RaycastHit hit = new RaycastHit();
+            hit.transform.position = collision.transform.position;
+
+            this.TakeDamage(Damage, hit);
+            hitDestructible.TakeDamage(Damage, hit);
         }
     }
 }

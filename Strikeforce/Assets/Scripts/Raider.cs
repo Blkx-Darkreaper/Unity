@@ -89,11 +89,11 @@ namespace Strikeforce
             this.CurrentEnergy += amount;
         }
 
-        public override void TakeDamage(int damage)
+        public override void TakeDamage(int amount, RaycastHit hit)
         {
-            damage = SoakDamage(damage);
+            amount = SoakDamage(amount);
 
-            base.TakeDamage(damage);
+            base.TakeDamage(amount, hit);
         }
 
         private int SoakDamage(int damage)

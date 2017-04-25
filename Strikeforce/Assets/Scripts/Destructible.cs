@@ -90,14 +90,14 @@ namespace Strikeforce
             healthStyle.normal.background = GlobalAssets.HealthBarTextures.Critical;
         }
 
-        public virtual void TakeDamage(int damage)
+        public virtual void TakeDamage(int amount, RaycastHit hit)
         {
             if (isServer == false)
             {
                 return;
             }
 
-            CurrentHitPoints -= damage;
+            CurrentHitPoints -= amount;
 
             string ownersName = "Neutral";
             if (Owner != null)
@@ -105,7 +105,7 @@ namespace Strikeforce
                 ownersName = string.Format("{0}'s", Owner.PlayerId.ToString());
             }
 
-            Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, damage));
+            Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, amount));
 
             if (CurrentHitPoints > 0)
             {
