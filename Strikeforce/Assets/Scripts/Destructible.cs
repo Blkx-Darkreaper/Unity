@@ -107,6 +107,8 @@ namespace Strikeforce
 
             Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, amount));
 
+            Flash(Color.red, 5f);
+
             if (CurrentHitPoints > 0)
             {
                 return;

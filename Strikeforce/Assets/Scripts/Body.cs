@@ -15,6 +15,8 @@ namespace Strikeforce
         protected Quaternion targetHeading;
         protected GameObject targetEntityGameObject;
         public Rect playingArea { get; set; }
+        protected bool isFlashing = false;
+        protected float flashDuration { get; set; }
         protected struct BodyProperties
         {
             public const string MESHES = "Meshes";
@@ -35,7 +37,9 @@ namespace Strikeforce
             playingArea = new Rect(0f, 0f, 0f, 0f);
         }
 
-        protected virtual void Update() { }
+        protected virtual void Update() {
+            FlashFade();
+        }
 
         public void SetColliders(bool enabled)
         {
@@ -63,6 +67,32 @@ namespace Strikeforce
 
             SetWaypoint(target.transform.position);
             targetEntityGameObject = target.gameObject;
+        }
+
+        public virtual void Flash(Color colour, float duration)
+        {
+            MeshRenderer mesh = GetComponentInChildren<MeshRenderer>();
+            mesh.material.color = colour;
+
+            this.isFlashing = true;
+            this.flashDuration = duration;
+        }
+
+        public virtual void FlashFade()
+        {
+            if(isFlashing == false)
+            {
+                return;
+            }
+
+            MeshRenderer mesh = GetComponentInChildren<MeshRenderer>();
+            if(mesh.material.color == Color.clear)
+            {
+                isFlashing = false;
+                return;
+            }
+
+            mesh.material.color = Color.Lerp(mesh.material.color, Color.clear, flashDuration * Time.deltaTime);
         }
     }
 }
