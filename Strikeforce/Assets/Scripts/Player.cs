@@ -10,7 +10,6 @@ namespace Strikeforce
     {
         public int PlayerId { get { return this.playerControllerId; } }
         public bool IsNPC;
-        [HideInInspector]
         protected Camera mainCamera;
         [HideInInspector]
         public Hud PlayerHud;
@@ -21,10 +20,10 @@ namespace Strikeforce
         public string RaiderPrefabName = "Raider";
         [HideInInspector]
         public Inventory CurrentInventory;
-        [HideInInspector]
         protected bool isInBuildMode = true;
         [HideInInspector]
         public GridCursor BuildCursor;
+        [HideInInspector]
         public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
@@ -340,18 +339,20 @@ namespace Strikeforce
 
         protected GameObject GetHighlightedByBuildCursor()
         {
-            return GetHighlighted(BuildCursor);
+            return GetHighlightedStructure(BuildCursor);
         }
 
         protected GameObject GetHighlightedByBuyCursor()
         {
-            return GetHighlighted(BuyCursor);
+            return GetHighlightedStructure(BuyCursor);
         }
 
-        protected GameObject GetHighlighted(GridCursor cursor)
+        protected GameObject GetHighlightedStructure(GridCursor cursor)
         {
             RaycastHit hit;
-            if(Physics.Raycast(cursor.transform.position, Vector3.down, out hit) == false)
+            int groundMask = GameManager.Singleton.GroundMask;
+
+            if(Physics.Raycast(cursor.transform.position, Vector3.down, out hit, groundMask) == false)
             {
                 return null;
             }
@@ -365,9 +366,9 @@ namespace Strikeforce
             return gameObject;
         }
 
-        protected List<GameObject> GetOnScreen()
+        protected List<GameObject> GetStructuresOnScreen()
         {
-            List<GameObject> allOwned = GetAllOwned();
+            List<GameObject> allOwned = GetAllOwnedStructures();
             List<GameObject> allOnScreen = new List<GameObject>();
 
             foreach(GameObject gameObject in allOwned)
@@ -389,7 +390,7 @@ namespace Strikeforce
             return allOnScreen;
         }
 
-        protected List<GameObject> GetAllOwned()
+        protected List<GameObject> GetAllOwnedStructures()
         {
             List<GameObject> allOwned = new List<GameObject>();
 
@@ -556,7 +557,7 @@ namespace Strikeforce
 
         protected void ToggleRepairOnScreen()
         {
-            List<GameObject> onScreen = GetOnScreen();
+            List<GameObject> onScreen = GetStructuresOnScreen();
             foreach(GameObject gameObject in onScreen)
             {
                 ToggleRepairing(gameObject);
@@ -565,7 +566,7 @@ namespace Strikeforce
 
         protected void ToggleRepairAll()
         {
-            List<GameObject> owned = GetAllOwned();
+            List<GameObject> owned = GetAllOwnedStructures();
             foreach (GameObject gameObject in owned)
             {
                 ToggleRepairing(gameObject);
