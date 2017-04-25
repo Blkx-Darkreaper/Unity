@@ -24,6 +24,18 @@ namespace Strikeforce
         public const string SCENE = "Scene";
     }
 
+    public struct Layers
+    {
+        public const string TRANSPARENT_FX = "TransparentFX";
+        public const string IGNORE_RAYCAST = "Ignore Raycast";
+        public const string WATER = "Water";
+        public const string UI = "UI";
+        public const string BASE = "Base";
+        public const string EFFECTS = "Effects";
+        public const string GROUND = "Ground";
+        public const string AIR = "Air";
+    }
+
     public struct Hooks
     {
         public const string CHANGE_HEALTH = "OnChangeHealth";

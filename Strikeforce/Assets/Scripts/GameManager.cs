@@ -16,6 +16,10 @@ namespace Strikeforce
         public string CurrentLevelName { get; protected set; }
         public Level[] CurrentLevels { get; protected set; }
         public Color DefaultColour;
+        public int BaseMask;
+        public int GroundMask;
+        public int AirMask;
+        public int EffectsMask;
         protected int nextEntityId = 0;
         protected Dictionary<int, Entity> allGameEntities;
         public int MaxEntities = 1000;
@@ -32,6 +36,11 @@ namespace Strikeforce
                 Destroy(gameObject);
                 return;
             }
+
+            this.BaseMask = LayerMask.GetMask(Layers.BASE);
+            this.GroundMask = LayerMask.GetMask(Layers.GROUND);
+            this.AirMask = LayerMask.GetMask(Layers.AIR);
+            this.EffectsMask = LayerMask.GetMask(Layers.EFFECTS);
 
             this.CurrentLevels = new Level[2];
             this.allGameEntities = new Dictionary<int, Entity>();
