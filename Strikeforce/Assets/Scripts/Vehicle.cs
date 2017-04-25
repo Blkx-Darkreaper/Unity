@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Networking;
 using System.Drawing;
 using System;
@@ -12,6 +13,7 @@ namespace Strikeforce
 
     public class Vehicle : Destructible
     {
+        protected NavMeshAgent pathfinder;
         [SyncVar]
         protected Order currentOrder;
         public int RepairCost = 1;
@@ -29,6 +31,7 @@ namespace Strikeforce
         {
             base.Awake();
 
+            this.pathfinder = GetComponentInChildren<NavMeshAgent>();
             this.currentOrder = Order.None;
             this.distanceTravelled = 0f;
             this.fuelRemaining = 0f;
