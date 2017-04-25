@@ -337,17 +337,17 @@ namespace Strikeforce
             PageDown();
         }
 
-        protected GameObject GetHighlightedByBuildCursor()
+        protected Structure GetStructureHighlightedByBuildCursor()
         {
             return GetHighlightedStructure(BuildCursor);
         }
 
-        protected GameObject GetHighlightedByBuyCursor()
+        protected Structure GetStructureHighlightedByBuyCursor()
         {
             return GetHighlightedStructure(BuyCursor);
         }
 
-        protected GameObject GetHighlightedStructure(GridCursor cursor)
+        protected Structure GetHighlightedStructure(GridCursor cursor)
         {
             RaycastHit hit;
             int groundMask = GameManager.Singleton.GroundMask;
@@ -357,23 +357,18 @@ namespace Strikeforce
                 return null;
             }
 
-            if(hit.collider.tag != Tags.STRUCTURE)
-            {
-                return null;
-            }
-
-            GameObject gameObject = hit.collider.gameObject;
-            return gameObject;
+            Structure highlighted = hit.collider.GetComponentInParent<Structure>();
+            return highlighted;
         }
 
-        protected List<GameObject> GetStructuresOnScreen()
+        protected List<Structure> GetStructuresOnScreen()
         {
-            List<GameObject> allOwned = GetAllOwnedStructures();
-            List<GameObject> allOnScreen = new List<GameObject>();
+            List<Structure> allOwned = GetAllOwnedStructures();
+            List<Structure> allOnScreen = new List<Structure>();
 
-            foreach(GameObject gameObject in allOwned)
+            foreach(Structure structure in allOwned)
             {
-                Renderer renderer = gameObject.GetComponent<Renderer>();
+                Renderer renderer = structure.GetComponent<Renderer>();
                 if(renderer == null)
                 {
                     continue;
@@ -384,22 +379,15 @@ namespace Strikeforce
                     continue;
                 }
 
-                allOnScreen.Add(gameObject);
+                allOnScreen.Add(structure);
             }
 
             return allOnScreen;
         }
 
-        protected List<GameObject> GetAllOwnedStructures()
+        protected List<Structure> GetAllOwnedStructures()
         {
-            List<GameObject> allOwned = new List<GameObject>();
-
-            foreach(Structure structure in allStructures)
-            {
-                GameObject gameObject = structure.gameObject;
-                allOwned.Add(gameObject);
-            }
-
+            List<Structure> allOwned = new List<Structure>(allStructures);
             return allOwned;
         }
 
@@ -431,7 +419,7 @@ namespace Strikeforce
 
         protected void Select()
         {
-            GameObject selected = GetHighlightedByBuildCursor();
+            GameObject selected = GetStructureHighlightedByBuildCursor().gameObject;
             if (selected == null)
             {
                 return;
@@ -531,15 +519,8 @@ namespace Strikeforce
             }
         }
 
-        protected void ToggleRepairing(GameObject gameObject)
+        protected void ToggleRepairing(Structure structure)
         {
-            if (gameObject == null)
-            {
-                ActionFailed();
-                return;
-            }
-
-            Structure structure = gameObject.GetComponent<Structure>();
             if (structure == null)
             {
                 ActionFailed();
@@ -551,25 +532,25 @@ namespace Strikeforce
 
         protected void ToggleRepairHighlighted()
         {
-            GameObject highlighted = GetHighlightedByBuildCursor();
+            Structure highlighted = GetStructureHighlightedByBuildCursor();
             ToggleRepairing(highlighted);
         }
 
         protected void ToggleRepairOnScreen()
         {
-            List<GameObject> onScreen = GetStructuresOnScreen();
-            foreach(GameObject gameObject in onScreen)
+            List<Structure> onScreen = GetStructuresOnScreen();
+            foreach(Structure structure in onScreen)
             {
-                ToggleRepairing(gameObject);
+                ToggleRepairing(structure);
             }
         }
 
         protected void ToggleRepairAll()
         {
-            List<GameObject> owned = GetAllOwnedStructures();
-            foreach (GameObject gameObject in owned)
+            List<Structure> owned = GetAllOwnedStructures();
+            foreach (Structure structure in owned)
             {
-                ToggleRepairing(gameObject);
+                ToggleRepairing(structure);
             }
         }
 
@@ -598,14 +579,7 @@ namespace Strikeforce
 
         protected void BuyStructure()
         {
-            GameObject gameObject = GetHighlightedByBuyCursor();
-            if(gameObject == null)
-            {
-                ActionFailed();
-                return;
-            }
-
-            Structure structure = gameObject.GetComponent<Structure>();
+            Structure structure = GetStructureHighlightedByBuyCursor();
             if(structure == null)
             {
                 ActionFailed();
@@ -623,7 +597,7 @@ namespace Strikeforce
             }
 
             Vector3 spawnPoint = BuildCursor.transform.position;
-            GameObject gameObjectToBuild = Instantiate(gameObject, spawnPoint, Quaternion.identity) as GameObject;
+            GameObject gameObjectToBuild = Instantiate(structure.gameObject, spawnPoint, Quaternion.identity) as GameObject;
             if(gameObjectToBuild == null)
             {
                 ActionFailed();
