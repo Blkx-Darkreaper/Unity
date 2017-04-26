@@ -16,7 +16,10 @@ namespace Strikeforce
         protected const string CONSTRUCTION_MESSAGE = "Building...";
         public bool IsRepairing = false;
         public int RepairCost;
-        public bool IsDamaged { get; protected set; }
+        public bool IsDamaged { get{
+                int damageThreshold = 2 * MaxHitPoints / 3;
+                return CurrentHitPoints > damageThreshold;
+        } }
         protected Vector3 spawnPoint;
         public Vector3 RallyPoint { get; protected set; }
         public Texture2D RallypointIcon;
@@ -39,7 +42,6 @@ namespace Strikeforce
             this.spawnPoint = new Vector3(spawnX, 0f, spawnZ);
             this.RallyPoint = spawnPoint;
             this.IsConstructionComplete = false;
-            this.IsDamaged = false;
         }
 
         protected override void Start()
@@ -92,25 +94,26 @@ namespace Strikeforce
         protected void AddVehicleToBuildQueue(string unitName)
         {
             GameObject unitGameObject = GlobalAssets.GetVehiclePrefab(unitName);
-            Selectable unit = unitGameObject.GetComponent<Selectable>();
+            Vehicle vehicle = unitGameObject.GetComponent<Vehicle>();
+            if (vehicle == null)
+            {
+                return;
+            }
+
             if (Owner != null)
             {
-                if (unit == null)
-                {
-                    return;
-                }
-
-                bool sufficientFunds = Owner.CurrentInventory.HasSufficientResources(ResourceType.Money, unit.Cost);
+                bool sufficientFunds = Owner.CurrentInventory.HasSufficientResources(ResourceType.Money, vehicle.Cost);
                 if (sufficientFunds == false)
                 {
                     Owner.CurrentInventory.InsufficientResources(ResourceType.Money);
                     return;
                 }
 
-                Owner.CurrentInventory.UpdateResource(ResourceType.Money, -unit.Cost);
+                Owner.CurrentInventory.UpdateResource(ResourceType.Money, -vehicle.Cost);
             }
 
             buildQueue.Enqueue(unitName);
+            this.BuildTime = vehicle.BuildTime;
         }
 
         protected void Build()
@@ -120,7 +123,7 @@ namespace Strikeforce
                 return;
             }
 
-            currentBuildProgress += Time.deltaTime * GlobalAssets.BuildSpeed;
+            currentBuildProgress += Time.deltaTime;
             if (currentBuildProgress < BuildTime)
             {
                 return;
@@ -143,6 +146,11 @@ namespace Strikeforce
 
         public float GetBuildCompletionPercentage()
         {
+            if(buildQueue.Count == 0)
+            {
+                return 0f;
+            }
+
             float completionPercentage = currentBuildProgress / BuildTime;
             return completionPercentage;
         }
@@ -304,6 +312,21 @@ namespace Strikeforce
             CurrentHitPoints = 0;
         }
 
+        public void CancelConstruction()
+        {
+            if (Owner == null)
+            {
+                return;
+            }
+
+            if (isSelected == true)
+            {
+                SetSelection(false);
+            }
+
+            GameManager.Singleton.RemoveEntity(this);
+        }
+
         public void Construct(int amount)
         {
             CurrentHitPoints += amount;
@@ -352,15 +375,6 @@ namespace Strikeforce
         public override void TakeDamage(int amount, RaycastHit hit)
         {
             base.TakeDamage(amount, hit);
-
-            SetIsDamaged();
-        }
-
-        public void SetIsDamaged()
-        {
-            int damageThreshold = 2 * MaxHitPoints / 3;
-
-            this.IsDamaged = CurrentHitPoints > damageThreshold;
         }
     }
 }

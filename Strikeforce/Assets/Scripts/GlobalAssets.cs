@@ -86,7 +86,6 @@ namespace Strikeforce
         public static GUISkin SelectionBoxSkin { get; set; }
         private static Bounds invalidBoundsValue = new Bounds(new Vector3(-99999f, -99999f, -99999f), Vector3.zero);
         public static Bounds InvalidBounds { get { return invalidBoundsValue; } }
-        public static int BuildSpeed { get { return 2; } }
         private static Dictionary<ResourceType, Texture2D> resourceHealthBarTextures;
         private static Dictionary<int, Texture2D> playerAvatars;
         public static KeyValuePair<string, string>[] PlayerResourceProperties = new KeyValuePair<string, string>[] 
