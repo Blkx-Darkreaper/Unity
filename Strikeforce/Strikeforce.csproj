@@ -100,11 +100,11 @@
     <Compile Include="Assets\Scripts\Body.cs" />
     <Compile Include="Assets\Scripts\Boss.cs" />
     <Compile Include="Assets\Scripts\BossComponent.cs" />
-    <Compile Include="Assets\Scripts\BuildCursor.cs" />
     <Compile Include="Assets\Scripts\Checkpoint.cs" />
     <Compile Include="Assets\Scripts\Decoy.cs" />
     <Compile Include="Assets\Scripts\Destructible.cs" />
     <Compile Include="Assets\Scripts\Detector.cs" />
+    <Compile Include="Assets\Scripts\Drome.cs" />
     <Compile Include="Assets\Scripts\Effect.cs" />
     <Compile Include="Assets\Scripts\EndGameMenu.cs" />
     <Compile Include="Assets\Scripts\Entity.cs" />
@@ -115,6 +115,7 @@
     <Compile Include="Assets\Scripts\GameMenu.cs" />
     <Compile Include="Assets\Scripts\GlobalAssets.cs" />
     <Compile Include="Assets\Scripts\Grid.cs" />
+    <Compile Include="Assets\Scripts\GridCursor.cs" />
     <Compile Include="Assets\Scripts\Hardpoint.cs" />
     <Compile Include="Assets\Scripts\Headquarters.cs" />
     <Compile Include="Assets\Scripts\Hud.cs" />
