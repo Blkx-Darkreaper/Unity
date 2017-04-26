@@ -33,5 +33,16 @@ namespace Strikeforce
 
             transform.Translate(x, 0, z);
         }
+
+        public virtual void DefaultSize()
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+
+        public virtual void SetSize(Vector2 size)
+        {
+            float height = transform.localScale.y;
+            transform.localScale = new Vector3(size.x, height, size.y);
+        }
     }
 }

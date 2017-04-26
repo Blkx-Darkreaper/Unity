@@ -27,6 +27,7 @@ namespace Strikeforce
         public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
+        public Color SelectionColour = Color.red;
         public bool IsSettingConstructionPoint = false;
         public bool IsSellingStructure = false;
         public Material NotAllowedMaterial, AllowedMaterial;
@@ -444,7 +445,7 @@ namespace Strikeforce
             Color selectedColour = selectable.GetComponentInChildren<MeshRenderer>().material.color;
             this.savedMaterialColour = selectedColour;
 
-            selectedColour = Color.red;
+            selectedColour = SelectionColour;
         }
 
         protected void Select()
@@ -462,6 +463,19 @@ namespace Strikeforce
             }
 
             SetSelected(selectable);
+
+            // Set build cursor size
+            float width = selectable.transform.lossyScale.x;
+            float length = selectable.transform.lossyScale.z;
+            Vector2 size = new Vector2(width, length);
+            BuildCursor.SetSize(size);
+        }
+
+        protected void Deselect()
+        {
+            SetSelected(null);
+
+            BuildCursor.DefaultSize();
         }
 
         protected void ShowOptions()
@@ -645,11 +659,6 @@ namespace Strikeforce
             IsSettingConstructionPoint = true;
 
             CurrentInventory.UpdateResource(ResourceType.Money, -cost);
-        }
-
-        protected void Deselect()
-        {
-            SetSelected(null);
         }
 
         protected void ToggleContextOption()
