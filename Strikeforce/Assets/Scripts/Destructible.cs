@@ -92,6 +92,11 @@ namespace Strikeforce
 
         public virtual void TakeDamage(int amount, RaycastHit hit)
         {
+            TakeDamage(amount);
+        }
+
+        public virtual void TakeDamage(int amount)
+        {
             if (isServer == false)
             {
                 return;

@@ -113,7 +113,7 @@ namespace Strikeforce
             transform.Rotate(direction * amount);
         }
 
-        public override void TakeDamage(int amount, RaycastHit hit)
+        public override void TakeDamage(int amount)
         {
             if (isServer == false)
             {
@@ -183,7 +183,7 @@ namespace Strikeforce
                 return;
             }
 
-            TakeDamage(Destructible.MAX_DAMAGE, new RaycastHit());
+            TakeDamage(Destructible.MAX_DAMAGE);
         }
     }
 }
