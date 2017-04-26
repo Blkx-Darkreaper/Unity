@@ -36,6 +36,7 @@ namespace Strikeforce
         protected const string STRUCTURE = "Structure";
         protected LinkedList<Vehicle> allUnits { get; set; }
         protected LinkedList<Structure> allStructures { get; set; }
+        protected float constructionProgress = 0f;
 
         protected override void Awake()
         {
@@ -62,6 +63,34 @@ namespace Strikeforce
             PlayerHud = GetComponentInChildren<Hud>();
             IsSettingConstructionPoint = false;
             SpawnRaider();
+        }
+
+        protected void Update()
+        {
+            float timeElapsed = Time.deltaTime;
+            this.constructionProgress += timeElapsed;
+            int progress = Mathf.FloorToInt(constructionProgress);
+            if (progress <= 0)
+            {
+                return;
+            }
+
+            constructionProgress -= progress;
+
+            foreach (Structure structure in allStructures)
+            {
+                //Construct
+                if (structure.IsConstructionComplete == false)
+                {
+                    structure.Construct(progress);
+                }
+
+                // Repair
+                if (structure.IsRepairing == true)
+                {
+                    structure.Repair(progress);
+                }
+            }
         }
 
         protected void SpawnRaider()	// Testing
