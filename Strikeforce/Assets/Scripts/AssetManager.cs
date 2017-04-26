@@ -72,15 +72,15 @@ namespace Strikeforce
         {
             foreach (GameObject gameObject in items)
             {
-                T controller = gameObject.GetComponent<T>();
-                if (controller == null)
+                T component = gameObject.GetComponent<T>();
+                if (component == null)
                 {
-                    Debug.Log(string.Format("{0} gameobject has no controller", gameObject.name));
+                    Debug.Log(string.Format("{0} gameobject has no {1} component", gameObject.name, typeof(T).Name));
                     continue;
                 }
 
-                SetEntityName(gameObject, controller);
-                string name = controller.name;
+                SetEntityName(gameObject, component);
+                string name = component.name;
                 if (name.Equals(string.Empty) == true)
                 {
                     Debug.Log(string.Format("{0} {1} has no name", collectionName, gameObject.ToString()));
