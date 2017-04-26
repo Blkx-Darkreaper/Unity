@@ -18,8 +18,8 @@ namespace Strikeforce
         public int RepairCost;
         public bool IsDamaged { get; protected set; }
         protected Vector3 spawnPoint;
-        protected Vector3 rallyPoint;
-        public Texture2D RallyPointIcon;
+        public Vector3 RallyPoint { get; protected set; }
+        public Texture2D RallypointIcon;
         public Texture2D SellIcon;
         protected struct StructureProperties
         {
@@ -37,7 +37,7 @@ namespace Strikeforce
             float spawnX = SelectionBounds.center.x + transform.forward.x * SelectionBounds.extents.x + transform.forward.x * 10;
             float spawnZ = SelectionBounds.center.z + transform.forward.z * SelectionBounds.extents.z + transform.forward.z * 10;
             this.spawnPoint = new Vector3(spawnX, 0f, spawnZ);
-            this.rallyPoint = spawnPoint;
+            this.RallyPoint = spawnPoint;
             this.IsConstructionComplete = false;
             this.IsDamaged = false;
         }
@@ -131,7 +131,7 @@ namespace Strikeforce
             }
 
             string unitName = buildQueue.Dequeue();
-            Owner.SpawnUnit(unitName, spawnPoint, rallyPoint, transform.rotation, this);
+            Owner.SpawnUnit(unitName, spawnPoint, RallyPoint, transform.rotation, this);
             currentBuildProgress = 0f;
         }
 
@@ -172,12 +172,12 @@ namespace Strikeforce
                 {
                     return;
                 }
-                if (rallyPoint == GlobalAssets.InvalidPoint)
+                if (RallyPoint == GlobalAssets.InvalidPoint)
                 {
                     return;
                 }
 
-                flag.transform.localPosition = rallyPoint;
+                flag.transform.localPosition = RallyPoint;
                 flag.transform.forward = transform.forward;
                 flag.Enable();
             }
@@ -224,7 +224,7 @@ namespace Strikeforce
 
         private void UpdateRallyPointPosition(Vector3 updatedPoint)
         {
-            rallyPoint = updatedPoint;
+            RallyPoint = updatedPoint;
 
             RallyPoint flag = GetComponentInChildren<RallyPoint>();
             if (flag == null)
@@ -238,7 +238,7 @@ namespace Strikeforce
         public bool HasValidSpawnPoint()
         {
             bool hasSpawnPoint = spawnPoint != GlobalAssets.InvalidPoint;
-            bool hasRallyPoint = rallyPoint != GlobalAssets.InvalidPoint;
+            bool hasRallyPoint = RallyPoint != GlobalAssets.InvalidPoint;
 
             return hasSpawnPoint && hasRallyPoint;
         }

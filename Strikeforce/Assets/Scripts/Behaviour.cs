@@ -9,9 +9,9 @@ namespace Strikeforce
         public float WeaponRange = 10f;
         private const float DEFAULT_WEAPON_RANGE = 10f;
         public float WeaponAimSpeed = 1f;
-        private const float DEFAULT_WEAPON_AIM_SPEED = 1f;
+        protected const float DEFAULT_WEAPON_AIM_SPEED = 1f;
         public float WeaponCooldown = 1f;
-        private const float DEFAULT_WEAPON_COOLDOWN = 1f;
+        protected const float DEFAULT_WEAPON_COOLDOWN = 1f;
         protected float currentCooldownRemaining { get; set; }
         protected bool isAttacking { get; set; }
         protected bool isAdvancing { get; set; }
@@ -66,7 +66,7 @@ namespace Strikeforce
             SetDefaultWeaponCooldown();
         }
 
-        private void SetDefaultWeaponRange()
+        protected void SetDefaultWeaponRange()
         {
             if (WeaponRange > 0)
             {
@@ -76,7 +76,7 @@ namespace Strikeforce
             WeaponRange = DEFAULT_WEAPON_RANGE;
         }
 
-        private void SetDefaultWeaponAimSpeed()
+        protected void SetDefaultWeaponAimSpeed()
         {
             if (WeaponAimSpeed > 0)
             {
@@ -86,7 +86,7 @@ namespace Strikeforce
             WeaponAimSpeed = DEFAULT_WEAPON_AIM_SPEED;
         }
 
-        private void SetDefaultWeaponCooldown()
+        protected void SetDefaultWeaponCooldown()
         {
             if (WeaponCooldown > 0)
             {
@@ -118,7 +118,7 @@ namespace Strikeforce
             return false;
         }
 
-        private bool IsTargetInRange(Vector3 targetPosition)
+        protected bool IsTargetInRange(Vector3 targetPosition)
         {
 
             Vector3 bearingToTarget = targetPosition - transform.position;
@@ -131,7 +131,7 @@ namespace Strikeforce
             return false;
         }
 
-        private void AttackTarget(Entity attackTarget)
+        protected void AttackTarget(Entity attackTarget)
         {
             if (attackTarget == null)
             {
@@ -163,7 +163,7 @@ namespace Strikeforce
             FireWeaponAtTarget(attackTarget);
         }
 
-        private bool IsTargetInSights(Vector3 targetPosition)
+        protected bool IsTargetInSights(Vector3 targetPosition)
         {
             Vector3 bearingToTarget = targetPosition - transform.position;
             if (bearingToTarget.normalized == transform.forward.normalized)
@@ -174,7 +174,7 @@ namespace Strikeforce
             return false;
         }
 
-        private bool IsReadyToFire()
+        protected bool IsReadyToFire()
         {
             if (currentCooldownRemaining <= 0)
             {
@@ -216,7 +216,7 @@ namespace Strikeforce
             isAiming = true;
         }
 
-        private void AdvanceTowardsTarget(Vector3 targetPosition)
+        protected void AdvanceTowardsTarget(Vector3 targetPosition)
         {
             Selectable unit = this.slave as Selectable;
             if (unit == null)
@@ -231,13 +231,37 @@ namespace Strikeforce
             isAttacking = true;
         }
 
-        private Vector3 GetNearestAttackPosition(Vector3 targetPosition)
+        protected Vector3 GetNearestAttackPosition(Vector3 targetPosition)
         {
             Vector3 bearingToTarget = targetPosition - transform.position;
             float distanceToTarget = bearingToTarget.magnitude;
             float distanceToTravel = distanceToTarget - (0.9f * WeaponRange); // Move in slightly closer than weapon's range
             Vector3 attackPosition = Vector3.Lerp(transform.position, targetPosition, distanceToTravel / distanceToTarget);
             return attackPosition;
+        }
+
+        protected void ReturnToBase()
+        {
+            Vehicle vehicle = (Vehicle)slave;
+            if(vehicle == null)
+            {
+                return;
+            }
+
+            float distanceTravelled = vehicle.DistanceTravelled;
+            float range = vehicle.Range;
+            if(distanceTravelled < range)
+            {
+                return;
+            }
+
+            float fuel = vehicle.FuelRemaining;
+            if(fuel > 0)
+            {
+                return;
+            }
+
+            vehicle.AddWaypoint(vehicle.HomeBase.Rallypoint);
         }
     }
 }

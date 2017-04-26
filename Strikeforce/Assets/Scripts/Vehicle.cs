@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Networking;
-using System.Drawing;
 using System;
+using System.Drawing;
+using System.Collections.Generic;
 
 namespace Strikeforce
 {
@@ -14,27 +15,71 @@ namespace Strikeforce
     public class Vehicle : Destructible
     {
         protected NavMeshAgent pathfinder;
-        [SyncVar]
+        protected Queue<Vector3> allWaypoints;
         protected Order currentOrder;
         public int RepairCost = 1;
         public int MaxSpeed = 5;
         public int Acceleration = 1;
         public int Range = 50;
-        [SyncVar]
-        protected float distanceTravelled;
+        protected Vector3 previousPosition;
+        public float DistanceTravelled { get; protected set; }
         public int MaxFuelCapacity = 0;
-        [SyncVar]
-        protected float fuelRemaining;
+        public float FuelRemaining { get; protected set; }
         public int FuelConsumption = 0;
+        public Structure HomeBase { get; protected set; }
 
         protected override void Awake()
         {
             base.Awake();
 
             this.pathfinder = GetComponentInChildren<NavMeshAgent>();
+            this.allWaypoints = new Queue<Vector3>();
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+
             this.currentOrder = Order.None;
-            this.distanceTravelled = 0f;
-            this.fuelRemaining = 0f;
+            this.pathfinder.speed = MaxSpeed;
+            this.pathfinder.acceleration = Acceleration;
+            //this.pathfinder.autoRepath = true;
+            this.previousPosition = transform.position;
+            this.DistanceTravelled = 0f;
+            this.FuelRemaining = 0f;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            UpdateDistanceTravelled();
+        }
+
+        public virtual void SetHomeBase(Structure homeBase)
+        {
+            this.HomeBase = homeBase;
+        }
+
+        public virtual void AddWaypoint(Vector3 waypoint)
+        {
+            this.allWaypoints.Enqueue(waypoint);
+        }
+
+        public virtual void SetNextWaypoint()
+        {
+            if(allWaypoints.Count == 0)
+            {
+                return;
+            }
+
+            Vector3 nextWaypoint = allWaypoints.Dequeue();
+            if(nextWaypoint == null)
+            {
+                return;
+            }
+
+            this.pathfinder.SetDestination(nextWaypoint);
         }
 
         public virtual void Move(float x, float z)
@@ -64,6 +109,21 @@ namespace Strikeforce
             this.currentOrder = order;
         }
 
+        public virtual void ConsumeFuel()
+        {
+            if(DistanceTravelled < Range)
+            {
+                return;
+            }
+
+            if(FuelRemaining <= 0)
+            {
+                return;
+            }
+
+            FuelRemaining -= FuelConsumption * Time.deltaTime;
+        }
+
         public virtual float GetFuelPercentage()
         {
             if(MaxFuelCapacity == 0)
@@ -71,15 +131,21 @@ namespace Strikeforce
                 return 1f;
             }
 
-            float fuelPercentage = fuelRemaining / (float)MaxFuelCapacity;
+            float fuelPercentage = FuelRemaining / (float)MaxFuelCapacity;
             return fuelPercentage;
         }
 
         public virtual void Refuel(float amount)
         {
-            fuelRemaining += amount;
+            FuelRemaining += amount;
 
-            fuelRemaining = Mathf.Clamp(fuelRemaining, 0, MaxFuelCapacity);
+            FuelRemaining = Mathf.Clamp(FuelRemaining, 0, MaxFuelCapacity);
+        }
+
+        protected virtual void UpdateDistanceTravelled()
+        {
+            this.DistanceTravelled += Vector3.Distance(transform.position, previousPosition);
+            this.previousPosition = transform.position;
         }
     }
 }
