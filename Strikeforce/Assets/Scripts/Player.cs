@@ -125,10 +125,19 @@ namespace Strikeforce
                 new Hardpoint[] { new Hardpoint(94, -69, 1, 1, HardpointPosition.RightOuterWing) });
 
             GameObject basicShotPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BASIC_SHOT);
-            Weapon basicShot = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
-            basicShot.transform.parent = CurrentRaider.transform;
+            Weapon basicShot1 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
+            basicShot1.transform.parent = CurrentRaider.transform;
 
-            bool equipped = CurrentRaider.EquipWeapon(basicShot, HardpointPosition.Center, 0, 0, 0);
+            Weapon basicShot2 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
+            basicShot2.transform.parent = CurrentRaider.transform;
+
+            GameObject boltPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BOLT);
+            Weapon bolt = GameObject.Instantiate(boltPrefab).GetComponent<Weapon>() as Weapon;
+            bolt.transform.parent = CurrentRaider.transform;
+
+            bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.LeftOuterWing, 0, 0, 0);
+            equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.RightOuterWing, 0, 0, 0);
+            equipped &= CurrentRaider.EquipWeapon(bolt, HardpointPosition.Center, 0, 0, 0);
             if (equipped == true)
             {
                 CurrentRaider.ReadyWeapons();
