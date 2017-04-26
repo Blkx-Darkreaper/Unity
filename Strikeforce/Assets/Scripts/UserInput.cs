@@ -30,10 +30,11 @@ namespace Strikeforce
         public Profile profile;
         protected KeyMap gamepadBinds;
         protected KeyMap keyboardBinds;
-        public float KeyHoldDuration = 1f;
+        public float MinKeyHoldDuration = 1f;
         public float KeyDoubleTapDelay = 0.5f;
         protected Dictionary<ActionKey, KeyEvent> incompleteKeyEvents { get; set; }
-        protected Queue<KeyEvent> completeKeyEvents { get; set; }
+        protected Queue<KeyEvent> allKeyEvents { get; set; }
+        protected KeyEvent previousKeyEvent { get; set; }
         protected bool rightTriggerDown = false;
         protected bool leftTriggerDown = false;
         public const string TRIGGER = "Trigger";
@@ -73,7 +74,7 @@ namespace Strikeforce
         protected void Awake()
         {
             incompleteKeyEvents = new Dictionary<ActionKey, KeyEvent>();
-            completeKeyEvents = new Queue<KeyEvent>();
+            allKeyEvents = new Queue<KeyEvent>();
 
             InitKeyBinds();
         }
@@ -341,7 +342,7 @@ namespace Strikeforce
 
         protected void LeftTrigger()
         {
-            KeyEvent keyEvent = null;
+            KeyEvent keyEvent;
 
 			string leftTrigger = string.Format ("{0} {1}", Direction.LEFT, TRIGGER);
             int trigger = (int)Input.GetAxis(leftTrigger);
@@ -353,8 +354,8 @@ namespace Strikeforce
                 }
 
                 leftTriggerDown = false;
-                keyEvent = GetKeyEvent(ActionKey.LeftTrigger, false);
-                completeKeyEvents.Enqueue(keyEvent);
+                keyEvent = KeyUpEvent(ActionKey.LeftTrigger);
+                allKeyEvents.Enqueue(keyEvent);
                 return;
             }
 
@@ -364,13 +365,13 @@ namespace Strikeforce
             }
 
             leftTriggerDown = true;
-            keyEvent = GetKeyEvent(ActionKey.LeftTrigger, true);
-            completeKeyEvents.Enqueue(keyEvent);
+            keyEvent = KeyDownEvent(ActionKey.LeftTrigger);
+            allKeyEvents.Enqueue(keyEvent);
         }
 
         protected void RightTrigger()
         {
-            KeyEvent keyEvent = null;
+            KeyEvent keyEvent;
 
 			string rightTrigger = string.Format ("{0} {1}", Direction.RIGHT, TRIGGER);
             int trigger = (int)Input.GetAxis(rightTrigger);
@@ -382,8 +383,8 @@ namespace Strikeforce
                 }
 
                 rightTriggerDown = false;
-                keyEvent = GetKeyEvent(ActionKey.RightTrigger, false);
-                completeKeyEvents.Enqueue(keyEvent);
+                keyEvent = KeyUpEvent(ActionKey.RightTrigger);
+                allKeyEvents.Enqueue(keyEvent);
                 return;
             }
 
@@ -393,8 +394,8 @@ namespace Strikeforce
             }
 
             rightTriggerDown = true;
-            keyEvent = GetKeyEvent(ActionKey.RightTrigger, true);
-            completeKeyEvents.Enqueue(keyEvent);
+			keyEvent = KeyDownEvent(ActionKey.RightTrigger);
+            allKeyEvents.Enqueue(keyEvent);
         }
 
         protected void CheckForPressedKeys()
@@ -409,54 +410,63 @@ namespace Strikeforce
                 return;
             }
 
+            KeyEvent keyEvent;
+
             if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
             {
-                AddKeyEvent(ActionKey.Action1);
+                keyEvent = KeyDownEvent(ActionKey.Action1);
+                allKeyEvents.Enqueue(keyEvent);
             }
 
             if (Input.GetKeyDown(keyboardBinds.RightTrigger))
             {
-                AddKeyEvent(ActionKey.RightTrigger);
+                keyEvent = KeyDownEvent(ActionKey.RightTrigger);
+                allKeyEvents.Enqueue(keyEvent);
             }
 
             if (Input.GetKeyDown(gamepadBinds.Menu) || Input.GetKeyDown(keyboardBinds.Menu))
             {
-                AddKeyEvent(ActionKey.Menu);
+                OpenPauseMenu();
             }
         }
 
         protected void CheckForReleasedKeys()
         {
-            KeyEvent keyEvent = null;
+            KeyEvent keyEvent;
 
             if (Input.GetKeyUp(gamepadBinds.Action1) || Input.GetKeyUp(keyboardBinds.Action1))
             {
-                keyEvent = GetKeyEvent(ActionKey.Action1, false);
-                completeKeyEvents.Enqueue(keyEvent);
+                keyEvent = KeyUpEvent(ActionKey.Action1);
+                allKeyEvents.Enqueue(keyEvent);
             }
 
             if (Input.GetKeyUp(keyboardBinds.RightTrigger))
             {
-                keyEvent = GetKeyEvent(ActionKey.RightTrigger, false);
-                completeKeyEvents.Enqueue(keyEvent);
+                keyEvent = KeyUpEvent(ActionKey.RightTrigger);
+                allKeyEvents.Enqueue(keyEvent);
             }
 
             if (Input.GetKeyUp(gamepadBinds.Menu) || Input.GetKeyUp(keyboardBinds.Menu))
             {
-                keyEvent = GetKeyEvent(ActionKey.Menu, false);
                 OpenPauseMenu();
             }
         }
 
-        // KeyDown
-        protected void AddKeyEvent(ActionKey key)
+        protected KeyEvent KeyDownEvent(ActionKey key)
         {
+            if(incompleteKeyEvents.ContainsKey(key) == true)
+            {
+                KeyUpEvent(key);
+                Debug.Log(string.Format("Duplicate keydown events"));
+            }
+
             KeyEvent keyEvent = new KeyEvent(key, KeyEvent.Type.Pressed, Time.time);
             incompleteKeyEvents.Add(key, keyEvent);
+
+            return keyEvent;
         }
 
-        // KeyUp
-        protected KeyEvent GetKeyEvent(ActionKey key, bool keyDownEvent)
+        protected KeyEvent KeyUpEvent(ActionKey key)
         {
             KeyEvent keyEvent;
 
@@ -466,42 +476,53 @@ namespace Strikeforce
             } else
             {
                 keyEvent = incompleteKeyEvents[key];
+                incompleteKeyEvents.Remove(key);
             }
 
-            keyEvent.Release(Time.time);
+            keyEvent.Release(Time.time, MinKeyHoldDuration);
 
             return keyEvent;
         }
 
         protected void HandleKeyEvents()
         {
-            while (completeKeyEvents.Count > 0)
+            while (allKeyEvents.Count > 0)
             {
-                KeyEvent keyEvent = completeKeyEvents.Dequeue();
+                KeyEvent keyEvent = allKeyEvents.Dequeue();
 
                 CheckForDoubleTap(ref keyEvent);
 
                 PlayerHandleKeyEvent(keyEvent);
+
+                if(keyEvent.IsComplete == false)
+                {
+                    return;
+                }
+
+                previousKeyEvent = keyEvent;
             }
         }
 
         protected void CheckForDoubleTap(ref KeyEvent current)
         {
-            KeyEvent next = completeKeyEvents.Peek();
-
-            if(next.Key != current.Key)
+            if(previousKeyEvent == null)
             {
                 return;
             }
 
-            float delay = next.PressedTime - current.PressedTime;
+            if(previousKeyEvent.Key != current.Key)
+            {
+                return;
+            }
+
+            float delay = current.PressedTime - previousKeyEvent.PressedTime;
             if(delay > KeyDoubleTapDelay)
             {
                 return;
             }
 
-            current.DoubleTap(next.PressedTime, next.ReleasedTime);
-            completeKeyEvents.Dequeue();
+            current.DoubleTap(previousKeyEvent.PressedTime, (float)previousKeyEvent.ReleasedTime);
+            //Debug.Log(string.Format("{0} key was double-tapped", current.Key));
         }
 
         protected void PlayerHandleKeyEvent(KeyEvent keyEvent)

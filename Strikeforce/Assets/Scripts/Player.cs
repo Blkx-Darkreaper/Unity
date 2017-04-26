@@ -20,7 +20,7 @@ namespace Strikeforce
         public string RaiderPrefabName = "Raider";
         [HideInInspector]
         public Inventory CurrentInventory;
-        protected bool isInBuildMode = true;
+        protected bool isInBuildMode = false;
         [HideInInspector]
         public GridCursor BuildCursor;
         [HideInInspector]
@@ -146,7 +146,6 @@ namespace Strikeforce
 
         protected void MovePlayer(float x, float y, float z)
         {
-            isInBuildMode = false;    //testing
             Vector3 cameraPosition = Vector3.zero;
             if (isInBuildMode == true)
             {
@@ -183,6 +182,15 @@ namespace Strikeforce
         public void RespondToKeyEvent(KeyEvent keyEvent)
         {
             ActionKey key = keyEvent.Key;
+
+            if (keyEvent.IsComplete == false)
+            {
+                Debug.Log(string.Format("{0} key {1} at {2}", key.ToString(), keyEvent.EventType.ToString(), Time.time.ToString()));
+            }
+            else
+            {
+                Debug.Log(string.Format("{0} key released at {1}", key.ToString(), Time.time.ToString()));
+            }
 
             switch (key)
             {
@@ -234,14 +242,7 @@ namespace Strikeforce
                     }
                     else
                     {
-                        KeyEvent.Type eventType = keyEvent.EventType;
-                        if (eventType == KeyEvent.Type.Released)
-                        {
-                            SetPrimaryFiring(false);
-                            break;
-                        }
-
-                        SetPrimaryFiring(true);
+                        SetPrimaryFiring(!keyEvent.IsComplete);
                     }
                     break;
             }

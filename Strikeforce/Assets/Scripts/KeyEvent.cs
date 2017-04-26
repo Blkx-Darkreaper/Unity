@@ -7,6 +7,7 @@ namespace Strikeforce
         public Type EventType { get; protected set; }
         public float PressedTime { get; protected set; }
         public float? ReleasedTime { get; set; }
+        public bool IsComplete { get; protected set; }
         public float HoldDuration
         {
             get
@@ -20,13 +21,14 @@ namespace Strikeforce
                 return duration;
             }
         }
-        public enum Type { Pressed, DoubleTapped, Held, Released }
+        public enum Type { Pressed, DoubleTapped, Held }
 
         public KeyEvent(ActionKey key, Type type, float pressedTime)
         {
             this.Key = key;
             this.EventType = type;
             this.PressedTime = pressedTime;
+            this.IsComplete = false;
         }
 
         public override string ToString()
@@ -35,13 +37,20 @@ namespace Strikeforce
             return output;
         }
 
-        public void Release(float releasedTime)
+        public void Release(float releasedTime, float minHoldDuration)
         {
             this.ReleasedTime = releasedTime;
-            this.EventType = Type.Released;
+            this.IsComplete = true;
+
+            if(HoldDuration < minHoldDuration)
+            {
+                return;
+            }
+
+            this.EventType = Type.Held;
         }
 
-        public void DoubleTap(float secondPressedTime, float? secondReleasedTime)
+        public void DoubleTap(float previousPressedTime, float previousReleasedTime)
         {
             this.EventType = Type.DoubleTapped;
         }
