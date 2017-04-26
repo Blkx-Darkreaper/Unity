@@ -19,6 +19,8 @@ namespace Strikeforce
 
     public struct Direction
     {
+        public const string UP = "Up";
+        public const string DOWN = "Down";
         public const string LEFT = "Left";
         public const string RIGHT = "Right";
         public const string X = "X";
@@ -28,6 +30,7 @@ namespace Strikeforce
     public class UserInput : NetworkBehaviour
     {
         public Profile profile;
+        public bool IsMenuOpen { get; protected set; }
         protected KeyMap gamepadBinds;
         protected KeyMap keyboardBinds;
         public float MinKeyHoldDuration = 1f;
@@ -73,6 +76,7 @@ namespace Strikeforce
 
         protected void Awake()
         {
+            IsMenuOpen = true;
             incompleteKeyEvents = new Dictionary<ActionKey, KeyEvent>();
             allKeyEvents = new Queue<KeyEvent>();
 
@@ -295,6 +299,12 @@ namespace Strikeforce
                 {
                     return;
                 }
+            }
+
+            if(IsMenuOpen == true)
+            {
+                throw new NotImplementedException();
+                return;
             }
 
             Player player = profile.Player;

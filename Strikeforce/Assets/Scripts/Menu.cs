@@ -20,6 +20,7 @@ namespace Strikeforce
         protected MenuManager menuManager;
         protected Animator animator;
         protected CanvasGroup canvasGroup;
+        protected int selectedIndex = 0;
         protected string[] buttonNames;
         protected Dictionary<string, Button> allButtons;
         protected const string BACK = "Back";
@@ -175,6 +176,28 @@ namespace Strikeforce
             {
                 menuManager.Resume();
             }
+        }
+
+        protected virtual int MenuSelection(int selectedIndex, string direction)
+        {
+            int totalButtons = allButtons.Count;
+
+            switch(direction)
+            {
+                case Direction.UP:
+                    selectedIndex--;
+                    selectedIndex %= totalButtons;
+                    break;
+
+                case Direction.DOWN:
+                    selectedIndex++;
+                    selectedIndex %= totalButtons;
+                    break;
+            }
+
+            string name = buttonNames[selectedIndex];
+            Button selected = allButtons[name];
+            GUI.FocusControl(selected);
         }
 
         protected virtual void DrawMenu()
