@@ -41,9 +41,11 @@ namespace Strikeforce
             base.Start();
 
             this.currentOrder = Order.None;
-            this.pathfinder.speed = MaxSpeed;
-            this.pathfinder.acceleration = Acceleration;
-            //this.pathfinder.autoRepath = true;
+            if (pathfinder != null)
+            {
+                this.pathfinder.speed = MaxSpeed;
+                this.pathfinder.acceleration = Acceleration;
+            }
             this.previousPosition = transform.position;
             this.DistanceTravelled = 0f;
             this.FuelRemaining = 0f;
