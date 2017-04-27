@@ -30,6 +30,7 @@ namespace Strikeforce
     public class UserInput : NetworkBehaviour
     {
         public Profile profile;
+        protected MenuManager menuManager;
         public bool IsMenuOpen { get; protected set; }
         protected KeyMap gamepadBinds;
         protected KeyMap keyboardBinds;
@@ -76,6 +77,7 @@ namespace Strikeforce
 
         protected void Awake()
         {
+            MenuManager menuManager = GetComponent<MenuManager>();
             IsMenuOpen = true;
             incompleteKeyEvents = new Dictionary<ActionKey, KeyEvent>();
             allKeyEvents = new Queue<KeyEvent>();
@@ -301,9 +303,9 @@ namespace Strikeforce
                 }
             }
 
-            if(IsMenuOpen == true)
+            if (IsMenuOpen == true)
             {
-                throw new NotImplementedException();
+                HandleMenuSelection(x, z);
                 return;
             }
 
@@ -314,6 +316,41 @@ namespace Strikeforce
             }
 
             player.LeftStick(x, 0, z);
+        }
+
+        protected void HandleMenuSelection(float x, float z)
+        {
+            if (menuManager == null)
+            {
+                return;
+            }
+
+            Menu currentMenu = menuManager.CurrentMenu;
+
+            string direction;
+            if (x == 0)
+            {
+                return;
+            }
+
+            direction = Direction.UP;
+            if (x < 0)
+            {
+                direction = Direction.DOWN;
+            }
+
+            currentMenu.MenuSelection(direction);
+        }
+
+        protected void HandleMenuClick()
+        {
+            if (menuManager == null)
+            {
+                return;
+            }
+
+            Menu currentMenu = menuManager.CurrentMenu;
+            currentMenu.MenuClick();
         }
 
         protected void RightStick()
@@ -342,7 +379,7 @@ namespace Strikeforce
             float y = Input.GetAxis(dpadY);
 
             Player player = profile.Player;
-            if(player == null)
+            if (player == null)
             {
                 return;
             }
@@ -354,7 +391,7 @@ namespace Strikeforce
         {
             KeyEvent keyEvent;
 
-			string leftTrigger = string.Format ("{0} {1}", Direction.LEFT, TRIGGER);
+            string leftTrigger = string.Format("{0} {1}", Direction.LEFT, TRIGGER);
             int trigger = (int)Input.GetAxis(leftTrigger);
             if (trigger == 0)
             {
@@ -383,7 +420,7 @@ namespace Strikeforce
         {
             KeyEvent keyEvent;
 
-			string rightTrigger = string.Format ("{0} {1}", Direction.RIGHT, TRIGGER);
+            string rightTrigger = string.Format("{0} {1}", Direction.RIGHT, TRIGGER);
             int trigger = (int)Input.GetAxis(rightTrigger);
             if (trigger == 0)
             {
@@ -404,7 +441,7 @@ namespace Strikeforce
             }
 
             rightTriggerDown = true;
-			keyEvent = KeyDownEvent(ActionKey.RightTrigger);
+            keyEvent = KeyDownEvent(ActionKey.RightTrigger);
             allKeyEvents.Enqueue(keyEvent);
         }
 
@@ -424,8 +461,14 @@ namespace Strikeforce
 
             if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
             {
-                keyEvent = KeyDownEvent(ActionKey.Action1);
-                allKeyEvents.Enqueue(keyEvent);
+                if(IsMenuOpen == true)
+                {
+                    HandleMenuClick();
+                } else
+                {
+                    keyEvent = KeyDownEvent(ActionKey.Action1);
+                    allKeyEvents.Enqueue(keyEvent);
+                }
             }
 
             if (Input.GetKeyDown(keyboardBinds.RightTrigger))
@@ -464,7 +507,7 @@ namespace Strikeforce
 
         protected KeyEvent KeyDownEvent(ActionKey key)
         {
-            if(incompleteKeyEvents.ContainsKey(key) == true)
+            if (incompleteKeyEvents.ContainsKey(key) == true)
             {
                 KeyUpEvent(key);
                 Debug.Log(string.Format("Duplicate keydown events"));
@@ -480,10 +523,11 @@ namespace Strikeforce
         {
             KeyEvent keyEvent;
 
-            if(incompleteKeyEvents.ContainsKey(key) == false)
+            if (incompleteKeyEvents.ContainsKey(key) == false)
             {
                 keyEvent = new KeyEvent(key, KeyEvent.Type.Pressed, Time.time);
-            } else
+            }
+            else
             {
                 keyEvent = incompleteKeyEvents[key];
                 incompleteKeyEvents.Remove(key);
@@ -504,7 +548,7 @@ namespace Strikeforce
 
                 PlayerHandleKeyEvent(keyEvent);
 
-                if(keyEvent.IsComplete == false)
+                if (keyEvent.IsComplete == false)
                 {
                     return;
                 }
@@ -515,18 +559,18 @@ namespace Strikeforce
 
         protected void CheckForDoubleTap(ref KeyEvent current)
         {
-            if(previousKeyEvent == null)
+            if (previousKeyEvent == null)
             {
                 return;
             }
 
-            if(previousKeyEvent.Key != current.Key)
+            if (previousKeyEvent.Key != current.Key)
             {
                 return;
             }
 
             float delay = current.PressedTime - previousKeyEvent.PressedTime;
-            if(delay > KeyDoubleTapDelay)
+            if (delay > KeyDoubleTapDelay)
             {
                 return;
             }

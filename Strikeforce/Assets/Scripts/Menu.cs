@@ -20,7 +20,7 @@ namespace Strikeforce
         protected MenuManager menuManager;
         protected Animator animator;
         protected CanvasGroup canvasGroup;
-        protected int selectedIndex = 0;
+        protected int selectedIndex { get; set; }
         protected string[] buttonNames;
         protected Dictionary<string, Button> allButtons;
         protected const string BACK = "Back";
@@ -39,10 +39,10 @@ namespace Strikeforce
 
         protected virtual void Awake()
         {
-            menuManager = GetComponentInParent<MenuManager>();
+            this.menuManager = GetComponentInParent<MenuManager>();
 
-            animator = GetComponent<Animator>();
-            canvasGroup = GetComponent<CanvasGroup>();
+            this.animator = GetComponent<Animator>();
+            this.canvasGroup = GetComponent<CanvasGroup>();
 
             RectTransform rect = GetComponent<RectTransform>();
             if (rect != null)
@@ -52,6 +52,8 @@ namespace Strikeforce
 
             SetButtonNames();
             SetMenuButtons();
+            this.selectedIndex = 0;
+            SelectMenuButton(selectedIndex);
         }
 
         protected virtual void Start()
@@ -89,7 +91,7 @@ namespace Strikeforce
 
         protected virtual void SetButtonNames()
         {
-            buttonNames = new string[] { BACK, EXIT };
+            this.buttonNames = new string[] { BACK, EXIT };
         }
 
         protected virtual void SetMenuButtons()
@@ -178,9 +180,12 @@ namespace Strikeforce
             }
         }
 
-        protected virtual int MenuSelection(int selectedIndex, string direction)
+        public virtual void MenuSelection(string direction)
         {
             int totalButtons = allButtons.Count;
+
+            Debug.Log("Index(" + selectedIndex + ")");  //debug
+            Debug.Log("Direction(" + direction + ")");  //debug
 
             switch(direction)
             {
@@ -195,9 +200,60 @@ namespace Strikeforce
                     break;
             }
 
-            string name = buttonNames[selectedIndex];
-            Button selected = allButtons[name];
-            GUI.FocusControl(selected);
+            Debug.Log("Final Index(" + selectedIndex + ")");  //debug
+
+            SelectMenuButton(selectedIndex);
+        }
+
+        public virtual void MenuClick()
+        {
+            ClickMenuButton(selectedIndex);
+        }
+
+        protected virtual void SelectMenuButton(int index)
+        {
+            if(buttonNames == null)
+            {
+                return;
+            }
+            if(allButtons == null)
+            {
+                return;
+            }
+
+            string name = buttonNames[index];
+
+            if(allButtons.ContainsKey(name) == false)
+            {
+                return;
+            }
+
+            Button button = allButtons[name];
+            button.Select();
+            Debug.Log(string.Format("{0} button selected", name));
+        }
+
+        protected virtual void ClickMenuButton(int index)
+        {
+            if (buttonNames == null)
+            {
+                return;
+            }
+            if (allButtons == null)
+            {
+                return;
+            }
+
+            string name = buttonNames[index];
+
+            if (allButtons.ContainsKey(name) == false)
+            {
+                return;
+            }
+
+            Button button = allButtons[name];
+            button.onClick.Invoke();
+            Debug.Log(string.Format("{0} button clicked", name));
         }
 
         protected virtual void DrawMenu()
