@@ -54,7 +54,9 @@ namespace Strikeforce
 
         protected override void SetButtonNames()
         {
-            buttonNames = new string[] { HOST_GAME, JOIN_GAME };
+            buttonNames = new string[] { HOST_GAME, JOIN_GAME, BACK };
+
+            AddMenuButtons(new string[] { HOST_GAME, JOIN_GAME });
         }
 
         protected override void HandleButtonPress(string buttonName)

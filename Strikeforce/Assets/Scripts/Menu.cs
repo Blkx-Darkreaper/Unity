@@ -51,7 +51,6 @@ namespace Strikeforce
             }
 
             SetButtonNames();
-            SetMenuButtons();
             this.selectedIndex = 0;
             SelectMenuButton(selectedIndex);
         }
@@ -92,9 +91,11 @@ namespace Strikeforce
         protected virtual void SetButtonNames()
         {
             this.buttonNames = new string[] { BACK, EXIT };
+
+            AddMenuButtons(buttonNames);
         }
 
-        protected virtual void SetMenuButtons()
+        protected virtual void AddMenuButtons(string[] buttonsToAdd)
         {
             if (IsDrawingMenu == true)
             {
@@ -124,7 +125,7 @@ namespace Strikeforce
                 return;
             }
 
-            foreach (string buttonName in buttonNames)
+            foreach (string buttonName in buttonsToAdd)
             {
                 GameObject buttonObject = Instantiate(ButtonPrefab) as GameObject;
                 buttonObject.transform.SetParent(buttonGroup.transform, false);

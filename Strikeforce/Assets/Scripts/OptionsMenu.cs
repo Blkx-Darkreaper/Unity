@@ -18,7 +18,7 @@ namespace Strikeforce
 
         protected override void SetButtonNames()
         {
-            
+            this.buttonNames = new string[] { BACK };
         }
     }
 }
