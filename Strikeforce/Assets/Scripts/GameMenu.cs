@@ -11,5 +11,12 @@ namespace Strikeforce
         public const string MANAGE_TEAM = "Manage Team";
         public const string MARKET = "Black Market";
         public const string OPTIONS = "Options";
+
+        protected override void SetButtonNames()
+        {
+            this.buttonNames = new string[] { RESUME, RAID, MANAGE_TEAM, MARKET, OPTIONS };
+
+            AddMenuButtons(buttonNames);
+        }
     }
 }
