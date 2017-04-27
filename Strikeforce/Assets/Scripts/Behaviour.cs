@@ -261,7 +261,7 @@ namespace Strikeforce
                 return;
             }
 
-            vehicle.AddWaypoint(vehicle.HomeBase.Rallypoint);
+            vehicle.AddWaypoint(vehicle.HomeBase.RallyPoint);
         }
     }
 }

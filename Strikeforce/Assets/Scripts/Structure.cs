@@ -22,7 +22,7 @@ namespace Strikeforce
         } }
         protected Vector3 spawnPoint;
         public Vector3 RallyPoint { get; protected set; }
-        public Texture2D RallypointIcon;
+        public Texture2D RallyPointIcon;
         public Texture2D SellIcon;
         protected struct StructureProperties
         {
@@ -361,8 +361,6 @@ namespace Strikeforce
             Owner.CurrentInventory.UpdateResource(ResourceType.Money, -fundsRequired);
 
             CurrentHitPoints += amount;
-
-            SetIsDamaged();
 
             if (CurrentHitPoints < MaxHitPoints)
             {
