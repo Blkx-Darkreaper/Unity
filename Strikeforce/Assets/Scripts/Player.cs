@@ -52,6 +52,8 @@ namespace Strikeforce
             this.CurrentInventory = GetComponent<Inventory>();
             this.Sectors = new LinkedList<Sector>();
             this.CurrentLevel = GameManager.Singleton.CurrentLevels[0];
+            this.allUnits = new LinkedList<Vehicle>();
+            this.allStructures = new LinkedList<Structure>();
         }
 
         public override void OnStartLocalPlayer()
