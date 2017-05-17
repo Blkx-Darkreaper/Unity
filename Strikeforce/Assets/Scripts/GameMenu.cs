@@ -15,8 +15,6 @@ namespace Strikeforce
         protected override void SetButtonNames()
         {
             this.buttonNames = new string[] { RESUME, RAID, MANAGE_TEAM, MARKET, OPTIONS };
-
-            AddMenuButtons(buttonNames);
         }
     }
 }

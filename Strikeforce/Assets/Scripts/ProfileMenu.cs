@@ -32,6 +32,11 @@ namespace Strikeforce
             base.OnGUI();
         }
 
+        protected override void SetButtonNames()
+        {
+            this.buttonNames = new string[] { BACK };
+        }
+
         private static void LoadUsernames()
         {
             if (ProfileManager.Singleton == null)

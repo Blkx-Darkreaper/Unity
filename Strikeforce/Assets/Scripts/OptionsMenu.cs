@@ -20,5 +20,10 @@ namespace Strikeforce
         {
             this.buttonNames = new string[] { BACK };
         }
+
+        protected override string[] GetMenuButtonNamesToAdd()
+        {
+            return new string[] { };
+        }
     }
 }

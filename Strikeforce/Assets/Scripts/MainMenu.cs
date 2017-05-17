@@ -73,7 +73,7 @@ namespace Strikeforce
 
         protected override void SetButtonNames()
         {
-            buttonNames = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
+            this.buttonNames = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
         }
 
         protected override void HandleKeyboardActivity()

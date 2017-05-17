@@ -51,6 +51,9 @@ namespace Strikeforce
             }
 
             SetButtonNames();
+			SetHeaderText();
+            AddMenuButtons();
+
             this.selectedIndex = 0;
             SelectMenuButton(selectedIndex);
         }
@@ -91,24 +94,27 @@ namespace Strikeforce
         protected virtual void SetButtonNames()
         {
             this.buttonNames = new string[] { BACK, EXIT };
-
-            AddMenuButtons(buttonNames);
         }
 
-        protected virtual void AddMenuButtons(string[] buttonsToAdd)
+        protected virtual string[] GetMenuButtonNamesToAdd()
+        {
+            return buttonNames;
+        }
+
+        protected void AddMenuButtons()
         {
             if (IsDrawingMenu == true)
             {
                 return;
             }
 
-            SetHeaderText();
+            string[] buttonsToAdd = GetMenuButtonNamesToAdd();
 
-            if (buttonNames == null)
+            if (buttonsToAdd == null)
             {
                 return;
             }
-            if (buttonNames.Length == 0)
+            if (buttonsToAdd.Length == 0)
             {
                 return;
             }
@@ -157,8 +163,13 @@ namespace Strikeforce
 
         private void SetHeaderText()
         {
+            if (IsDrawingMenu == true)
+            {
+                return;
+            }
+
             //GameObject header = GameObject.FindGameObjectWithTag(Tags.HEADER);
-			Image header = GlobalAssets.GetChildComponentWithTag<Image>(gameObject, Tags.HEADER);
+            Image header = GlobalAssets.GetChildComponentWithTag<Image>(gameObject, Tags.HEADER);
             if (header == null)
             {
                 return;
