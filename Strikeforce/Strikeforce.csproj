@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9631D123-9715-4A90-9691-90744F66FE39}</ProjectGuid>
+    <ProjectGuid>{243C8E98-393D-0802-BAAE-1356271FFB8A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Strikeforce</RootNamespace>
