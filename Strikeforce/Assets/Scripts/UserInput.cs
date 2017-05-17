@@ -31,7 +31,6 @@ namespace Strikeforce
     {
         public Profile profile;
         protected MenuManager menuManager;
-        public bool IsMenuOpen { get; protected set; }
         protected KeyMap gamepadBinds;
         protected KeyMap keyboardBinds;
         public float MinKeyHoldDuration = 1f;
@@ -78,7 +77,6 @@ namespace Strikeforce
         protected void Awake()
         {
             MenuManager menuManager = GetComponent<MenuManager>();
-            IsMenuOpen = true;
             incompleteKeyEvents = new Dictionary<ActionKey, KeyEvent>();
             allKeyEvents = new Queue<KeyEvent>();
 
@@ -303,7 +301,7 @@ namespace Strikeforce
                 }
             }
 
-            if (IsMenuOpen == true)
+            if (menuManager.IsMenuOpen == true)
             {
                 HandleMenuSelection(x, z);
                 return;
@@ -339,7 +337,7 @@ namespace Strikeforce
                 direction = Direction.DOWN;
             }
 
-            currentMenu.MenuSelection(direction);
+            currentMenu.HandleMenuSelection(direction);
         }
 
         protected void HandleMenuClick()
@@ -461,7 +459,7 @@ namespace Strikeforce
 
             if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
             {
-                if(IsMenuOpen == true)
+                if(menuManager.IsMenuOpen == true)
                 {
                     HandleMenuClick();
                 } else
@@ -588,15 +586,6 @@ namespace Strikeforce
             }
 
             player.RespondToKeyEvent(keyEvent);
-        }
-
-        protected void OpenPauseMenu()
-        {
-            Time.timeScale = 0f;
-            GetComponentInChildren<PauseMenu>().enabled = true;
-            //GetComponent<UserInput>().enabled = false;
-            Cursor.visible = true;
-            profile.Player.IsMenuOpen = true;
         }
     }
 }

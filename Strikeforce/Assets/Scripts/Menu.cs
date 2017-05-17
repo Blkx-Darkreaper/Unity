@@ -192,7 +192,7 @@ namespace Strikeforce
             }
         }
 
-        public virtual void MenuSelection(string direction)
+        public virtual void HandleMenuSelection(string direction)
         {
             int totalButtons = allButtons.Count;
 

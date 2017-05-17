@@ -6,8 +6,14 @@ namespace Strikeforce
     public class MenuManager : MonoBehaviour
     {
         public Menu CurrentMenu;
+        public bool IsMenuOpen { get; protected set; }
         public float LoadingTransitionTime = 0.1f;
         public GameObject LoadingScreen;
+
+        public void Awake()
+        {
+            this.IsMenuOpen = true;
+        }
 
         public void Start()
         {
@@ -23,6 +29,7 @@ namespace Strikeforce
 
         public virtual void Pause()
         {
+            this.IsMenuOpen = true;
             Time.timeScale = 0f;
             Cursor.visible = true;
             CurrentMenu.IsOpening = true;
@@ -30,6 +37,7 @@ namespace Strikeforce
 
         public virtual void Resume()
         {
+            this.IsMenuOpen = false;
             Time.timeScale = 1f;
             //Cursor.visible = false;
             CurrentMenu.IsOpening = false;

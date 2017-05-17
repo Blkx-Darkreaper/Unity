@@ -14,8 +14,6 @@ namespace Strikeforce
         [HideInInspector]
         public Hud PlayerHud;
         [HideInInspector]
-        public bool IsMenuOpen { get; set; }
-        [HideInInspector]
         public Raider CurrentRaider;
         public string RaiderPrefabName = "Raider";
         [HideInInspector]
