@@ -82,7 +82,7 @@ namespace Strikeforce
 
         protected void HostGame()
         {
-            menuManager.ToggleLoadingScreen(true);
+            menuManager.LoadGame();
 
             //serverManager.StartAsServer();
             networkManager.StartHost();
@@ -90,7 +90,7 @@ namespace Strikeforce
 
         protected void JoinGame()
         {
-            menuManager.ToggleLoadingScreen(true);
+            menuManager.LoadGame();
 
             networkManager.StartClient();
         }

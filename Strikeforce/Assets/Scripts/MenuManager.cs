@@ -56,12 +56,21 @@ namespace Strikeforce
 
         public virtual void HideLoadingScreen()
         {
-            ToggleLoadingScreen(false);
+            SetLoadingScreenActive(false);
         }
 
-        public virtual void ToggleLoadingScreen(bool isLoading)
+        public virtual void SetLoadingScreenActive(bool isLoading)
         {
             LoadingScreen.SetActive(isLoading);
+        }
+
+        public virtual void LoadGame()
+        {
+            SetLoadingScreenActive(true);
+
+            PauseMenu pauseMenu = FindObjectOfType(typeof(PauseMenu)) as PauseMenu;
+            this.CurrentMenu = pauseMenu;
+            this.CurrentMenu.IsOpening = false;
         }
     }
 }

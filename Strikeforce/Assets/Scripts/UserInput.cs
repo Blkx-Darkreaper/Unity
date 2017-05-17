@@ -477,7 +477,19 @@ namespace Strikeforce
 
             if (Input.GetKeyDown(gamepadBinds.Menu) || Input.GetKeyDown(keyboardBinds.Menu))
             {
-                OpenPauseMenu();
+                TogglePauseMenu();
+            }
+        }
+
+        protected void TogglePauseMenu()
+        {
+            if (menuManager.IsMenuOpen == true)
+            {
+                menuManager.Resume();
+            }
+            else
+            {
+                menuManager.Pause();
             }
         }
 
@@ -499,7 +511,7 @@ namespace Strikeforce
 
             if (Input.GetKeyUp(gamepadBinds.Menu) || Input.GetKeyUp(keyboardBinds.Menu))
             {
-                OpenPauseMenu();
+                TogglePauseMenu();
             }
         }
 
