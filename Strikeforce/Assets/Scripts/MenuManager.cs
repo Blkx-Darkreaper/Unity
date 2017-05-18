@@ -3,8 +3,9 @@ using System.Collections;
 
 namespace Strikeforce
 {
-    public class MenuManager : MonoBehaviour
+    public class MenuManager : Manager
     {
+        public static MenuManager Singleton = null;
         public Menu CurrentMenu;
         public bool IsMenuOpen { get; protected set; }
         public float LoadingTransitionTime = 0.1f;
@@ -12,6 +13,17 @@ namespace Strikeforce
 
         public void Awake()
         {
+            if (Singleton == null)
+            {
+                DontDestroyOnLoad(gameObject);
+                Singleton = this;
+            }
+            if (Singleton != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
             this.IsMenuOpen = true;
         }
 
@@ -45,6 +57,12 @@ namespace Strikeforce
 
         public virtual void ShowMenu(Menu menu)
         {
+            if(menu == null)
+            {
+                Debug.Log("Cannot show menu, no menu loaded");
+                return;
+            }
+
             if (CurrentMenu != null)
             {
                 CurrentMenu.HideMenu();

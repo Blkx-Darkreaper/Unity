@@ -299,7 +299,7 @@ namespace Strikeforce
                 }
             }
 
-            if (profile.MenuManager.IsMenuOpen == true)
+            if (MenuManager.Singleton.IsMenuOpen == true)
             {
                 HandleMenuSelection(x, z);
                 return;
@@ -316,12 +316,7 @@ namespace Strikeforce
 
         protected void HandleMenuSelection(float x, float z)
         {
-            if (profile.MenuManager == null)
-            {
-                return;
-            }
-
-            Menu currentMenu = profile.MenuManager.CurrentMenu;
+            Menu currentMenu = MenuManager.Singleton.CurrentMenu;
 
             string direction;
             if (x == 0)
@@ -340,12 +335,7 @@ namespace Strikeforce
 
         protected void HandleMenuClick()
         {
-            if (profile.MenuManager == null)
-            {
-                return;
-            }
-
-            Menu currentMenu = profile.MenuManager.CurrentMenu;
+            Menu currentMenu = MenuManager.Singleton.CurrentMenu;
             currentMenu.MenuClick();
         }
 
@@ -457,7 +447,7 @@ namespace Strikeforce
 
             if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
             {
-                if(profile.MenuManager.IsMenuOpen == true)
+                if(MenuManager.Singleton.IsMenuOpen == true)
                 {
                     HandleMenuClick();
                 } else
@@ -481,13 +471,13 @@ namespace Strikeforce
 
         protected void TogglePauseMenu()
         {
-            if (profile.MenuManager.IsMenuOpen == true)
+            if (MenuManager.Singleton.IsMenuOpen == true)
             {
-                profile.MenuManager.Resume();
+                MenuManager.Singleton.Resume();
             }
             else
             {
-                profile.MenuManager.Pause();
+                MenuManager.Singleton.Pause();
             }
         }
 

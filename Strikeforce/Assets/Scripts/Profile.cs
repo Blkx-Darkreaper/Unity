@@ -18,7 +18,6 @@ namespace Strikeforce
         public bool IsCurrentProfile { get; protected set; }
         [JsonIgnore]
         public Player Player;
-        public MenuManager MenuManager;
 
         [JsonConstructor]
         public Profile(string username, int avatarId, bool isCurrentProfile)
@@ -36,7 +35,6 @@ namespace Strikeforce
             this.Username = username;
             this.AvatarId = avatarId;
 			this.IsCurrentProfile = isCurrentProfile;
-            this.MenuManager = GetComponent<MenuManager>();
         }
 
         public static void SetCurrentProfile(Profile previousProfile, Profile currentProfile)
