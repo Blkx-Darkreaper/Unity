@@ -76,11 +76,6 @@ namespace Strikeforce
             }
 
             Vector3 nextWaypoint = allWaypoints.Dequeue();
-            if(nextWaypoint == null)
-            {
-                return;
-            }
-
             this.pathfinder.SetDestination(nextWaypoint);
         }
 

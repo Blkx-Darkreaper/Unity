@@ -30,7 +30,6 @@ namespace Strikeforce
     public class UserInput : NetworkBehaviour
     {
         public Profile profile;
-        protected MenuManager menuManager;
         protected KeyMap gamepadBinds;
         protected KeyMap keyboardBinds;
         public float MinKeyHoldDuration = 1f;
@@ -76,7 +75,6 @@ namespace Strikeforce
 
         protected void Awake()
         {
-            MenuManager menuManager = GetComponent<MenuManager>();
             incompleteKeyEvents = new Dictionary<ActionKey, KeyEvent>();
             allKeyEvents = new Queue<KeyEvent>();
 
@@ -301,7 +299,7 @@ namespace Strikeforce
                 }
             }
 
-            if (menuManager.IsMenuOpen == true)
+            if (profile.MenuManager.IsMenuOpen == true)
             {
                 HandleMenuSelection(x, z);
                 return;
@@ -318,12 +316,12 @@ namespace Strikeforce
 
         protected void HandleMenuSelection(float x, float z)
         {
-            if (menuManager == null)
+            if (profile.MenuManager == null)
             {
                 return;
             }
 
-            Menu currentMenu = menuManager.CurrentMenu;
+            Menu currentMenu = profile.MenuManager.CurrentMenu;
 
             string direction;
             if (x == 0)
@@ -342,12 +340,12 @@ namespace Strikeforce
 
         protected void HandleMenuClick()
         {
-            if (menuManager == null)
+            if (profile.MenuManager == null)
             {
                 return;
             }
 
-            Menu currentMenu = menuManager.CurrentMenu;
+            Menu currentMenu = profile.MenuManager.CurrentMenu;
             currentMenu.MenuClick();
         }
 
@@ -459,7 +457,7 @@ namespace Strikeforce
 
             if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
             {
-                if(menuManager.IsMenuOpen == true)
+                if(profile.MenuManager.IsMenuOpen == true)
                 {
                     HandleMenuClick();
                 } else
@@ -483,13 +481,13 @@ namespace Strikeforce
 
         protected void TogglePauseMenu()
         {
-            if (menuManager.IsMenuOpen == true)
+            if (profile.MenuManager.IsMenuOpen == true)
             {
-                menuManager.Resume();
+                profile.MenuManager.Resume();
             }
             else
             {
-                menuManager.Pause();
+                profile.MenuManager.Pause();
             }
         }
 

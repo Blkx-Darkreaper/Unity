@@ -69,8 +69,14 @@ namespace Strikeforce
             SetLoadingScreenActive(true);
 
             PauseMenu pauseMenu = FindObjectOfType(typeof(PauseMenu)) as PauseMenu;
+            
+            if (CurrentMenu != null)
+            {
+                CurrentMenu.HideMenu();
+            }
+
             this.CurrentMenu = pauseMenu;
-            this.CurrentMenu.IsOpening = false;
+            //this.CurrentMenu.IsOpening = false;
         }
     }
 }

@@ -89,7 +89,7 @@ namespace Strikeforce
                 resultsScreen.enabled = true;
                 Time.timeScale = 0f;
                 Cursor.visible = true;
-                winner.Player.IsMenuOpen = true;
+                winner.MenuManager.ShowMenu(resultsScreen);
                 winner.Player.PlayerHud.enabled = false;
             }
         }
