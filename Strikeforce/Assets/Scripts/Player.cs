@@ -142,8 +142,6 @@ namespace Strikeforce
 
             this.CurrentRaider = raiderObject.GetComponent<Raider>();
 
-            Vector3 raiderPosition = raiderObject.transform.position;
-
             CurrentRaider.SetLayout(new Vector3[] {
                 new Vector3(-2, 0, 0),
                 new Vector3(-1, 0, 0),
@@ -180,9 +178,10 @@ namespace Strikeforce
             }
             else
             {
-                Debug.Log("Failed to equip weapons");
+                Debug.Log(String.Format("Failed to equip weapons to raider {0}", CurrentRaider.EntityId));
             }
 
+            Vector3 raiderPosition = raiderObject.transform.position;
             SetCameraOverhead(raiderPosition);
 
             // Set raider and camera initial velocity
@@ -196,7 +195,7 @@ namespace Strikeforce
             CurrentRaider.TakeOff();
             if (CurrentRaider.IsAirborne == false)
             {
-                Debug.Log(String.Format("Raider {0} of player {1} failed to take off", CurrentRaider.EntityId));
+                Debug.Log(String.Format("Raider {0} of player {1} failed to take off", CurrentRaider.EntityId, PlayerId));
             }
         }
 

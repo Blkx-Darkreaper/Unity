@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +14,10 @@ namespace Strikeforce
         public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
         public string CurrentGameName { get; protected set; }
         public string CurrentLevelName { get; protected set; }
-        public Level[] CurrentLevels { get; protected set; }
+        //public Level[] CurrentLevels { get; protected set; }
+        public Team[] AllTeams { get; protected set; }
+        public bool IsGameInProgress { get; protected set; }
+        public float ElapsedGameTime { get; protected set; }
         public Color DefaultColour;
         public int BaseMask;
         public int GroundMask;
@@ -44,15 +48,19 @@ namespace Strikeforce
             this.CurrentLevels = new Level[2];
             this.allGameEntities = new Dictionary<int, Entity>();
 
-            GameObject[] levels = GameObject.FindGameObjectsWithTag(Tags.LEVEL);
-            if (levels == null)
+            GameObject[] allLevels = GameObject.FindGameObjectsWithTag(Tags.LEVEL);
+            if (allLevels == null)
             {
                 return;
             }
 
-            for (int i = 0; i < levels.Length; i++)
+            this.AllTeams = new Team[allLevels.Length];
+            for (int i = 0; i < allLevels.Length; i++)
             {
-                this.CurrentLevels[i] = levels[i].GetComponent<Level>();
+                Level level = allLevels[i].GetComponent<Level>();
+                Team team = allLevels[i].GetComponent<Team>();
+                team.SetHomeBase(level);
+                //this.CurrentLevels[i] = levels[i].GetComponent<Level>();
             }
         }
 
@@ -63,6 +71,13 @@ namespace Strikeforce
 
         protected void Update()
         {
+            if(IsGameInProgress == false)
+            {
+                return;
+            }
+
+            this.ElapsedGameTime += Time.deltaTime;
+
             if (victoryConditions == null)
             {
                 return;
@@ -118,6 +133,57 @@ namespace Strikeforce
             {
                 winCondition.activePlayers = activePlayers.ToArray();
             }
+        }
+
+        public bool CanJoinTeam(Profile playerAccount, Team teamToCheck, Team otherTeam)
+        {
+            int rank = playerAccount.Ranking.Level;
+
+            int teamMembers = teamToCheck.Members.Count;
+            int teamValue = teamToCheck.Value;
+
+            int otherTeamMembers = otherTeam.Members.Count;
+            int otherTeamValue = otherTeam.Value;
+
+            float threshold = 4;    //testing
+
+            int difference = rank + teamValue - otherTeamValue;
+            if(difference > threshold)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void JoinTeam(Profile playerAccount, Team teamToJoin, Team otherTeam)
+        {
+            if(IsGameInProgress == true)
+            {
+                return;
+            }
+
+            bool canJoinTeam = CanJoinTeam(playerAccount, teamToJoin, otherTeam);
+            if (canJoinTeam == false)
+            {
+                return;
+            }
+
+            teamToJoin.AddPlayer(playerAccount);
+        }
+
+        public void StartGame()
+        {
+            Team teamA = AllTeams[0];
+            int teamAPlayers = teamA.Members.Count;
+
+            Team teamB = AllTeams[1];
+            int teamBPlayers = teamB.Members.Count;
+
+            teamA.ResetRaidCountdown(0f, 0f, teamAPlayers, teamBPlayers);
+            teamB.ResetRaidCountdown(0f, 0f, teamBPlayers, teamAPlayers);
+
+            this.IsGameInProgress = true;
         }
 
         public void LoadGame(string gameToLoad, string levelToLoad)
