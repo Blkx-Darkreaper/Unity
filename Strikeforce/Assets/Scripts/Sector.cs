@@ -7,7 +7,7 @@ namespace Strikeforce
     public class Sector : Region
     {
         public int SectorId { get; protected set; }
-        protected Zone parent { get; set; }
+        public Zone Parent { get; protected set; }
         public Spawnpoint Spawn { get; protected set; }
         public Player Owner { get; protected set; }
         protected int totalBuildings { get; set; }
@@ -19,7 +19,7 @@ namespace Strikeforce
             : base(x, y, width, height)
         {
             this.SectorId = sectorId;
-            this.parent = parent;
+            this.Parent = parent;
             this.Spawn = spawn;
             this.Owner = null;
             this.totalBuildings = 0;
@@ -43,12 +43,12 @@ namespace Strikeforce
 
         public bool CanConstructStructure(int cost)
         {
-            return parent.CanConstructStructure(cost);
+            return Parent.CanConstructStructure(cost);
         }
 
         public void UpdateDevelopment(int amount)
         {
-            parent.UpdateDevelopment(amount);
+            Parent.UpdateDevelopment(amount);
         }
 
         public void SetOwnership(Player owner)

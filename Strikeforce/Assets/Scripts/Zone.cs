@@ -8,7 +8,7 @@ namespace Strikeforce
     public class Zone : Region
     {
         public int ZoneId { get; protected set; }
-        protected Zone next { get; set; }
+        public Zone NextZone { get; protected set; }
         public Dictionary<int, Sector> AllSectors { get; protected set; }
         public bool IsLocked { get; protected set; }
         public int CurrentDevelopment { get; protected set; }
@@ -20,7 +20,7 @@ namespace Strikeforce
             : base(x, y, width, height)
         {
             this.ZoneId = zoneId;
-            this.next = null;
+            this.NextZone = null;
             this.AllSectors = new Dictionary<int, Sector>();
 
             SetUnlockThreshold();
@@ -45,7 +45,7 @@ namespace Strikeforce
                 return;
             }
 
-            this.next = zone;
+            this.NextZone = zone;
         }
 
         public override void AddGrid(Grid gridToAdd)
@@ -80,15 +80,15 @@ namespace Strikeforce
 
             int maxDevelopment = baseMax;
 
-            while (next != null)
+            while (NextZone != null)
             {
-                int development = next.CurrentDevelopment;
+                int development = NextZone.CurrentDevelopment;
                 if (development == 0)
                 {
                     break;
                 }
 
-                int modifier = (int)Math.Round(development * 0.5 * (next.ZoneId - ZoneId),0);
+                int modifier = (int)Math.Round(development * 0.5 * (NextZone.ZoneId - ZoneId),0);
                 maxDevelopment += modifier;
             }
 

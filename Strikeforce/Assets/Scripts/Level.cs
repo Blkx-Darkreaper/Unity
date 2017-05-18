@@ -23,6 +23,7 @@ namespace Strikeforce
         protected List<GameObject> allMapTiles;
         protected GameObject allGridObjects;
         protected Dictionary<int, Zone> allZones;
+        protected Sector nextAvailableSector { get; set; }
         public const string BOUNDING_BOX = "BoundingBox";
 
         public void Start()
@@ -105,6 +106,8 @@ namespace Strikeforce
             }
 
             LinkZones();
+
+            this.nextAvailableSector = GetFirstSector();
         }
 
         protected void AddGridToZones(Grid grid)
@@ -166,6 +169,26 @@ namespace Strikeforce
             Sector sector = zone.AllSectors[sectorId];
 
             this.HeadquartersSpawn = sector.Spawn;
+            this.nextAvailableSector = sector;
+        }
+
+        public Sector GetNextAvailableSector()
+        {
+            Sector availableSector = nextAvailableSector;
+
+            int sectorId = availableSector.SectorId;
+            Zone zoneToCheck = availableSector.Parent;
+
+            int nextSectorId = sectorId + 1;
+
+            while(!zoneToCheck.AllSectors.ContainsKey(nextSectorId))
+            {
+                zoneToCheck = zoneToCheck.NextZone;
+            }
+
+            this.nextAvailableSector = zoneToCheck.AllSectors[nextSectorId];
+
+            return availableSector;
         }
 
         protected void LoadBoundingBox(int columns, int rows)

@@ -18,7 +18,7 @@ namespace Strikeforce
         public string RaiderPrefabName = "Raider";
         [HideInInspector]
         public Inventory CurrentInventory;
-        protected bool isInBuildMode = false;
+        protected bool isInBuildMode = true;
         [HideInInspector]
         public GridCursor BuildCursor;
         [HideInInspector]
@@ -61,9 +61,12 @@ namespace Strikeforce
 
         protected void Start()
         {
-            PlayerHud = GetComponentInChildren<Hud>();
-            IsSettingConstructionPoint = false;
-            SpawnRaider();
+            this.PlayerHud = GetComponentInChildren<Hud>();
+            this.IsSettingConstructionPoint = false;
+            this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
+
+            //SpawnCursors();
+            SpawnRaider();  // Testing
         }
 
         protected void Update()
@@ -94,46 +97,79 @@ namespace Strikeforce
             }
         }
 
+        protected void SetCursors()
+        {
+            // Get initial sector and spawnpoint
+            Sector spawnSector = CurrentLevel.GetNextAvailableSector();
+            Spawnpoint spawnpoint = spawnSector.Spawn;
+
+            spawnSector.SetOwnership(this);
+            SetCameraOverhead(spawnpoint);
+
+            // Get the cursors
+            GridCursor[] cursors = GetComponentsInChildren<GridCursor>() as GridCursor;
+            if(cursors.Length != 2)
+            {
+                Debug.Log(String.Format("Failed to retrieve both cursors in player {0}", this.PlayerId));
+                return;
+            }
+
+            this.BuildCursor = cursors[0];
+            this.BuyCursor = cursors[1];
+
+            BuildCursor.transform.position = new Vector3(spawnpoint.x, spawnpoint.y, spawnpoint.z);
+        }
+
         protected void SpawnRaider()	// Testing
         {
+            this.isInBuildMode = false;
+
             // Get spawn point from level
             Vector3 spawn = CurrentLevel.RaiderSpawn.Location;
+
+            // Spawn the raider at the spawnpoint
             GameObject raiderObject = Instantiate(
                 GlobalAssets.GetVehiclePrefab(RaiderPrefabName),
                 spawn,
                 Quaternion.identity) as GameObject;
+
+            // Make the raider a child of the player
             raiderObject.transform.parent = gameObject.transform;
 
-            CurrentRaider = raiderObject.GetComponent<Raider>();
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
+            NetworkServer.SpawnWithClientAuthority(CurrentRaider.gameObject, gameObject);
+            GameManager.Singleton.RegisterEntity(CurrentRaider);
 
-            this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
+            this.CurrentRaider = raiderObject.GetComponent<Raider>();
 
             Vector3 raiderPosition = raiderObject.transform.position;
 
             CurrentRaider.SetLayout(new Vector3[] {
-            	new Vector3(-2, 0, 0),
-            	new Vector3(-1, 0, 0),
-            	new Vector3(0, 0, 0),
-            	new Vector3(1, 0, 0),
-            	new Vector3(2, 0, 0)},
+                new Vector3(-2, 0, 0),
+                new Vector3(-1, 0, 0),
+                new Vector3(0, 0, 0),
+                new Vector3(1, 0, 0),
+                new Vector3(2, 0, 0)},
                 new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
                 new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
                 new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center),
-                	new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) },
+                    new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) },
                 new Hardpoint[] { new Hardpoint(50, -16, 1, 1, HardpointPosition.RightWing) },
                 new Hardpoint[] { new Hardpoint(94, -69, 1, 1, HardpointPosition.RightOuterWing) });
 
             GameObject basicShotPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BASIC_SHOT);
             Weapon basicShot1 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
             basicShot1.transform.parent = CurrentRaider.transform;
+            GameManager.Singleton.RegisterEntity(basicShot1);
 
             Weapon basicShot2 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
             basicShot2.transform.parent = CurrentRaider.transform;
+            GameManager.Singleton.RegisterEntity(basicShot2);
 
             GameObject boltPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BOLT);
             Weapon bolt = GameObject.Instantiate(boltPrefab).GetComponent<Weapon>() as Weapon;
             bolt.transform.parent = CurrentRaider.transform;
+            GameManager.Singleton.RegisterEntity(boltPrefab);
 
             bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.LeftOuterWing, 0, 0, 0);
             equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.RightOuterWing, 0, 0, 0);
@@ -142,13 +178,12 @@ namespace Strikeforce
             {
                 CurrentRaider.ReadyWeapons();
             }
+            else
+            {
+                Debug.Log("Failed to equip weapons");
+            }
 
-            NetworkServer.SpawnWithClientAuthority(CurrentRaider.gameObject, gameObject);
-
-            // Set camera overhead
-            Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 10, raiderPosition.z);
-            mainCamera.transform.position = overheadView;
-            mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
+            SetCameraOverhead(raiderPosition);
 
             // Set raider and camera initial velocity
             float initialVelocity = CurrentRaider.StallSpeed;
@@ -156,6 +191,20 @@ namespace Strikeforce
 
             Vector3 raiderVelocity = CurrentRaider.GetVelocity();
             SetCameraVelocity(raiderVelocity.x, raiderVelocity.y, raiderVelocity.z);
+
+            // Make raider airbourne
+            CurrentRaider.TakeOff();
+            if (CurrentRaider.IsAirborne == false)
+            {
+                Debug.Log(String.Format("Raider {0} of player {1} failed to take off", CurrentRaider.EntityId));
+            }
+        }
+
+        protected void SetCameraOverhead(Vector3 position)
+        {
+            Vector3 overheadView = new Vector3(position.x, position.y + 10, position.z);
+            mainCamera.transform.position = overheadView;
+            mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
         }
 
         public void LeftStick(float x, float y, float z)
