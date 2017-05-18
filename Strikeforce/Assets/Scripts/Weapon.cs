@@ -81,19 +81,7 @@ namespace Strikeforce
             firingSound.Play();
 
             // make bullet disappear after 10 seconds
-            Destroy(bullet, 10.0f);
+            Destroy(bullet, 10.0f); // testing
         }
-
-        //public void Start()
-        //{
-        //	InvokeRepeating(FIRE, AttackDelay, weapon.cooldown);
-        //}
-
-        //private void Fire()
-        //{
-        //	Instantiate(weapon.projectileType, ShotSpawn.position, ShotSpawn.rotation);
-        //	var blasterSound = GetComponent<AudioSource>();
-        //	blasterSound.Play();
-        //}
     }
 }

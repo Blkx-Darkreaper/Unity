@@ -121,7 +121,7 @@ namespace Strikeforce
             this.isBoosting = false;
         }
 
-        public void SetPrimaryFire(bool isFiring)  // Testing
+        public void SetPrimaryFire(bool isFiring)
         {
             foreach (HardpointPosition position in positionOrder)
             {

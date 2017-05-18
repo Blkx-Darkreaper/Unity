@@ -9,7 +9,6 @@ namespace Strikeforce
     public class GameManager : Manager
     {
         public static GameManager Singleton = null;
-        //protected bool isLoading = false;
         protected VictoryCondition[] victoryConditions;
         public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
         public string CurrentGameName { get; protected set; }

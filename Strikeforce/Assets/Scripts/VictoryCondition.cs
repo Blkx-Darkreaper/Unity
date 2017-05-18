@@ -22,7 +22,9 @@ namespace Strikeforce
 
             winningPlayers = new List<Profile>();
 
-            foreach (Profile player in activePlayers)
+            Profile[] sortedPlayers = GetSortedPlayers(activePlayers);
+
+            foreach (Profile player in sortedPlayers)
             {
                 bool conditionsMet = HasPlayerMetWinConditions(player);
                 if (conditionsMet == false)
@@ -67,6 +69,8 @@ namespace Strikeforce
         }
 
         public abstract string GetDescription();
+
+        public abstract Profile[] GetSortedPlayers(Profile[] allPlayersToSort);
 
         public abstract bool HasPlayerMetWinConditions(Profile player);
     }
