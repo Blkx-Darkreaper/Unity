@@ -50,6 +50,39 @@ namespace Strikeforce
             }
         }
 
+        public Vector3 GetVelocity()
+        {
+            Rigidbody rigidBody = GetComponent<Rigidbody>();
+            if(rigidBody == null)
+            {
+                return Vector3.zero;
+            }
+
+            return rigidBody.velocity;
+        }
+
+        public void SetVelocity(float velocityX, float velocityY, float velocityZ)
+        {
+            Rigidbody rigidBody = GetComponent<Rigidbody>();
+            if (rigidBody == null)
+            {
+                return;
+            }
+
+            rigidBody.velocity = new Vector3(velocityX, velocityY, velocityZ);
+        }
+
+        public void SetForwardVelocity(float velocity)
+        {
+            Rigidbody rigidBody = GetComponent<Rigidbody>();
+            if (rigidBody == null)
+            {
+                return;
+            }
+
+            rigidBody.velocity = transform.forward * velocity;
+        }
+
         public virtual void SetWaypoint(Vector3 destination)
         {
             currentWaypoint = destination;

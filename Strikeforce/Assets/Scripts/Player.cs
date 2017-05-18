@@ -149,6 +149,13 @@ namespace Strikeforce
             Vector3 overheadView = new Vector3(raiderPosition.x, raiderPosition.y + 10, raiderPosition.z);
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
+
+            // Set raider and camera initial velocity
+            float initialVelocity = CurrentRaider.StallSpeed;
+            CurrentRaider.SetForwardVelocity(initialVelocity);
+
+            Vector3 raiderVelocity = CurrentRaider.GetVelocity();
+            SetCameraVelocity(raiderVelocity.x, raiderVelocity.y, raiderVelocity.z);
         }
 
         public void LeftStick(float x, float y, float z)
@@ -216,6 +223,18 @@ namespace Strikeforce
         {
             float y = mainCamera.transform.position.y;
             mainCamera.transform.position = new Vector3(position.x, y, position.z);
+        }
+
+        protected void SetCameraVelocity(float velocityX, float velocityY, float velocityZ)
+        {
+            Rigidbody cameraVelocity = mainCamera.GetComponent<Rigidbody>();
+            if(cameraVelocity == null)
+            {
+                Debug.Log("Main camera has no rigidbody");
+                return;
+            }
+
+            cameraVelocity.velocity = new Vector3(velocityX, velocityY, velocityZ);
         }
 
         public void RespondToKeyEvent(KeyEvent keyEvent)

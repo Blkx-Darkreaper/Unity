@@ -18,7 +18,6 @@ namespace Strikeforce
         protected Queue<Vector3> allWaypoints;
         protected Order currentOrder;
         public int RepairCost = 1;
-        public int MaxSpeed = 5;
         public int Acceleration = 1;
         public int Range = 50;
         protected Vector3 previousPosition;
@@ -32,6 +31,7 @@ namespace Strikeforce
         {
             base.Awake();
 
+            this.MaxVelocity = 5;
             this.pathfinder = GetComponentInChildren<NavMeshAgent>();
             this.allWaypoints = new Queue<Vector3>();
         }
@@ -43,7 +43,7 @@ namespace Strikeforce
             this.currentOrder = Order.None;
             if (pathfinder != null)
             {
-                this.pathfinder.speed = MaxSpeed;
+                this.pathfinder.speed = MaxVelocity;
                 this.pathfinder.acceleration = Acceleration;
             }
             this.previousPosition = transform.position;
