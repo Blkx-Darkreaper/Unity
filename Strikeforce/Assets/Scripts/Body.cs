@@ -83,6 +83,28 @@ namespace Strikeforce
             rigidBody.velocity = transform.forward * velocity;
         }
 
+        public void Accelerate(float deltaVelocity)
+        {
+            Rigidbody rigidBody = GetComponent<Rigidbody>();
+            if (rigidBody == null)
+            {
+                return;
+            }
+
+            rigidBody.velocity += transform.forward * deltaVelocity;
+        }
+
+        public void Stop()
+        {
+            Rigidbody rigidBody = GetComponent<Rigidbody>();
+            if (rigidBody == null)
+            {
+                return;
+            }
+
+            rigidBody.velocity = Vector3.zero;
+        }
+
         public virtual void SetWaypoint(Vector3 destination)
         {
             currentWaypoint = destination;

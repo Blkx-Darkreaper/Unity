@@ -21,6 +21,7 @@ namespace Strikeforce
                     HardpointPosition.LeftOuterWing, 
                     HardpointPosition.RightOuterWing 
                 };
+        protected bool isBoosting { get; protected set; }
 
         protected override void Awake()
         {
@@ -35,6 +36,32 @@ namespace Strikeforce
             this.nextArmourNode = allArmour.First;
 
             this.EquippedItem = null;
+
+            this.isBoosting = false;
+        }
+
+        protected override void Update()
+        {
+            foreach (HardpointPosition position in positionOrder)
+            {
+                Hardpoint[] hardpoints = AllHardpoints[position];
+                foreach (Hardpoint hardpoint in hardpoints)
+                {
+                    hardpoint.Update();
+                }
+            }
+        }
+
+        protected void FixedUpdate()
+        {
+            Boost();
+        }
+
+        protected override void DestroyEntity()
+        {
+            base.DestroyEntity();
+
+            Debug.Log(string.Format("You have been destroyed."));
         }
 
         public void SetLayout(Vector3[] firingPoints, Hardpoint[] leftOuterWing, Hardpoint[] leftWing, Hardpoint[] center, Hardpoint[] rightWing, Hardpoint[] rightOuterWing)
@@ -60,6 +87,40 @@ namespace Strikeforce
             }
         }
 
+        public void SetIsBoosting(bool isBoosting)
+        {
+            if(FuelRemaining <= 0)
+            {
+                this.isBoosting = false;
+                return;
+            }
+
+            this.isBoosting = isBoosting;
+        }
+
+        protected void Boost()
+        {
+            if(isBoosting == false)
+            {
+                return;
+            }
+
+            float fuelConsumed = Mathf.Clamp(FuelConsumption * Time.fixedDeltaTime, 0, FuelRemaining);
+            float boostDuration = fuelConsumed / FuelConsumption;
+
+            float deltaVelocity = Acceleration * boostDuration;
+            Accelerate(deltaVelocity);
+
+            FuelRemaining -= fuelConsumed;
+
+            if(FuelRemaining > 0)
+            {
+                return;
+            }
+
+            this.isBoosting = false;
+        }
+
         public void SetPrimaryFire(bool isFiring)  // Testing
         {
             foreach (HardpointPosition position in positionOrder)
@@ -68,18 +129,6 @@ namespace Strikeforce
                 foreach (Hardpoint hardpoint in hardpoints)
                 {
                     hardpoint.SetPrimaryFire(isFiring);
-                }
-            }
-        }
-
-        protected override void Update()
-        {
-            foreach (HardpointPosition position in positionOrder)
-            {
-                Hardpoint[] hardpoints = AllHardpoints[position];
-                foreach (Hardpoint hardpoint in hardpoints)
-                {
-                    hardpoint.Update();
                 }
             }
         }
@@ -197,13 +246,6 @@ namespace Strikeforce
             allArmour.AddLast(armour);
 
             return true;
-        }
-
-        protected override void DestroyEntity()
-        {
-            base.DestroyEntity();
-
-            Debug.Log(string.Format("You have been destroyed."));
         }
     }
 }

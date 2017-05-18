@@ -263,6 +263,9 @@ namespace Strikeforce
                     if(isInBuildMode == true)
                     {
                         Action2();
+                    } else
+                    {
+                        SetIsBoosting(!keyEvent.IsComplete);
                     }
                     break;
 
@@ -733,6 +736,22 @@ namespace Strikeforce
         protected void PageDown()
         {
             throw new NotImplementedException();
+        }
+
+        protected void SetIsBoosting(bool isBoosting)
+        {
+            if(isLocalPlayer == false)
+            {
+                return;
+            }
+
+            Raider raider = CurrentRaider;
+            if(raider == null)
+            {
+                return;
+            }
+
+            raider.SetIsBoosting(isBoosting);
         }
 
         protected void SetPrimaryFiring(bool isFiring)
