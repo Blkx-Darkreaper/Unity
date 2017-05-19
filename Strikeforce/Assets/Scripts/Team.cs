@@ -6,6 +6,7 @@ namespace Strikeforce
 {
     public class Team : MonoBehaviour
     {
+        public string Name { get; protected set; }
         public Level HomeBase { get; protected set; }
         public Color Colour;
         public int TotalRank { get; protected set; }
@@ -18,6 +19,11 @@ namespace Strikeforce
         {
             this.TotalRank = 0;
             this.Members = new Dictionary<string, Profile>();
+        }
+
+        public void SetName(string name)
+        {
+            this.Name = name;
         }
 
         public void SetHomeBase(Level homeBase)
