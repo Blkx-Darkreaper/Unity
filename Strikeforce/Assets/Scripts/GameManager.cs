@@ -137,17 +137,17 @@ namespace Strikeforce
 
         public bool CanJoinTeam(Profile playerAccount, Team teamToCheck, Team otherTeam)
         {
-            int rank = playerAccount.Ranking.Level;
+            int rank = playerAccount.Ranking.Grade;
 
             int teamMembers = teamToCheck.Members.Count;
-            int teamValue = teamToCheck.Value;
+            int totalTeamRank = teamToCheck.TotalRank;
 
             int otherTeamMembers = otherTeam.Members.Count;
-            int otherTeamValue = otherTeam.Value;
+            int otherTotalTeamRank = otherTeam.TotalRank;
 
-            float threshold = 4;    //testing
+            float threshold = 3 * (otherTeamMembers - teamMembers) + 0.5f * (otherTotalTeamRank - totalTeamRank) / rank;
 
-            int difference = rank + teamValue - otherTeamValue;
+            int difference = rank + totalTeamRank - otherTotalTeamRank;
             if(difference > threshold)
             {
                 return false;
@@ -170,6 +170,7 @@ namespace Strikeforce
             }
 
             teamToJoin.AddPlayer(playerAccount);
+            playerAccount.Player.CurrentTeam = teamToJoin;
         }
 
         public void StartGame()

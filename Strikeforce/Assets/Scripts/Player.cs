@@ -10,6 +10,7 @@ namespace Strikeforce
     {
         public int PlayerId { get { return this.playerControllerId; } }
         public bool IsNPC;
+        public Team CurrentTeam { get; set; }
         protected Camera mainCamera;
         [HideInInspector]
         public Hud PlayerHud;
@@ -44,6 +45,8 @@ namespace Strikeforce
             {
                 profile.Player = this;
             }
+
+            this.CurrentTeam = null;
 
             // Get the main camera
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();

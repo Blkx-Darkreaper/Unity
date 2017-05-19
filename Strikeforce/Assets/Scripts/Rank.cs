@@ -108,7 +108,7 @@ namespace Strikeforce
 
     public class Rank
     {
-        public int Level { get; protected set; }
+        public int Grade { get; protected set; }
         public int Score { get; protected set; }
         public GameStats currentGameStats { get; protected set; }
         public RaidModeStats currentRaidStats { get; protected set; }
@@ -120,9 +120,9 @@ namespace Strikeforce
         public Rank() : this(1, 0, new GameStats(), new RaidModeStats(), new BuildModeStats()) { }
 
         [JsonConstructor]
-        public Rank(int level, int score, GameStats gameStats, RaidModeStats raidStats, BuildModeStats buildStats)
+        public Rank(int ranking, int score, GameStats gameStats, RaidModeStats raidStats, BuildModeStats buildStats)
         {
-            this.Level = level;
+            this.Grade = ranking;
             this.Score = score;
             this.currentGameStats = gameStats;
             this.currentRaidStats = raidStats;
@@ -154,7 +154,7 @@ namespace Strikeforce
             this.Level++;*/
 
             // Level adjusts based on player's score
-            this.Level = (5 + (int)Math.Sqrt(25 - 4 * 5 * (100 - Score))) / 10;
+            this.Grade = (5 + (int)Math.Sqrt(25 - 4 * 5 * (100 - Score))) / 10;
         }
 
         public void UpdateScore()

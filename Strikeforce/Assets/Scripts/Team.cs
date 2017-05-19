@@ -8,7 +8,7 @@ namespace Strikeforce
     {
         public Level HomeBase { get; protected set; }
         public Color Colour;
-        public int Value { get; protected set; }
+        public int TotalRank { get; protected set; }
         public Dictionary<string, Profile> Members;
         public bool IsRaidInProgress { get; protected set; }
         public float RaidCountdown { get; protected set; }
@@ -16,7 +16,7 @@ namespace Strikeforce
 
         protected void Awake()
         {
-            this.Value = 0;
+            this.TotalRank = 0;
             this.Members = new Dictionary<string, Profile>();
         }
 
@@ -42,8 +42,16 @@ namespace Strikeforce
         {
             Members.Add(playerToAdd.Username, playerToAdd);
 
-            int rank = playerToAdd.Ranking.Level;
-            Value += rank;
+            int rank = playerToAdd.Ranking.Grade;
+            TotalRank += rank;
+        }
+
+        public void RemovePlayer(Profile playerToRemove)
+        {
+            int rank = playerToRemove.Ranking.Grade;
+            TotalRank -= rank;
+
+            Members.Remove(playerToRemove.Username);
         }
 
         public void LaunchRaid()
