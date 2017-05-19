@@ -14,7 +14,7 @@ namespace Strikeforce
         public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
         public string CurrentGameName { get; protected set; }
         public string CurrentLevelName { get; protected set; }
-        //public Level[] CurrentLevels { get; protected set; }
+        public Level[] CurrentLevels { get; protected set; }
         public Team[] AllTeams { get; protected set; }
         public bool IsGameInProgress { get; protected set; }
         public float ElapsedGameTime { get; protected set; }
@@ -103,7 +103,7 @@ namespace Strikeforce
                 resultsScreen.enabled = true;
                 Time.timeScale = 0f;
                 Cursor.visible = true;
-                winner.MenuManager.ShowMenu(resultsScreen);
+                //winner.MenuManager.ShowMenu(resultsScreen);
                 winner.Player.PlayerHud.enabled = false;
             }
         }

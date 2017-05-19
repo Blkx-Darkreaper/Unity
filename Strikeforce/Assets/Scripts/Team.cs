@@ -17,7 +17,7 @@ namespace Strikeforce
         protected void Awake()
         {
             this.Value = 0;
-            this.Members = new Dictonary<string, Profile>();
+            this.Members = new Dictionary<string, Profile>();
         }
 
         public void SetHomeBase(Level homeBase)

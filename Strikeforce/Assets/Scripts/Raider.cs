@@ -21,7 +21,7 @@ namespace Strikeforce
                     HardpointPosition.LeftOuterWing, 
                     HardpointPosition.RightOuterWing 
                 };
-        protected bool isBoosting { get; protected set; }
+        protected bool isBoosting { get; set; }
 
         protected override void Awake()
         {

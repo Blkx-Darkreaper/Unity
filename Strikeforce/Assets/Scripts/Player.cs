@@ -104,10 +104,10 @@ namespace Strikeforce
             Spawnpoint spawnpoint = spawnSector.Spawn;
 
             spawnSector.SetOwnership(this);
-            SetCameraOverhead(spawnpoint);
+            SetCameraOverhead(spawnpoint.Location);
 
             // Get the cursors
-            GridCursor[] cursors = GetComponentsInChildren<GridCursor>() as GridCursor;
+            GridCursor[] cursors = GetComponentsInChildren<GridCursor>() as GridCursor[];
             if(cursors.Length != 2)
             {
                 Debug.Log(String.Format("Failed to retrieve both cursors in player {0}", this.PlayerId));
@@ -117,7 +117,7 @@ namespace Strikeforce
             this.BuildCursor = cursors[0];
             this.BuyCursor = cursors[1];
 
-            BuildCursor.transform.position = new Vector3(spawnpoint.x, spawnpoint.y, spawnpoint.z);
+            BuildCursor.transform.position = new Vector3(spawnpoint.Location.x, spawnpoint.Location.y, spawnpoint.Location.z);
         }
 
         protected void SpawnRaider()	// Testing
@@ -136,11 +136,11 @@ namespace Strikeforce
             // Make the raider a child of the player
             raiderObject.transform.parent = gameObject.transform;
 
+            this.CurrentRaider = raiderObject.GetComponent<Raider>();
+
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
             NetworkServer.SpawnWithClientAuthority(CurrentRaider.gameObject, gameObject);
             GameManager.Singleton.RegisterEntity(CurrentRaider);
-
-            this.CurrentRaider = raiderObject.GetComponent<Raider>();
 
             CurrentRaider.SetLayout(new Vector3[] {
                 new Vector3(-2, 0, 0),
@@ -167,7 +167,7 @@ namespace Strikeforce
             GameObject boltPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BOLT);
             Weapon bolt = GameObject.Instantiate(boltPrefab).GetComponent<Weapon>() as Weapon;
             bolt.transform.parent = CurrentRaider.transform;
-            GameManager.Singleton.RegisterEntity(boltPrefab);
+            GameManager.Singleton.RegisterEntity(bolt);
 
             bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.LeftOuterWing, 0, 0, 0);
             equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.RightOuterWing, 0, 0, 0);

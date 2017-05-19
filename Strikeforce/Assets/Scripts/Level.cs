@@ -106,8 +106,6 @@ namespace Strikeforce
             }
 
             LinkZones();
-
-            this.nextAvailableSector = GetFirstSector();
         }
 
         protected void AddGridToZones(Grid grid)
