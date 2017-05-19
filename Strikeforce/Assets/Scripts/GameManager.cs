@@ -40,6 +40,8 @@ namespace Strikeforce
                 return;
             }
 
+            this.IsGameInProgress = false;
+
             this.BaseMask = LayerMask.GetMask(Layers.BASE);
             this.GroundMask = LayerMask.GetMask(Layers.GROUND);
             this.AirMask = LayerMask.GetMask(Layers.AIR);
@@ -156,33 +158,31 @@ namespace Strikeforce
             return true;
         }
 
-        public void JoinTeam(Profile playerAccount, Team teamToJoin, Team otherTeam)
+        public void JoinTeam(Profile playerAccount, Team teamToJoin)
         {
             if(IsGameInProgress == true)
             {
                 return;
             }
 
-            bool canJoinTeam = CanJoinTeam(playerAccount, teamToJoin, otherTeam);
-            if (canJoinTeam == false)
-            {
-                return;
-            }
-
             teamToJoin.AddPlayer(playerAccount);
-            playerAccount.Player.CurrentTeam = teamToJoin;
         }
 
         public void StartGame()
         {
+            if(IsGameInProgress == true)
+            {
+                return;
+            }
+
             Team teamA = AllTeams[0];
             int teamAPlayers = teamA.Members.Count;
 
             Team teamB = AllTeams[1];
             int teamBPlayers = teamB.Members.Count;
 
-            teamA.ResetRaidCountdown(0f, 0f, teamAPlayers, teamBPlayers);
-            teamB.ResetRaidCountdown(0f, 0f, teamBPlayers, teamAPlayers);
+            teamA.ResetRaidCountdown(teamAPlayers, teamBPlayers);
+            teamB.ResetRaidCountdown(teamBPlayers, teamAPlayers);
 
             this.IsGameInProgress = true;
         }

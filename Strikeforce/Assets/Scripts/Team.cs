@@ -41,6 +41,7 @@ namespace Strikeforce
         public void AddPlayer(Profile playerToAdd)
         {
             Members.Add(playerToAdd.Username, playerToAdd);
+            playerToAdd.Player.CurrentTeam = this;
 
             int rank = playerToAdd.Ranking.Grade;
             TotalRank += rank;
@@ -52,6 +53,7 @@ namespace Strikeforce
             TotalRank -= rank;
 
             Members.Remove(playerToRemove.Username);
+            playerToRemove.Player.CurrentTeam = null;
         }
 
         public void LaunchRaid()
@@ -59,9 +61,9 @@ namespace Strikeforce
             this.IsRaidInProgress = true;
         }
 
-        public void ResetRaidCountdown(float totalDamageValue, float elapsedGameTime, int teamPlayers, int enemyPlayers)
+        public void ResetRaidCountdown(int teamPlayers, int enemyPlayers, float totalDamageValueFromPreviousRaid = 0f, float elapsedGameTime = 0f)
         {
-            this.RaidCountdown = (12 - 2) * (1 - (float)Math.Exp(-totalDamageValue / 5000f)) + 2 + (teamPlayers - enemyPlayers) / 2f;
+            this.RaidCountdown = (12 - 2) * (1 - (float)Math.Exp(-totalDamageValueFromPreviousRaid / 5000f)) + 2 + (teamPlayers - enemyPlayers) / 2f;
             this.RaidWindowRemaining = 0.5f + 0.1f * (float)Math.Floor((elapsedGameTime + RaidCountdown) / 5) - 0.02f * teamPlayers;
             this.IsRaidInProgress = false;
         }
