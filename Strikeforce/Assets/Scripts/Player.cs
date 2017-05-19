@@ -128,12 +128,12 @@ namespace Strikeforce
             this.isInBuildMode = false;
 
             // Get spawn point from level
-            Vector3 spawn = CurrentLevel.RaiderSpawn.Location;
+            Vector3 spawnLocation = CurrentLevel.GetRaiderSpawnLocation();
 
             // Spawn the raider at the spawnpoint
             GameObject raiderObject = Instantiate(
                 GlobalAssets.GetVehiclePrefab(RaiderPrefabName),
-                spawn,
+                spawnLocation,
                 Quaternion.identity) as GameObject;
 
             // Make the raider a child of the player

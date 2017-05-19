@@ -17,12 +17,12 @@ namespace Strikeforce
         public GameObject BoundingBox;
         public Rectangle Bounds { get { return new Rectangle(0, 0, Columns, Rows); } }
         public Spawnpoint HeadquartersSpawn;
-        public Spawnpoint RaiderSpawn;
         public GameObject TilePrefab;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
         protected GameObject allGridObjects;
         protected Dictionary<int, Zone> allZones;
+        protected Zone lastUnlockedZone;
         protected Sector nextAvailableSector { get; set; }
         public const string BOUNDING_BOX = "BoundingBox";
 
@@ -69,12 +69,7 @@ namespace Strikeforce
             this.Columns = width / TileLength;
             this.Rows = height / TileLength;
 
-            // Set Raider spawn and build Bounding box
-            int spawnX = 0;
-            int spawnY = 5;
-            int spawnZ = 9;
-            this.RaiderSpawn = new Spawnpoint(spawnX, spawnY, spawnZ);
-
+            // Set build Bounding box
             LoadBoundingBox(Columns, Rows);
 
             allGridObjects = new GameObject("GridsObject");
@@ -105,6 +100,7 @@ namespace Strikeforce
                 AddGridToZones(grid);
             }
 
+            this.lastUnlockedZone = allZones[0];
             LinkZones();
         }
 
@@ -139,6 +135,12 @@ namespace Strikeforce
             while (allZones.ContainsKey(nextZoneId) == true)
             {
                 Zone nextZone = allZones[nextZoneId];
+
+                // Update the last unlocked zone
+                if(currentZone.IsLocked == false)
+                {
+                    this.lastUnlockedZone = currentZone;
+                }
 
                 currentZone.SetNextZone(nextZone);
                 currentZone = nextZone;
@@ -202,6 +204,30 @@ namespace Strikeforce
             this.BoundingBox = Instantiate(boundingBoxPrefab, position, Quaternion.identity) as GameObject;
             this.BoundingBox.transform.localScale = new Vector3(columns, 20, rows);
             this.BoundingBox.transform.parent = gameObject.transform;
+        }
+
+        public Vector3 GetRaiderSpawnLocation()
+        {
+            Zone spawnZone = lastUnlockedZone.NextZone;
+            if(spawnZone == null)
+            {
+                spawnZone = lastUnlockedZone;
+            }
+
+            if(spawnZone == null)
+            {
+                throw new InvalidOperationException("No unlocked zones. Cannot get raider spawn location");
+            }
+
+            Vector2 spawnZoneLocation = spawnZone.Location;
+            Size spawnZoneSize = spawnZone.Size;
+            float halfHeight = spawnZoneSize.Height / 2f;
+
+            int spawnX = 0;
+            int spawnY = spawnZoneLocation.y + halfHeight;
+            int spawnZ = 9;
+            Vector3 raiderSpawn = new Vector3(spawnX, spawnY, spawnZ);
+            return raiderSpawn;
         }
 
         public void KeepInBounds(float x, float z, ref float deltaX, ref float deltaZ)
