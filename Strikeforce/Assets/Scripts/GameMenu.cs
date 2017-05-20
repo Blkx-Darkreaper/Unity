@@ -11,10 +11,31 @@ namespace Strikeforce
         public const string MANAGE_TEAM = "Manage Team";
         public const string MARKET = "Black Market";
         public const string OPTIONS = "Options";
+        public const string QUIT_GAME = "Resign";
 
         protected override void SetButtonNames()
         {
-            this.buttonNames = new string[] { RESUME, RAID, MANAGE_TEAM, MARKET, OPTIONS };
+            this.buttonNames = new string[] { RESUME, RAID, MANAGE_TEAM, MARKET, OPTIONS, QUIT_GAME, EXIT };
+        }
+
+        protected override void HandleButtonPress(string buttonName)
+        {
+            switch(buttonName)
+            {
+                case RESUME:
+                    MenuManager.Singleton.Resume();
+                    break;
+
+                case QUIT_GAME:
+                    QuitGame();
+                    break;
+            }
+        }
+
+        protected virtual void QuitGame()
+        {
+            MenuManager.Singleton.SetLoadingScreenActive(true);
+            MenuManager.Singleton.ShowMenu(PreviousMenu);
         }
     }
 }

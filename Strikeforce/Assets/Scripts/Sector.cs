@@ -13,7 +13,13 @@ namespace Strikeforce
         protected int totalBuildings { get; set; }
         public float BuildingConstructionTimeBonus = 0.05f;
 
-        public Sector(int sectorId, Zone parent) : this(sectorId, parent, 0, 0, 0, 0, null) { }
+        public Sector(int sectorId, Zone parent) : base() {
+            this.SectorId = sectorId;
+            this.Parent = parent;
+            this.Spawn = null;
+            this.Owner = null;
+            this.totalBuildings = 0;
+        }
 
         public Sector(int sectorId, Zone parent, int x, int y, int width, int height, Spawnpoint spawn)
             : base(x, y, width, height)

@@ -100,7 +100,7 @@ namespace Strikeforce
                 AddGridToZones(grid);
             }
 
-            this.lastUnlockedZone = allZones[0];
+            this.lastUnlockedZone = allZones[1];
             LinkZones();
         }
 
@@ -130,11 +130,13 @@ namespace Strikeforce
         protected void LinkZones()
         {
             Zone currentZone = allZones[1];
+            currentZone.UpdateDevelopment(0);
 
             int nextZoneId = 2;
             while (allZones.ContainsKey(nextZoneId) == true)
             {
                 Zone nextZone = allZones[nextZoneId];
+                nextZone.UpdateUnlockThreshold();
 
                 // Update the last unlocked zone
                 if(currentZone.IsLocked == false)
@@ -221,11 +223,14 @@ namespace Strikeforce
 
             Vector2 spawnZoneLocation = spawnZone.Location;
             Size spawnZoneSize = spawnZone.Size;
-            float halfHeight = spawnZoneSize.Height / 2f;
+            float halfHeight = 0.5f * spawnZoneSize.Height;
 
-            int spawnX = 0;
-            int spawnY = spawnZoneLocation.y + halfHeight;
-            int spawnZ = 9;
+            float spawnX = 0;
+            float spawnY = 5;
+
+            float spawnZ = spawnZoneLocation.y + halfHeight;
+            spawnZ /= Level.TileLength;
+
             Vector3 raiderSpawn = new Vector3(spawnX, spawnY, spawnZ);
             return raiderSpawn;
         }

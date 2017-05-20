@@ -25,6 +25,7 @@ namespace Strikeforce
             }
 
             this.IsMenuOpen = true;
+            Cursor.visible = false;
         }
 
         public void Start()
@@ -42,15 +43,15 @@ namespace Strikeforce
         public virtual void Pause()
         {
             this.IsMenuOpen = true;
-            Time.timeScale = 0f;
-            Cursor.visible = true;
+            //Time.timeScale = 0f;
+            //Cursor.visible = true;
             CurrentMenu.IsOpening = true;
         }
 
         public virtual void Resume()
         {
             this.IsMenuOpen = false;
-            Time.timeScale = 1f;
+            //Time.timeScale = 1f;
             //Cursor.visible = false;
             CurrentMenu.IsOpening = false;
         }
@@ -80,21 +81,6 @@ namespace Strikeforce
         public virtual void SetLoadingScreenActive(bool isLoading)
         {
             LoadingScreen.SetActive(isLoading);
-        }
-
-        public virtual void LoadGame()
-        {
-            SetLoadingScreenActive(true);
-
-            PauseMenu pauseMenu = FindObjectOfType(typeof(PauseMenu)) as PauseMenu;
-            
-            if (CurrentMenu != null)
-            {
-                CurrentMenu.HideMenu();
-            }
-
-            this.CurrentMenu = pauseMenu;
-            //this.CurrentMenu.IsOpening = false;
         }
     }
 }

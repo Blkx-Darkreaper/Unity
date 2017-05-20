@@ -14,7 +14,13 @@ namespace Strikeforce
         public int CurrentDevelopment { get; protected set; }
         protected int unlockThreshold { get; set; }
 
-        public Zone(int zoneId) : this(zoneId, 0, 0, 0, 0) { }
+        public Zone(int zoneId) : base() {
+            this.ZoneId = zoneId;
+            this.NextZone = null;
+            this.AllSectors = new Dictionary<int, Sector>();
+            this.IsLocked = true;
+            this.unlockThreshold = 0;
+        }
 
         public Zone(int zoneId, int x, int y, int width, int height)
             : base(x, y, width, height)
@@ -22,13 +28,15 @@ namespace Strikeforce
             this.ZoneId = zoneId;
             this.NextZone = null;
             this.AllSectors = new Dictionary<int, Sector>();
-
-            SetUnlockThreshold();
+            this.IsLocked = true;
+            this.unlockThreshold = 0;
         }
 
-        protected void SetUnlockThreshold()
+        public void UpdateUnlockThreshold()
         {
-            int size = Size.Width * Size.Height;
+            int tilesWide = Size.Width / Level.TileLength;
+            int tilesHigh = Size.Height / Level.TileLength;
+            int size = tilesWide * tilesHigh;
 
             this.unlockThreshold = (int)Math.Round(size * (2.5 - 0.05 * (ZoneId - 1)), 0);
         }
@@ -108,7 +116,7 @@ namespace Strikeforce
         {
             this.CurrentDevelopment += amount;
 
-            this.IsLocked = CurrentDevelopment >= unlockThreshold;
+            this.IsLocked = CurrentDevelopment < unlockThreshold;
         }
     }
 }

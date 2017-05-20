@@ -11,6 +11,7 @@ namespace Strikeforce
         public const string JOIN_GAME = "Join Game";
         protected NetworkManager networkManager;
         protected ServerManager serverManager;
+        public GameMenu gameMenu;
 
         protected override void Awake()
         {
@@ -82,7 +83,7 @@ namespace Strikeforce
 
         protected void HostGame()
         {
-            menuManager.LoadGame();
+            LoadGame();
 
             //serverManager.StartAsServer();
             networkManager.StartHost();
@@ -90,9 +91,15 @@ namespace Strikeforce
 
         protected void JoinGame()
         {
-            menuManager.LoadGame();
+            LoadGame();
 
             networkManager.StartClient();
+        }
+
+        protected virtual void LoadGame()
+        {
+            MenuManager.Singleton.SetLoadingScreenActive(true);
+            MenuManager.Singleton.ShowMenu(gameMenu);
         }
     }
 }
