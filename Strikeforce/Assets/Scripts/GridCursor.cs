@@ -22,11 +22,9 @@ namespace Strikeforce
             Vector3 currentPosition = transform.position;
 
             int signX = (int)Mathf.Sign(x);
-            //x = signX * Level.TileLength;
             x = signX;
 
             int signZ = (int)Mathf.Sign(z);
-            //z = signZ * Level.TileLength;
             z = signZ;
 
             CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);

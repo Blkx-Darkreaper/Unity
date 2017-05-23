@@ -61,13 +61,11 @@ namespace Strikeforce
                 return;
             }
 
-            TileLength = map.TileLength;
+            this.TileLength = map.TileLength;
 
-            int width = (int)map.MapSize.Width;
-            int halfWidth = width / 2;
-            int height = (int)map.MapSize.Height;
-            this.Columns = width / TileLength;
-            this.Rows = height / TileLength;
+            this.Columns = (int)map.MapSize.Width;
+            int halfWidth = Columns / 2;
+            this.Rows = (int)map.MapSize.Height;
 
             // Set build Bounding box
             LoadBoundingBox(Columns, Rows);
@@ -83,10 +81,8 @@ namespace Strikeforce
 
                 int x = (int)grid.Location.x;
                 x -= halfWidth;
-                x /= TileLength;
 
                 int z = height - (int)grid.Location.y;
-                z /= TileLength;
                 Vector3 position = new Vector3(x, 0, z);
 
                 GameObject tile = Instantiate(TilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
@@ -227,9 +223,7 @@ namespace Strikeforce
 
             float spawnX = 0;
             float spawnY = 5;
-
             float spawnZ = spawnZoneLocation.y + halfHeight;
-            spawnZ /= Level.TileLength;
 
             Vector3 raiderSpawn = new Vector3(spawnX, spawnY, spawnZ);
             return raiderSpawn;
