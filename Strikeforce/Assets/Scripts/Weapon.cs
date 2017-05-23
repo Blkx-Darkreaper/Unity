@@ -47,10 +47,10 @@ namespace Strikeforce
 
         public void Fire()
         {
-            Fire(0, 0, 1);
+            Fire(Direction.CENTER, 0, 0, 1);
         }
 
-        public void Fire(int angleSpread, int horizontalSpread, int groupingBonus)
+        public void Fire(string direction, int angleSpread, int horizontalSpread, int groupingBonus)
         {
             // Command function is called from the client, but invoked on the server
             bool active = Activate();

@@ -17,16 +17,6 @@ namespace Strikeforce
         //public const string SCROLL_WHEEL = "Mouse ScrollWheel";
     }
 
-    public struct Direction
-    {
-        public const string UP = "Up";
-        public const string DOWN = "Down";
-        public const string LEFT = "Left";
-        public const string RIGHT = "Right";
-        public const string X = "X";
-        public const string Y = "Y";
-    }
-
     public class UserInput : NetworkBehaviour
     {
         public Profile profile;
