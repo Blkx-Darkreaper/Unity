@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -204,26 +205,48 @@ namespace Strikeforce
                 switch (direction)
                 {
                     case Direction.UP:
+                        if (LoopSelection == false)
+                        {
+                            if (SelectedIndex == 0)
+                            {
+                                // Play error sound
+                                throw new NotImplementedException();
+                                return;
+                            }
+                        }
+
                         SelectedIndex--;
                         break;
 
                     case Direction.DOWN:
+                        if (LoopSelection == false)
+                        {
+                            if (SelectedIndex == totalButtons - 1)
+                            {
+                                // Player error sound
+                                throw new NotImplementedException();
+                                return;
+                            }
+                        }
+
                         SelectedIndex++;
                         break;
                 }
 
                 if(LoopSelection == true)
                 {
+                    // Loop through the list of buttons
                     SelectedIndex %= totalButtons;
                 } else
                 {
+                    // Stop at the end
                     SelectedIndex = Mathf.Clamp(SelectedIndex, 0, totalButtons - 1);
                 }
 
                 selectedButton = GetButtonAtIndex(SelectedIndex);
             } while (selectedButton.interactable == false);
 
-            Debug.Log("Final Index(" + SelectedIndex + ")");  //debug
+            //Debug.Log("Final Index(" + SelectedIndex + ")");  //debug
 
             SelectMenuButton(SelectedIndex);
         }
