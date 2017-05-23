@@ -21,6 +21,7 @@ namespace Strikeforce
         protected Animator animator;
         protected CanvasGroup canvasGroup;
         public int SelectedIndex = 0;
+        public bool LoopSelection = true;
         protected string[] buttonNames;
         protected Dictionary<string, Button> allButtons;
         protected const string BACK = "Back";
@@ -204,13 +205,19 @@ namespace Strikeforce
                 {
                     case Direction.UP:
                         SelectedIndex--;
-                        SelectedIndex %= totalButtons;
                         break;
 
                     case Direction.DOWN:
                         SelectedIndex++;
-                        SelectedIndex %= totalButtons;
                         break;
+                }
+
+                if(LoopSelection == true)
+                {
+                    SelectedIndex %= totalButtons;
+                } else
+                {
+                    SelectedIndex = Mathf.Clamp(SelectedIndex, 0, totalButtons - 1);
                 }
 
                 selectedButton = GetButtonAtIndex(SelectedIndex);
