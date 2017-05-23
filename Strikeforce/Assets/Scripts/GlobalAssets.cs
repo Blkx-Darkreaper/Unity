@@ -80,12 +80,12 @@ namespace Strikeforce
 
     public struct Direction
     {
-        public const string MIDDLE = "Middle";
         public const string UP = "Up";
         public const string DOWN = "Down";
-        public const string CENTER = "Center";
+        public const string MIDDLE = "Middle";
         public const string LEFT = "Left";
         public const string RIGHT = "Right";
+        public const string CENTER = "Center";
         public const string X = "X";
         public const string Y = "Y";
     }

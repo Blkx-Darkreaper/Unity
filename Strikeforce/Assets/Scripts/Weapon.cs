@@ -61,11 +61,19 @@ namespace Strikeforce
 
             Debug.Log(string.Format("{0} fired!", Type));
 
+            int directionValue = 1;
+            if(direction == Direction.LEFT)
+            {
+                directionValue = -1;
+            }
+
+            Vector3 synergyOffet = Parent.transform.right * 0.1 * directionValue;
+
             Vector3 parentLocation = Parent.transform.position;
             float x = parentLocation.x;
             float y = parentLocation.y;
             float z = parentLocation.z;
-            Vector3 firingPoint = new Vector3(x, y, z) + firingPointOffset;
+            Vector3 firingPoint = new Vector3(x, y, z) + firingPointOffset + synergyOffet;
 
             // create the bullet object from the bullet prefab
             GameObject bullet = Instantiate(projectilePrefab, firingPoint, Quaternion.identity) as GameObject;
@@ -73,7 +81,10 @@ namespace Strikeforce
             Projectile projectile = bullet.GetComponent<Projectile>();
 
             // make the bullet move away in front of the player
-            bullet.GetComponentInChildren<Rigidbody>().velocity = Parent.transform.forward * projectile.MaxVelocity;
+            Vector3 angleVector = Parent.transform.forward;
+            Quaternion angle = Quaternion.AngleAxis(directionValue * angleSpread, Parent.transform.forward);
+
+            bullet.GetComponentInChildren<Rigidbody>().velocity = angleVector * angle * projectile.MaxVelocity;
 
             // spawn the bullet on the clients
             NetworkServer.Spawn(bullet);
