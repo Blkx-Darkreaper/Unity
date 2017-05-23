@@ -20,7 +20,7 @@ namespace Strikeforce
         protected MenuManager menuManager;
         protected Animator animator;
         protected CanvasGroup canvasGroup;
-        protected int selectedIndex { get; set; }
+        public int SelectedIndex = 0;
         protected string[] buttonNames;
         protected Dictionary<string, Button> allButtons;
         protected const string BACK = "Back";
@@ -54,8 +54,7 @@ namespace Strikeforce
 			SetHeaderText();
             AddMenuButtons();
 
-            this.selectedIndex = 0;
-            SelectMenuButton(selectedIndex);
+            SelectMenuButton(SelectedIndex);
         }
 
         protected virtual void Start()
@@ -196,30 +195,53 @@ namespace Strikeforce
         {
             int totalButtons = allButtons.Count;
 
-            Debug.Log("Index(" + selectedIndex + ")");  //debug
+            Debug.Log("Index(" + SelectedIndex + ")");  //debug
             Debug.Log("Direction(" + direction + ")");  //debug
 
-            switch(direction)
-            {
-                case Direction.UP:
-                    selectedIndex--;
-                    selectedIndex %= totalButtons;
-                    break;
+            Button selectedButton;
+            do {
+                switch (direction)
+                {
+                    case Direction.UP:
+                        SelectedIndex--;
+                        SelectedIndex %= totalButtons;
+                        break;
 
-                case Direction.DOWN:
-                    selectedIndex++;
-                    selectedIndex %= totalButtons;
-                    break;
-            }
+                    case Direction.DOWN:
+                        SelectedIndex++;
+                        SelectedIndex %= totalButtons;
+                        break;
+                }
 
-            Debug.Log("Final Index(" + selectedIndex + ")");  //debug
+                selectedButton = GetButtonAtIndex(SelectedIndex);
+            } while (selectedButton.interactable == false);
 
-            SelectMenuButton(selectedIndex);
+            Debug.Log("Final Index(" + SelectedIndex + ")");  //debug
+
+            SelectMenuButton(SelectedIndex);
         }
 
         public virtual void MenuClick()
         {
-            ClickMenuButton(selectedIndex);
+            ClickMenuButton(SelectedIndex);
+        }
+
+        protected virtual Button GetButtonAtIndex(int index)
+        {
+            string name = buttonNames[index];
+
+            if (allButtons.ContainsKey(name) == false)
+            {
+                return null;
+            }
+
+            Button button = allButtons[name];
+            return button;
+        }
+
+        public virtual void SelectCurrentMenuButton()
+        {
+            SelectMenuButton(SelectedIndex);
         }
 
         protected virtual void SelectMenuButton(int index)
@@ -233,15 +255,20 @@ namespace Strikeforce
                 return;
             }
 
-            string name = buttonNames[index];
-
-            if(allButtons.ContainsKey(name) == false)
+            Button button = GetButtonAtIndex(index);
+            if(button == null)
             {
                 return;
             }
 
-            Button button = allButtons[name];
+            if(button.interactable == false)
+            {
+                return;
+            }
+
             button.Select();
+
+            string name = buttonNames[index];
             Debug.Log(string.Format("{0} button selected", name));
         }
 
