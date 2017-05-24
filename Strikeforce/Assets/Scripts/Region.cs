@@ -42,10 +42,8 @@ namespace Strikeforce
 
             this.Location = new Vector2(x, y);
 
-            int tileLength = Level.TileLength;
-
-            int outerGridX = gridX + tileLength;
-            int outerGridY = gridY + tileLength;
+            int outerGridX = gridX + 1;
+            int outerGridY = gridY + 1;
 
             float outerX = Location.x + Size.Width;
             float outerY = Location.y + Size.Height;

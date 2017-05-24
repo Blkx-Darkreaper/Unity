@@ -34,11 +34,11 @@ namespace Strikeforce
 
         public void UpdateUnlockThreshold()
         {
-            int tilesWide = Size.Width / Level.TileLength;
-            int tilesHigh = Size.Height / Level.TileLength;
-            int size = tilesWide * tilesHigh;
+            int tilesWide = Size.Width;
+            int tilesHigh = Size.Height;
+            int area = tilesWide * tilesHigh;
 
-            this.unlockThreshold = (int)Math.Round(size * (2.5 - 0.05 * (ZoneId - 1)), 0);
+            this.unlockThreshold = (int)Math.Round(area * (2.5 - 0.05 * (ZoneId - 1)), 0);
         }
 
         public void SetNextZone(Zone zone)

@@ -71,6 +71,9 @@ namespace Strikeforce
 
             CurrentMenu = menu;
             CurrentMenu.ShowMenu();
+
+            // Select the previously selected button
+            CurrentMenu.SelectCurrentMenuButton();
         }
 
         public virtual void HideLoadingScreen()
