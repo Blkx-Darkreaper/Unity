@@ -15,11 +15,13 @@ namespace Strikeforce
 
         protected override void Awake()
         {
-            // Hookup back button first
+            // Get back button first
             Button backButton = GlobalAssets.GetChildComponentWithTag<Button>(gameObject, Tags.BUTTON);
-            AddButtonHandler(backButton, BACK);
 
             base.Awake();
+
+            // Add back button handler
+            AddButtonHandler(backButton, BACK);
 
             this.networkManager = NetworkManager.singleton;
             if (networkManager == null)
