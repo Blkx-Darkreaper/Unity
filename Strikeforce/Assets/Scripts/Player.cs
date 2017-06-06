@@ -18,6 +18,8 @@ namespace Strikeforce
         public Raider CurrentRaider;
         public string RaiderPrefabName = "Raider";
         [HideInInspector]
+        public Checkpoint PreviousCheckpoint = null;
+        [HideInInspector]
         public Inventory CurrentInventory;
         protected bool isInBuildMode = true;
         public GridCursor BuildCursor;

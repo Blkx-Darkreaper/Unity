@@ -73,6 +73,12 @@ namespace Strikeforce
             this.RaidCountdown = (12 - 2) * (1 - (float)Math.Exp(-totalDamageValueFromPreviousRaid / 5000f)) + 2 + (teamPlayers - enemyPlayers) / 2f;
             this.RaidWindowRemaining = 0.5f + 0.1f * (float)Math.Floor((elapsedGameTime + RaidCountdown) / 5) - 0.02f * teamPlayers;
             this.IsRaidInProgress = false;
+
+            // Remove all checkpoints
+            foreach(Profile account in Members.Values)
+            {
+                account.Player.PreviousCheckpoint = null;
+            }
         }
     }
 }
