@@ -20,9 +20,7 @@ namespace Strikeforce
         [HideInInspector]
         public Inventory CurrentInventory;
         protected bool isInBuildMode = true;
-        [HideInInspector]
         public GridCursor BuildCursor;
-        [HideInInspector]
         public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
