@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace Strikeforce
 {
@@ -13,6 +14,11 @@ namespace Strikeforce
         public int Width { get { return EquippedItems.GetLength(1); } }
         public int Height { get { return EquippedItems.GetLength(0); } }
         public Equipment[,] EquippedItems { get; protected set; }
+        protected Dictionary<string, LinkedList<Weapon>> allWeaponTypes { get; set; }
+        public string DominantWeaponType { get; protected set; }
+        public int AngledSpread { get; protected set; }
+        public int HorizontalSpread { get; protected set; }
+        public int GroupingBonus { get; protected set; }
         protected TriggerLink primaryFire;
         protected TriggerLink secondaryFire;
         protected TriggerLink specialFire;
@@ -22,6 +28,11 @@ namespace Strikeforce
             this.Location = new Vector2(relativeToCenterX, relativeToCenterY);
             this.Position = position;
             this.EquippedItems = new Equipment[width, height];
+            this.allWeaponTypes = new Dictionary<string, LinkedList<Weapon>>();
+            this.DominantWeaponType = string.Empty;
+            this.AngledSpread = 0;
+            this.HorizontalSpread = 0;
+            this.GroupingBonus = 0;
             this.primaryFire = new TriggerLink(TriggerLink.Type.Primary);
             this.secondaryFire = new TriggerLink(TriggerLink.Type.Secondary);
             this.specialFire = new TriggerLink(TriggerLink.Type.Special);
@@ -88,8 +99,23 @@ namespace Strikeforce
                 return;
             }
 
-            // Set Parent
-            item.Parent = parent;
+            // Set Parent of weapon
+            Weapon weapon = (Weapon)item;
+            weapon.Parent = parent;
+
+            LinkedList<Weapon> weaponType;
+            bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
+            if (hasType == false)
+            {
+                weaponType = new LinkedList<Weapon>();
+                this.allWeaponTypes.Add(weapon.Type, weaponType);
+            }
+            else
+            {
+                weaponType = this.allWeaponTypes[weapon.Type];
+            }
+
+            weaponType.AddLast(weapon);
         }
 
         public Equipment Unequip(int row, int column)
@@ -112,6 +138,18 @@ namespace Strikeforce
                     }
 
                     EquippedItems[x, y] = null;
+                }
+            }
+
+            if(item.IsWeapon == true)
+            {
+                Weapon weapon = (Weapon)item;
+
+                bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
+                if (hasType == true)
+                {
+                    LinkedList<Weapon> weaponType = this.allWeaponTypes[weapon.Type];
+                    weaponType.Remove(weapon);
                 }
             }
 
@@ -146,16 +184,110 @@ namespace Strikeforce
 
         public void ReadyWeapons()
         {
-            primaryFire.ReadyWeapons();
-            secondaryFire.ReadyWeapons();
-            specialFire.ReadyWeapons();
+            if(allWeaponTypes.Count == 0)
+            {
+                return;
+            }
+
+            LinkedList<Weapon> sortedWeapons = SetFiringOrder();
+            SetAngledSpread();
+            SetHorizontalSpread();
+            SetGroupingBonus();
+
+            primaryFire.ReadyWeapons(sortedWeapons);
+            secondaryFire.ReadyWeapons(sortedWeapons);
+            specialFire.ReadyWeapons(sortedWeapons);
+        }
+
+        protected LinkedList<Weapon> SetFiringOrder()
+        {
+            SortedList<int, string> firingOrder = new SortedList<int, string>();
+
+            foreach (string type in allWeaponTypes.Keys)
+            {
+                GameObject prefab = GlobalAssets.GetWeaponPrefab(type);
+                Weapon weapon = prefab.GetComponent<Weapon>();
+                int priority = weapon.Priority;
+                int quantity = this.allWeaponTypes[type].Count;
+
+                int triples = quantity / 3;
+                int pairs = (quantity - 3 * triples) / 2;
+                int value = 100 * triples + 10 * pairs + priority;
+
+                firingOrder.Add(value, type);
+            }
+
+            // Set the dominant weapon type
+            this.DominantWeaponType = firingOrder[firingOrder.Keys[0]];
+
+            LinkedList<Weapon> sortedWeapons = new LinkedList<Weapon>();
+            foreach (int key in firingOrder.Keys)
+            {
+                string type = firingOrder[key];
+
+                LinkedList<Weapon> weaponType = allWeaponTypes[type];
+                foreach (Weapon weapon in weaponType)
+                {
+                    sortedWeapons.AddLast(weapon);
+                }
+            }
+
+            return sortedWeapons;
+        }
+
+        protected void SetAngledSpread()
+        {
+            if (DominantWeaponType.Equals(Weapon.Types.BOLT) == true)
+            {
+                return;
+            }
+
+            if (allWeaponTypes.ContainsKey(Weapon.Types.BOLT) == false)
+            {
+                return;
+            }
+
+            int quantity = allWeaponTypes[Weapon.Types.BOLT].Count;
+            this.AngledSpread = quantity * 5;
+        }
+
+        protected void SetHorizontalSpread()
+        {
+            if (DominantWeaponType.Equals(Weapon.Types.FLAMEBURST) == true)
+            {
+                return;
+            }
+
+            if (allWeaponTypes.ContainsKey(Weapon.Types.FLAMEBURST) == false)
+            {
+                return;
+            }
+
+            int quantity = allWeaponTypes[Weapon.Types.FLAMEBURST].Count;
+            this.HorizontalSpread = quantity * 10;
+        }
+
+        protected void SetGroupingBonus()
+        {
+            if (DominantWeaponType.Equals(Weapon.Types.WAVE) == true)
+            {
+                return;
+            }
+
+            if (allWeaponTypes.ContainsKey(Weapon.Types.WAVE) == false)
+            {
+                return;
+            }
+
+            int quantity = allWeaponTypes[Weapon.Types.WAVE].Count;
+            this.GroupingBonus = quantity;
         }
 
         public void Update()
         {
-            primaryFire.Update();
-            secondaryFire.Update();
-            specialFire.Update();
+            primaryFire.Update(DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
+            secondaryFire.Update(DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
+            specialFire.Update(DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
         }
 
         public void SetPrimaryFire(bool isFiring)
