@@ -244,7 +244,7 @@ namespace Strikeforce
             bool foundPoint = Physics.Raycast(ray, out hit);
             if (foundPoint == false)
             {
-                return GlobalAssets.InvalidPoint;
+                return GlobalAssets.InvalidLocation;
             }
 
             return hit.point;

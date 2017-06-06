@@ -902,7 +902,7 @@ namespace Strikeforce
             vehicleToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId));
 
-            if (rallyPoint == GlobalAssets.InvalidPoint)
+            if (rallyPoint == GlobalAssets.InvalidLocation)
             {
                 return;
             }
@@ -932,7 +932,7 @@ namespace Strikeforce
             vehicleToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId.ToString()));
 
-            if (rallyPoint == GlobalAssets.InvalidPoint)
+            if (rallyPoint == GlobalAssets.InvalidLocation)
             {
                 return;
             }
