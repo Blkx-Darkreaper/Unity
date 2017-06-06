@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strikeforce", "Strikeforce.csproj", "{243C8E98-393D-0802-BAAE-1356271FFB8A}"
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strikeforce", "Strikeforce.csproj", "{AFB96425-3D22-43DD-B811-93F4C8BA60FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{243C8E98-393D-0802-BAAE-1356271FFB8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{243C8E98-393D-0802-BAAE-1356271FFB8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{243C8E98-393D-0802-BAAE-1356271FFB8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{243C8E98-393D-0802-BAAE-1356271FFB8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFB96425-3D22-43DD-B811-93F4C8BA60FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFB96425-3D22-43DD-B811-93F4C8BA60FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFB96425-3D22-43DD-B811-93F4C8BA60FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFB96425-3D22-43DD-B811-93F4C8BA60FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
