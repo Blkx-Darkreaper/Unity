@@ -11,6 +11,7 @@ namespace Strikeforce
         public Color Colour;
         public int TotalRank { get; protected set; }
         public Dictionary<string, Profile> Members;
+        public Inventory SharedInventory;
         public bool IsRaidInProgress { get; protected set; }
         public float RaidCountdown { get; protected set; }
         public float RaidWindowRemaining { get; protected set; }

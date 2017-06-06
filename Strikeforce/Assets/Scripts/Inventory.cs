@@ -122,5 +122,58 @@ namespace Strikeforce
             int amount = resourceLimits[type];
             return amount;
         }
+
+        public void TransferAllTo(Inventory other)
+        {
+            other.AllRaiders.AddRange(AllRaiders);
+            AllRaiders = new List<Raider>();
+
+            other.AllGuns.AddRange(AllGuns);
+            AllGuns = new List<Weapon>();
+
+            other.AllOrdnance.AddRange(AllOrdnance);
+            AllOrdnance = new List<Weapon>();
+
+            other.AllMunitions.AddRange(AllMunitions);
+            AllMunitions = new List<Ordnance>();
+
+            other.AllEquipment.AddRange(AllEquipment);
+            AllEquipment = new List<Equipment>();
+        }
+
+        protected Raider RemoveRaider(Raider raiderToRemove)
+        {
+            AllRaiders.Remove(raiderToRemove);
+            return raiderToRemove;
+        }
+
+        protected Equipment RemoveEquipment(Equipment itemToRemove)
+        {
+            Type itemType = itemToRemove.GetType();
+
+            if (itemType != typeof(Weapon))
+            {
+                AllEquipment.Remove(itemToRemove);
+                return itemToRemove;
+            }
+
+            Weapon weapon = (Weapon)itemToRemove;
+
+            if (weapon.IsOrdnanceWeapon == false)
+            {
+                AllOrdnance.Remove(weapon);
+                return weapon;
+            }
+
+            AllGuns.Remove(weapon);
+            return itemToRemove;
+        }
+
+        protected Ordnance RemoveMunition(Ordnance munitionToRemove)
+        {
+            AllMunitions.Remove(munitionToRemove);
+            return munitionToRemove;
+        }
     }
+}
 }
