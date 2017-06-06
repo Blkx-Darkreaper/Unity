@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
+    [Serializable]
     public class Checkpoint : MonoBehaviour
     {
         public Vector2 Location;
