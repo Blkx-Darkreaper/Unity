@@ -111,19 +111,19 @@ namespace Strikeforce
             Vector3 leftFiringPoint = new Vector3(firingPoint.x, firingPoint.y, firingPoint.z) + leftOffset;
             Vector3 rightFiringPoint = new Vector3(firingPoint.x, firingPoint.y, firingPoint.z) + rightOffet;
 
-            // create the bullet objects from the bullet prefab
-            GameObject leftBullet = Instantiate(projectilePrefab, leftFiringPoint, Quaternion.identity) as GameObject;
-            GameObject rightBullet = Instantiate(projectilePrefab, rightFiringPoint, Quaternion.identity) as GameObject;
-
-            Projectile projectile = leftBullet.GetComponent<Projectile>();
-
             // make the bullets move away in front of the player
-            Vector3 angleVector = Parent.transform.forward;
+            Vector3 forwardVector = Parent.transform.forward;
             Quaternion rightAngle = Quaternion.AngleAxis(angleSpread, Parent.transform.forward);
             Quaternion leftAngle = Quaternion.AngleAxis(-angleSpread, Parent.transform.forward);
 
-            leftBullet.GetComponentInChildren<Rigidbody>().velocity = (angleVector + rightAngle.eulerAngles) * projectile.MaxVelocity;
-            rightBullet.GetComponentInChildren<Rigidbody>().velocity = (angleVector + leftAngle.eulerAngles) * projectile.MaxVelocity;
+            // create the bullet objects from the bullet prefab
+            GameObject leftBullet = Instantiate(projectilePrefab, leftFiringPoint, leftAngle) as GameObject;
+            GameObject rightBullet = Instantiate(projectilePrefab, rightFiringPoint, rightAngle) as GameObject;
+
+            Projectile projectile = leftBullet.GetComponent<Projectile>();
+
+            leftBullet.GetComponentInChildren<Rigidbody>().velocity = (forwardVector + rightAngle.eulerAngles) * projectile.MaxVelocity;
+            rightBullet.GetComponentInChildren<Rigidbody>().velocity = (forwardVector + leftAngle.eulerAngles) * projectile.MaxVelocity;
 
             // spawn the bullets on the clients
             NetworkServer.Spawn(leftBullet);
