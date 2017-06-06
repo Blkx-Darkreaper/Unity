@@ -29,22 +29,22 @@ namespace Strikeforce
 
     public class Inventory : MonoBehaviour
     {
-        public List<Raider> AllRaiders;
-        public List<Weapon> AllGuns;
-        public List<Weapon> AllOrdnance;
-        public List<Ordnance> AllMunitions;
-        public List<Equipment> AllEquipment;
+        public LinkedList<Raider> AllRaiders;
+        public LinkedList<Weapon> AllGuns;
+        public LinkedList<Weapon> AllOrdnance;
+        public LinkedList<Ordnance> AllMunitions;
+        public LinkedList<Equipment> AllEquipment;
         public int StartingMoney = 1000, MoneyLimit = 9999999, StartingFuel = 500, FuelLimit = 9999,
             StartingRockets = 0, RocketLimit = 9999, StartingMissiles = 0, MissileLimit = 9999, StartingBombs = 0, BombLimit = 9999;
         protected Dictionary<ResourceType, int> resources, resourceLimits;
 
         protected void Awake()
         {
-            AllRaiders = new List<Raider>();
-            AllGuns = new List<Weapon>();
-            AllOrdnance = new List<Weapon>();
-            AllMunitions = new List<Ordnance>();
-            AllEquipment = new List<Equipment>();
+            AllRaiders = new LinkedList<Raider>();
+            AllGuns = new LinkedList<Weapon>();
+            AllOrdnance = new LinkedList<Weapon>();
+            AllMunitions = new LinkedList<Ordnance>();
+            AllEquipment = new LinkedList<Equipment>();
             InitResources();
         }
 
@@ -125,20 +125,20 @@ namespace Strikeforce
 
         public void TransferAllTo(Inventory other)
         {
-            other.AllRaiders.AddRange(AllRaiders);
-            AllRaiders = new List<Raider>();
+            other.AllRaiders.AddLast(AllRaiders.First);
+            AllRaiders = new LinkedList<Raider>();
 
-            other.AllGuns.AddRange(AllGuns);
-            AllGuns = new List<Weapon>();
+            other.AllGuns.AddLast(AllGuns.First);
+            AllGuns = new LinkedList<Weapon>();
 
-            other.AllOrdnance.AddRange(AllOrdnance);
-            AllOrdnance = new List<Weapon>();
+            other.AllOrdnance.AddLast(AllOrdnance.First);
+            AllOrdnance = new LinkedList<Weapon>();
 
-            other.AllMunitions.AddRange(AllMunitions);
-            AllMunitions = new List<Ordnance>();
+            other.AllMunitions.AddLast(AllMunitions.First);
+            AllMunitions = new LinkedList<Ordnance>();
 
-            other.AllEquipment.AddRange(AllEquipment);
-            AllEquipment = new List<Equipment>();
+            other.AllEquipment.AddLast(AllEquipment.First);
+            AllEquipment = new LinkedList<Equipment>();
         }
 
         protected Raider RemoveRaider(Raider raiderToRemove)
