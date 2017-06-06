@@ -12,8 +12,8 @@ namespace Strikeforce
         public bool IsNPC;
         public Team CurrentTeam { get; set; }
         protected Camera mainCamera;
-        [HideInInspector]
-        public Hud PlayerHud;
+        public Hud BuildHud;
+        public Hud RaidHud;
         [HideInInspector]
         public Raider CurrentRaider;
         public string RaiderPrefabName = "Raider";
@@ -48,6 +48,9 @@ namespace Strikeforce
 
             this.CurrentTeam = null;
 
+            this.BuildHud.enabled = isInBuildMode;
+            this.RaidHud.enabled = !isInBuildMode;
+
             // Get the main camera
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
             this.CurrentInventory = GetComponent<Inventory>();
@@ -64,7 +67,6 @@ namespace Strikeforce
 
         protected void Start()
         {
-            this.PlayerHud = GetComponentInChildren<Hud>();
             this.IsSettingConstructionPoint = false;
             this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
 
@@ -126,6 +128,8 @@ namespace Strikeforce
         protected void SpawnRaider()	// Testing
         {
             this.isInBuildMode = false;
+            this.BuildHud.enabled = isInBuildMode;
+            this.RaidHud.enabled = !isInBuildMode;
 
             // Get spawn point from level
             Vector3 spawnLocation = CurrentLevel.GetRaiderSpawnLocation();
