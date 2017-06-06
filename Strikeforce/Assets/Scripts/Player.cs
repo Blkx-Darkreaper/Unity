@@ -146,11 +146,11 @@ namespace Strikeforce
             GameManager.Singleton.RegisterEntity(CurrentRaider);
 
             CurrentRaider.SetLayout(new Vector3[] {
-                new Vector3(-0.5f, 0, 0),
                 new Vector3(-0.25f, 0, 0),
+                new Vector3(-0.125f, 0, 0),
                 new Vector3(0, 0, 0),
-                new Vector3(0.25f, 0, 0),
-                new Vector3(0.5f, 0, 0)},
+                new Vector3(0.125f, 0, 0),
+                new Vector3(0.25f, 0, 0)},
                 new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
                 new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
                 new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center),

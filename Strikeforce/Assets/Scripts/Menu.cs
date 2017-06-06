@@ -55,13 +55,18 @@ namespace Strikeforce
             SetButtonNames();
 			SetHeaderText();
             AddMenuButtons();
-
-            SelectMenuButton(SelectedIndex);
         }
 
         protected virtual void Start()
         {
             //account = transform.root.GetComponent<PlayerAccount>();
+            if(MenuManager.Singleton.CurrentMenu != this)
+            {
+                return;
+            }
+
+            this.SelectedIndex = 0;
+            SelectMenuButton(SelectedIndex);
         }
 
         protected virtual void Update()

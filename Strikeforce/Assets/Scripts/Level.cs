@@ -61,7 +61,7 @@ namespace Strikeforce
                 return;
             }
 
-            this.TileLength = map.TileLength;
+            Level.TileLength = map.TileLength;
 
             this.Columns = (int)map.MapSize.Width;
             int halfWidth = Columns / 2;
@@ -82,7 +82,7 @@ namespace Strikeforce
                 int x = (int)grid.Location.x;
                 x -= halfWidth;
 
-                int z = height - (int)grid.Location.y;
+                int z = Rows - (int)grid.Location.y;
                 Vector3 position = new Vector3(x, 0, z);
 
                 GameObject tile = Instantiate(TilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
