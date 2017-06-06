@@ -47,10 +47,10 @@ namespace Strikeforce
 
         public void Fire()
         {
-            Fire(Direction.CENTER, 0, 0, 1);
+            Fire(0, 0, 1);
         }
 
-        public void Fire(string direction, int angleSpread, int horizontalSpread, int groupingBonus)
+        public void Fire(int angleSpread, int horizontalSpread, int groupingBonus)
         {
             // Command function is called from the client, but invoked on the server
             bool active = Activate();
@@ -61,20 +61,29 @@ namespace Strikeforce
 
             Debug.Log(string.Format("{0} fired!", Type));
 
-            int directionValue = 1;
-            if(direction == Direction.LEFT)
-            {
-                directionValue = -1;
-            }
-
-            Vector3 synergyOffet = Parent.transform.right * 0.1 * directionValue;
-
             Vector3 parentLocation = Parent.transform.position;
             float x = parentLocation.x;
             float y = parentLocation.y;
             float z = parentLocation.z;
-            Vector3 firingPoint = new Vector3(x, y, z) + firingPointOffset + synergyOffet;
+            Vector3 firingPoint = new Vector3(x, y, z) + firingPointOffset;
 
+            if (Mathf.Abs(angleSpread) > 0)
+            {
+                SplitShot(firingPoint, angleSpread, horizontalSpread);
+                return;
+            }
+
+            if(Mathf.Abs(horizontalSpread) > 0)
+            {
+                SplitShot(firingPoint, angleSpread, horizontalSpread);
+                return;
+            }
+
+            SingleShot(firingPoint);
+        }
+
+        protected void SingleShot(Vector3 firingPoint)
+        {
             // create the bullet object from the bullet prefab
             GameObject bullet = Instantiate(projectilePrefab, firingPoint, Quaternion.identity) as GameObject;
 
@@ -82,9 +91,8 @@ namespace Strikeforce
 
             // make the bullet move away in front of the player
             Vector3 angleVector = Parent.transform.forward;
-            Quaternion angle = Quaternion.AngleAxis(directionValue * angleSpread, Parent.transform.forward);
 
-            bullet.GetComponentInChildren<Rigidbody>().velocity = angleVector * angle * projectile.MaxVelocity;
+            bullet.GetComponentInChildren<Rigidbody>().velocity = angleVector * projectile.MaxVelocity;
 
             // spawn the bullet on the clients
             NetworkServer.Spawn(bullet);
@@ -93,6 +101,39 @@ namespace Strikeforce
 
             // make bullet disappear after 10 seconds
             Destroy(bullet, 10.0f); // testing
+        }
+
+        protected void SplitShot(Vector3 firingPoint, int angleSpread, int horizontalSpread)
+        {
+            Vector3 rightOffet = Parent.transform.right * 0.1f;
+            Vector3 leftOffset = -rightOffet;
+
+            Vector3 leftFiringPoint = new Vector3(firingPoint.x, firingPoint.y, firingPoint.z) + leftOffset;
+            Vector3 rightFiringPoint = new Vector3(firingPoint.x, firingPoint.y, firingPoint.z) + rightOffet;
+
+            // create the bullet objects from the bullet prefab
+            GameObject leftBullet = Instantiate(projectilePrefab, leftFiringPoint, Quaternion.identity) as GameObject;
+            GameObject rightBullet = Instantiate(projectilePrefab, rightFiringPoint, Quaternion.identity) as GameObject;
+
+            Projectile projectile = leftBullet.GetComponent<Projectile>();
+
+            // make the bullets move away in front of the player
+            Vector3 angleVector = Parent.transform.forward;
+            Quaternion rightAngle = Quaternion.AngleAxis(angleSpread, Parent.transform.forward);
+            Quaternion leftAngle = Quaternion.AngleAxis(-angleSpread, Parent.transform.forward);
+
+            leftBullet.GetComponentInChildren<Rigidbody>().velocity = (angleVector + rightAngle.eulerAngles) * projectile.MaxVelocity;
+            rightBullet.GetComponentInChildren<Rigidbody>().velocity = (angleVector + leftAngle.eulerAngles) * projectile.MaxVelocity;
+
+            // spawn the bullets on the clients
+            NetworkServer.Spawn(leftBullet);
+            NetworkServer.Spawn(rightBullet);
+
+            firingSound.Play();
+
+            // make bullet disappear after 10 seconds
+            Destroy(leftBullet, 10.0f); // testing
+            Destroy(rightBullet, 10.0f);
         }
     }
 }
