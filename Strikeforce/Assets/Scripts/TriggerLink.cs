@@ -5,23 +5,32 @@ using System.Collections.Generic;
 
 namespace Strikeforce
 {
-    public class TriggerLink
+    public class TriggerLink : MonoBehaviour
     {
         public Type TriggerType { get; protected set; }
         protected LinkedList<Weapon> allLinkedWeapons { get; set; }
         public float CyclePeriod = 0.5f;
         protected float cycleRemaining { get; set; }
         protected LinkedListNode<Weapon> currentWeaponToFire { get; set; }
+        protected string DominantWeaponType { get;  set; }
+        protected int AngledSpread { get;  set; }
+        protected int HorizontalSpread { get;  set; }
+        protected int GroupingBonus { get;  set; }
         public bool IsFiring { get; set; }
         public enum Type { Primary, Secondary, Special };
 
-        public TriggerLink(Type type)
+        protected void Awake()
         {
-            this.TriggerType = type;
             this.allLinkedWeapons = new LinkedList<Weapon>();
             this.cycleRemaining = this.CyclePeriod;
             this.currentWeaponToFire = null;
             this.IsFiring = false;
+        }
+
+        public void Init(Transform parent, Type type)
+        {
+            transform.parent = parent;
+            this.TriggerType = type;
         }
 
         public void LinkWeapon(Weapon weapon, Vector3 firingPoint)
@@ -48,7 +57,7 @@ namespace Strikeforce
             this.currentWeaponToFire = allLinkedWeapons.First;
         }
 
-        public void ReadyWeapons(LinkedList<Weapon> sortedWeapons)
+        public void ReadyWeapons(LinkedList<Weapon> sortedWeapons, string dominantWeaponType, int angledSpread, int horizontalSpread, int groupingBonus)
         {
             if (allLinkedWeapons.Count == 0)
             {
@@ -60,9 +69,14 @@ namespace Strikeforce
 
             // Set first weapon to fire
             this.currentWeaponToFire = allLinkedWeapons.First;
+
+            this.DominantWeaponType = dominantWeaponType;
+            this.AngledSpread = angledSpread;
+            this.HorizontalSpread = horizontalSpread;
+            this.GroupingBonus = groupingBonus;
         }
 
-        public void Update(string dominantWeaponType, int angledSpread, int horizontalSpread, int groupingBonus)
+        public void Update()
         {
             if (allLinkedWeapons.Count == 0)
             {
@@ -101,21 +115,21 @@ namespace Strikeforce
                 return;
             }
 
-            FireCurrentWeapon(dominantWeaponType, angledSpread, horizontalSpread, groupingBonus);
+            FireCurrentWeapon();
         }
 
-        protected void FireCurrentWeapon(string dominantWeaponType, int angledSpread, int horizontalSpread, int groupingBonus)
+        protected void FireCurrentWeapon()
         {
             Weapon weapon = currentWeaponToFire.Value;
             string weaponType = weapon.Type;
-            if (weaponType.Equals(dominantWeaponType) == true)
+            if (weaponType.Equals(DominantWeaponType) == true)
             {
                 weapon.Fire();
                 return;
             }
 
             // Apply Synergy effects
-            weapon.Fire(angledSpread, horizontalSpread, groupingBonus);
+            weapon.Fire(AngledSpread, HorizontalSpread, GroupingBonus);
         }
     }
 }

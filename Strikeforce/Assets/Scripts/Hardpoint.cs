@@ -6,7 +6,7 @@ namespace Strikeforce
 {
     public enum HardpointPosition { LeftOuterWing, LeftWing, Center, RightWing, RightOuterWing }
 
-    public class Hardpoint
+    public class Hardpoint : MonoBehaviour
     {
         public Vector2 Location;
         public HardpointPosition Position { get; protected set; }
@@ -23,19 +23,32 @@ namespace Strikeforce
         protected TriggerLink secondaryFire;
         protected TriggerLink specialFire;
 
-        public Hardpoint(int relativeToCenterX, int relativeToCenterY, int width, int height, HardpointPosition position)
+        protected void Awake()
         {
-            this.Location = new Vector2(relativeToCenterX, relativeToCenterY);
-            this.Position = position;
-            this.EquippedItems = new Equipment[width, height];
             this.allWeaponTypes = new Dictionary<string, LinkedList<Weapon>>();
             this.DominantWeaponType = string.Empty;
             this.AngledSpread = 0;
             this.HorizontalSpread = 0;
             this.GroupingBonus = 0;
-            this.primaryFire = new TriggerLink(TriggerLink.Type.Primary);
-            this.secondaryFire = new TriggerLink(TriggerLink.Type.Secondary);
-            this.specialFire = new TriggerLink(TriggerLink.Type.Special);
+        }
+
+        public void Init(Transform parent, int relativeToCenterX, int relativeToCenterY, int width, int height, HardpointPosition position)
+        {
+            this.transform.parent = parent;
+            this.Location = new Vector2(relativeToCenterX, relativeToCenterY);
+            this.Position = position;
+            this.EquippedItems = new Equipment[width, height];
+
+            TriggerLink[] allTriggers = GetComponentsInChildren<TriggerLink>();
+
+            this.primaryFire = allTriggers[0];
+            this.primaryFire.Init(parent, TriggerLink.Type.Primary);
+
+            this.secondaryFire = allTriggers[1];
+            this.secondaryFire.Init(parent, TriggerLink.Type.Secondary);
+
+            this.specialFire = allTriggers[2];
+            this.specialFire.Init(parent, TriggerLink.Type.Special);
         }
 
         public bool Contains(Equipment item)
@@ -194,9 +207,9 @@ namespace Strikeforce
             SetHorizontalSpread();
             SetGroupingBonus();
 
-            primaryFire.ReadyWeapons(sortedWeapons);
-            secondaryFire.ReadyWeapons(sortedWeapons);
-            specialFire.ReadyWeapons(sortedWeapons);
+            primaryFire.ReadyWeapons(sortedWeapons, DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
+            secondaryFire.ReadyWeapons(sortedWeapons, DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
+            specialFire.ReadyWeapons(sortedWeapons, DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
         }
 
         protected LinkedList<Weapon> SetFiringOrder()
@@ -281,13 +294,6 @@ namespace Strikeforce
 
             int quantity = allWeaponTypes[Weapon.Types.WAVE].Count;
             this.GroupingBonus = quantity;
-        }
-
-        public void Update()
-        {
-            primaryFire.Update(DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
-            secondaryFire.Update(DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
-            specialFire.Update(DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
         }
 
         public void SetPrimaryFire(bool isFiring)
