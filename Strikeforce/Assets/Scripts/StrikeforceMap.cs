@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json;
 using System.Drawing;
 
@@ -17,11 +16,12 @@ namespace Strikeforce
         public int TileLength { get; set; }
         public Size MapSize { get; set; }
         public List<Grid> AllMapGrids { get; set; }
+        public List<Zone> AllZones { get; set; }
         public List<Checkpoint> AllCheckpoints { get; set; }
 
         [JsonConstructor]
-        public StrikeforceMap(string author, DateTime dateCreated, string tilesetFilename, int tileLength, int nextSector, int nextZone, 
-            Size mapSize, List<Grid> allMapGrids, List<Checkpoint> allCheckpoints)
+        public StrikeforceMap(string author, DateTime dateCreated, string tilesetFilename, int tileLength, int nextSector, int nextZone,
+            Size mapSize, List<Grid> allMapGrids, List<Zone> allZones, List<Checkpoint> allCheckpoints)
         {
             this.Author = author;
             this.DateCreated = dateCreated;
@@ -29,6 +29,7 @@ namespace Strikeforce
             this.TileLength = tileLength;
             this.MapSize = mapSize;
             this.AllMapGrids = allMapGrids;
+            this.AllZones = allZones;
             this.AllCheckpoints = allCheckpoints;
         }
     }

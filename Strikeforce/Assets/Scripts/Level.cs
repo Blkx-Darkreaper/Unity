@@ -95,14 +95,50 @@ namespace Strikeforce
                 renderer.sprite = sprite;
 
                 allMapTiles.Add(tile);
-
-                AddGridToZones(grid);
             }
+
+            AddZones(map.AllZones);
 
             this.lastUnlockedZone = allZones[1];
             LinkZones();
+            AddCheckpoints(map.AllCheckpoints);
+        }
 
-            foreach(Vector2 location in map.AllCheckpoints)
+        protected void AddZones(List<Zone> zonesToAdd)
+        {
+            this.allZones = new Dictionary<int, Zone>();
+
+            foreach (Zone zone in zonesToAdd)
+            {
+                int zoneId = zone.ZoneId;
+                if (zoneId == 0)
+                {
+                    return;
+                }
+
+                bool zoneExists = allZones.ContainsKey(zoneId);
+                if (zoneExists == true)
+                {
+                    throw new InvalidOperationException(string.Format("Zone {0} has already been loaded", zoneId));
+                }
+
+                allZones.Add(zoneId, zone);
+
+                bool hasHQ = zone.HasHeadquartersSpawn;
+                if(hasHQ == false)
+                {
+                    continue;
+                }
+
+                SetHeadquartersSpawn(zone.HeadquartersSector);
+            }
+        }
+
+        protected void AddCheckpoints(List<Checkpoint> checkpointsToAdd)
+        {
+            this.allCheckpoints = new Dictionary<int, Checkpoint>();
+
+            foreach (Vector2 location in checkpointsToAdd)
             {
                 int y = (int)location.y;
                 GameObject gameObject = Instantiate(CheckpointPrefab, new Vector3(0, y, 0), Quaternion.Identity) as GameObject;
@@ -110,29 +146,6 @@ namespace Strikeforce
 
                 allCheckpoints.Add(y, checkpoint);
             }
-        }
-
-        protected void AddGridToZones(Grid grid)
-        {
-            int zoneId = grid.ZoneId;
-            if (zoneId == 0)
-            {
-                return;
-            }
-
-            Zone zone;
-            bool zoneExists = allZones.ContainsKey(zoneId);
-            if (zoneExists == false)
-            {
-                zone = new Zone(zoneId);
-                allZones.Add(zoneId, zone);
-            }
-
-            zone = allZones[zoneId];
-
-            zone.AddGrid(grid);
-
-            AddHeadquartersSpawn(grid);
         }
 
         protected void LinkZones()
@@ -165,19 +178,8 @@ namespace Strikeforce
             throw new InvalidOperationException(string.Format("Only {0} Zones linked out of {1}", nextZoneId - 2, allZones.Count));
         }
 
-        protected void AddHeadquartersSpawn(Grid grid)
+        public void SetHeadquartersSpawn(Sector sector)
         {
-            if (grid.IsHeadquartersSpawn == false)
-            {
-                return;
-            }
-
-            int zoneId = grid.ZoneId;
-            int sectorId = grid.SectorId;
-
-            Zone zone = allZones[zoneId];
-            Sector sector = zone.AllSectors[sectorId];
-
             this.HeadquartersSpawn = sector.Spawn;
             this.nextAvailableSector = sector;
         }
