@@ -40,18 +40,6 @@ namespace Strikeforce
             this.isBoosting = false;
         }
 
-        protected override void Update()
-        {
-            foreach (HardpointPosition position in positionOrder)
-            {
-                Hardpoint[] hardpoints = AllHardpoints[position];
-                foreach (Hardpoint hardpoint in hardpoints)
-                {
-                    hardpoint.Update();
-                }
-            }
-        }
-
         protected void FixedUpdate()
         {
             Boost();
