@@ -11,6 +11,7 @@ namespace Strikeforce
         public Color Colour;
         public int TotalRank { get; protected set; }
         public Dictionary<string, Profile> Members;
+        public Inventory SharedInventory;
         public bool IsRaidInProgress { get; protected set; }
         public float RaidCountdown { get; protected set; }
         public float RaidWindowRemaining { get; protected set; }
@@ -72,6 +73,12 @@ namespace Strikeforce
             this.RaidCountdown = (12 - 2) * (1 - (float)Math.Exp(-totalDamageValueFromPreviousRaid / 5000f)) + 2 + (teamPlayers - enemyPlayers) / 2f;
             this.RaidWindowRemaining = 0.5f + 0.1f * (float)Math.Floor((elapsedGameTime + RaidCountdown) / 5) - 0.02f * teamPlayers;
             this.IsRaidInProgress = false;
+
+            // Remove all checkpoints
+            foreach(Profile account in Members.Values)
+            {
+                account.Player.PreviousCheckpoint = null;
+            }
         }
     }
 }

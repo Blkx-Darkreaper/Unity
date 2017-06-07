@@ -176,11 +176,11 @@ namespace Strikeforce
 
             if (selected == true)
             {
-                if (spawnPoint == GlobalAssets.InvalidPoint)
+                if (spawnPoint == GlobalAssets.InvalidLocation)
                 {
                     return;
                 }
-                if (RallyPoint == GlobalAssets.InvalidPoint)
+                if (RallyPoint == GlobalAssets.InvalidLocation)
                 {
                     return;
                 }
@@ -218,7 +218,7 @@ namespace Strikeforce
                 return;
             }
 
-            if (hitPoint == GlobalAssets.InvalidPoint)
+            if (hitPoint == GlobalAssets.InvalidLocation)
             {
                 return;
             }
@@ -245,8 +245,8 @@ namespace Strikeforce
 
         public bool HasValidSpawnPoint()
         {
-            bool hasSpawnPoint = spawnPoint != GlobalAssets.InvalidPoint;
-            bool hasRallyPoint = RallyPoint != GlobalAssets.InvalidPoint;
+            bool hasSpawnPoint = spawnPoint != GlobalAssets.InvalidLocation;
+            bool hasRallyPoint = RallyPoint != GlobalAssets.InvalidLocation;
 
             return hasSpawnPoint && hasRallyPoint;
         }

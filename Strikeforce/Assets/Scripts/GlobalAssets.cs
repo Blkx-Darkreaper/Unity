@@ -93,11 +93,9 @@ namespace Strikeforce
     public static class GlobalAssets
     {
         public static string DefaultUsername = "NewPlayer";
-        private static Vector3 invalidPositionValue = new Vector3(-99999f, -99999f, -99999f);
-        public static Vector3 InvalidPoint { get { return invalidPositionValue; } }
+        public static Vector3 InvalidLocation { get { return new Vector3(-99999f, -99999f, -99999f); } }
         public static GUISkin SelectionBoxSkin { get; set; }
-        private static Bounds invalidBoundsValue = new Bounds(new Vector3(-99999f, -99999f, -99999f), Vector3.zero);
-        public static Bounds InvalidBounds { get { return invalidBoundsValue; } }
+        public static Bounds InvalidBounds { get { return new Bounds(new Vector3(-99999f, -99999f, -99999f), Vector3.zero); } }
         private static Dictionary<ResourceType, Texture2D> resourceHealthBarTextures;
         private static Dictionary<int, Texture2D> playerAvatars;
         public static KeyValuePair<string, string>[] PlayerResourceProperties = new KeyValuePair<string, string>[] 
