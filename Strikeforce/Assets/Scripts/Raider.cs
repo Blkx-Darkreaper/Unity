@@ -14,14 +14,17 @@ namespace Strikeforce
         protected LinkedList<Armour> allArmour { get; set; }
         protected LinkedListNode<Armour> nextArmourNode { get; set; }
         public Equipment EquippedItem { get; protected set; }
-        private static HardpointPosition[] positionOrder = new HardpointPosition[] { 
-                    HardpointPosition.Center, 
-                    HardpointPosition.LeftWing, 
-                    HardpointPosition.RightWing, 
-                    HardpointPosition.LeftOuterWing, 
-                    HardpointPosition.RightOuterWing 
+        private static HardpointPosition[] positionOrder = new HardpointPosition[] {
+                    HardpointPosition.Center,
+                    HardpointPosition.LeftWing,
+                    HardpointPosition.RightWing,
+                    HardpointPosition.LeftOuterWing,
+                    HardpointPosition.RightOuterWing
                 };
         protected bool isBoosting { get; set; }
+        protected bool isPrimaryFiring { get; set; }
+        protected bool isSecondaryFiring { get; set; }
+        protected bool isSpecialFiring { get; set; }
 
         protected override void Awake()
         {
@@ -89,7 +92,7 @@ namespace Strikeforce
 
         public void SetIsBoosting(bool isBoosting)
         {
-            if(FuelRemaining <= 0)
+            if (FuelRemaining <= 0)
             {
                 this.isBoosting = false;
                 return;
@@ -100,7 +103,7 @@ namespace Strikeforce
 
         protected void Boost()
         {
-            if(isBoosting == false)
+            if (isBoosting == false)
             {
                 return;
             }
@@ -113,7 +116,7 @@ namespace Strikeforce
 
             FuelRemaining -= fuelConsumed;
 
-            if(FuelRemaining > 0)
+            if (FuelRemaining > 0)
             {
                 return;
             }
@@ -123,12 +126,34 @@ namespace Strikeforce
 
         public void SetPrimaryFire(bool isFiring)
         {
+            this.isPrimaryFiring = isFiring;
+            SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
+        }
+
+        public void SetSecondaryFire(bool isFiring)
+        {
+            this.isSecondaryFiring = isFiring;
+            SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
+        }
+
+        public void SetSpecialFire(bool isFiring)
+        {
+            this.isSpecialFiring = isFiring;
+            SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
+        }
+
+        protected void SetFiring(bool primaryFiring, bool secondaryFiring, bool specialFiring)
+        {
             foreach (HardpointPosition position in positionOrder)
             {
                 Hardpoint[] hardpoints = AllHardpoints[position];
                 foreach (Hardpoint hardpoint in hardpoints)
                 {
-                    hardpoint.SetPrimaryFire(isFiring);
+                    hardpoint.SetPrimaryFire(primaryFiring);
+
+                    hardpoint.SetSecondaryFire(secondaryFiring);
+
+                    hardpoint.SetSpecialFire(specialFiring);
                 }
             }
         }

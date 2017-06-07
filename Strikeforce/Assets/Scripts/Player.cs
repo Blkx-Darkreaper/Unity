@@ -825,6 +825,38 @@ namespace Strikeforce
             raider.SetPrimaryFire(isFiring);
         }
 
+        protected void SetSecondaryFiring(bool isFiring)
+        {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
+            Raider raider = CurrentRaider;
+            if (raider == null)
+            {
+                return;
+            }
+
+            raider.SetSecondaryFire(isFiring);
+        }
+
+        protected void SetSpecialFiring(bool isFiring)
+        {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
+            Raider raider = CurrentRaider;
+            if (raider == null)
+            {
+                return;
+            }
+
+            raider.SetSpecialFire(isFiring);
+        }
+
         public bool IsConstructionSiteValid(Structure constructionSite)
         {
             Bounds buildSiteBounds = constructionSite.SelectionBounds;
