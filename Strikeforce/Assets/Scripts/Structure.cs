@@ -274,13 +274,13 @@ namespace Strikeforce
                 return;
             }
 
-            CursorState previousState = Owner.PlayerHud.PreviousCursorState;
+            CursorState previousState = Owner.BuildHud.PreviousCursorState;
             if (previousState != CursorState.rallyPoint)
             {
                 return;
             }
 
-            Owner.PlayerHud.SetCursorState(CursorState.rallyPoint);
+            Owner.BuildHud.SetCursorState(CursorState.rallyPoint);
         }
 
         public void Sell()

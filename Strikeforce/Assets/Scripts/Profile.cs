@@ -60,8 +60,8 @@ namespace Strikeforce
             // Transfer player inventory to team
             Player.CurrentInventory.TransferAllTo(Player.CurrentTeam.SharedInventory);
 
-            Network.RemoveRPCs(Player);
-            Network.DestroyPlayerObjects(Player);
+            //Network.RemoveRPCs(Player);
+            //Network.DestroyPlayerObjects(Player);
             this.Player = null;
         }
     }

@@ -354,9 +354,9 @@ namespace Strikeforce
             return getPrefabFromCollection(name, vehiclePrefabs);
         }
 
-        public static GameObject GetProjectilePrefab(string name)
+        public static GameObject[] GetProjectilePrefabs(string name)
         {
-            return getPrefabFromCollection(name, projectilePrefabs);
+            return new[] { getPrefabFromCollection(name, projectilePrefabs) };  // testing
         }
 
         public static GameObject GetMiscPrefab(string name)

@@ -150,8 +150,8 @@ namespace Strikeforce
             GameManager.Singleton.RegisterEntity(CurrentRaider);
 
             CurrentRaider.SetLayout(new Vector3[] {
-                new Vector3(-0.25f, 0, 0),
-                new Vector3(-0.125f, 0, 0),
+                new Vector3(-0.25f, -0.25f, 0),
+                new Vector3(-0.125f, -0.125f, 0),
                 new Vector3(0, 0, 0),
                 new Vector3(0.125f, 0, 0),
                 new Vector3(0.25f, 0, 0)},
@@ -176,8 +176,8 @@ namespace Strikeforce
             bolt.transform.parent = CurrentRaider.transform;
             GameManager.Singleton.RegisterEntity(bolt);
 
-            bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.LeftOuterWing, 0, 0, 0);
-            equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.RightOuterWing, 0, 0, 0);
+            bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.Center, 0, 1, 0);
+            equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.Center, 0, 2, 0);
             equipped &= CurrentRaider.EquipWeapon(bolt, HardpointPosition.Center, 0, 0, 0);
             if (equipped == true)
             {

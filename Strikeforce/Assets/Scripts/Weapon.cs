@@ -12,7 +12,7 @@ namespace Strikeforce
         protected Vector3 firingPointOffset;
         protected AudioSource firingSound;
         public string ProjectileType;
-        protected GameObject projectilePrefab;
+        protected GameObject[] projectilePrefabs;
         //protected const string FIRE = "Fire";
         protected const string PROJECTILE = "Projectile";
         public struct Types
@@ -37,7 +37,7 @@ namespace Strikeforce
 
         protected void LoadProjectilePrefab()
         {
-            this.projectilePrefab = GlobalAssets.GetProjectilePrefab(ProjectileType);
+            this.projectilePrefabs = GlobalAssets.GetProjectilePrefabs(ProjectileType);
         }
 
         public void SetFiringPointOffset(Vector3 offset)
@@ -61,31 +61,35 @@ namespace Strikeforce
 
             Debug.Log(string.Format("{0} fired!", Type));
 
+            GameObject singleShotPrefab = projectilePrefabs[-1 + groupingBonus];
+
             Vector3 parentLocation = Parent.transform.position;
             float x = parentLocation.x;
             float y = parentLocation.y;
             float z = parentLocation.z;
             Vector3 firingPoint = new Vector3(x, y, z) + firingPointOffset;
 
+            //firingSound.Play();
+
             if (Mathf.Abs(angleSpread) > 0)
             {
-                SplitShot(firingPoint, angleSpread, horizontalSpread);
+                SplitShot(firingPoint, singleShotPrefab, angleSpread, horizontalSpread);
                 return;
             }
 
             if(Mathf.Abs(horizontalSpread) > 0)
             {
-                SplitShot(firingPoint, angleSpread, horizontalSpread);
+                SplitShot(firingPoint, singleShotPrefab, angleSpread, horizontalSpread);
                 return;
             }
 
-            SingleShot(firingPoint);
+            SingleShot(firingPoint, singleShotPrefab);
         }
 
-        protected void SingleShot(Vector3 firingPoint)
+        protected void SingleShot(Vector3 firingPoint, GameObject bulletPrefab)
         {
             // create the bullet object from the bullet prefab
-            GameObject bullet = Instantiate(projectilePrefab, firingPoint, Quaternion.identity) as GameObject;
+            GameObject bullet = Instantiate(bulletPrefab, firingPoint, Quaternion.identity) as GameObject;
 
             Projectile projectile = bullet.GetComponent<Projectile>();
 
@@ -97,13 +101,11 @@ namespace Strikeforce
             // spawn the bullet on the clients
             NetworkServer.Spawn(bullet);
 
-            firingSound.Play();
-
             // make bullet disappear after 10 seconds
             Destroy(bullet, 10.0f); // testing
         }
 
-        protected void SplitShot(Vector3 firingPoint, int angleSpread, int horizontalSpread)
+        protected void SplitShot(Vector3 firingPoint, GameObject bulletPrefab, int angleSpread, int horizontalSpread)
         {
             Vector3 rightOffet = Parent.transform.right * 0.1f;
             Vector3 leftOffset = -rightOffet;
@@ -112,8 +114,8 @@ namespace Strikeforce
             Vector3 rightFiringPoint = new Vector3(firingPoint.x, firingPoint.y, firingPoint.z) + rightOffet;
 
             // create the bullet objects from the bullet prefab
-            GameObject leftBullet = Instantiate(projectilePrefab, leftFiringPoint, Quaternion.identity) as GameObject;
-            GameObject rightBullet = Instantiate(projectilePrefab, rightFiringPoint, Quaternion.identity) as GameObject;
+            GameObject leftBullet = Instantiate(bulletPrefab, leftFiringPoint, Quaternion.identity) as GameObject;
+            GameObject rightBullet = Instantiate(bulletPrefab, rightFiringPoint, Quaternion.identity) as GameObject;
 
             Projectile projectile = leftBullet.GetComponent<Projectile>();
 
@@ -128,8 +130,6 @@ namespace Strikeforce
             // spawn the bullets on the clients
             NetworkServer.Spawn(leftBullet);
             NetworkServer.Spawn(rightBullet);
-
-            firingSound.Play();
 
             // make bullet disappear after 10 seconds
             Destroy(leftBullet, 10.0f); // testing

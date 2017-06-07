@@ -124,14 +124,6 @@ namespace Strikeforce
             //DrawPlayerDetails();
             //DrawHealthBar();
             //DrawMouseCursor();
-
-            if(profile.Player.IsInBuildMode == true)
-            {
-                DrawBuildHud();
-            } else
-            {
-                DrawRaidHud();
-            }
         }
 
         protected void DrawBuildHud()
