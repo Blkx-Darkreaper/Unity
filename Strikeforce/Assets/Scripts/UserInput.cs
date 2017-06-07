@@ -111,24 +111,10 @@ namespace Strikeforce
             gamepadBinds.Action2 = KeyCode.Joystick1Button1;    // B
             gamepadBinds.Special1 = KeyCode.Joystick1Button2;   // X
             gamepadBinds.Special2 = KeyCode.Joystick1Button3;   // Y
-            gamepadBinds.LeftTrigger = KeyCode.Joystick1Button9;
-            gamepadBinds.RightTrigger = KeyCode.Joystick1Button10;
-            //gamepadBinds.DUp = KeyCode.
-            //gamepadBinds.DDown = KeyCode.
-            //gamepadBinds.DLeft = KeyCode.
-            //gamepadBinds.DRight = KeyCode.
+            gamepadBinds.LeftTrigger = KeyCode.Joystick1Button9;    // LT
+            gamepadBinds.RightTrigger = KeyCode.Joystick1Button10;  // RT
             gamepadBinds.Menu = KeyCode.Joystick1Button7;   // Start
             gamepadBinds.Back = KeyCode.Joystick1Button6;   // Back
-
-            //keyBinds.LeftStick.Up = KeyCode.UpArrow;
-            //keyBinds.LeftStick.Down = KeyCode.DownArrow;
-            //keyBinds.LeftStick.Left = KeyCode.LeftArrow;
-            //keyBinds.LeftStick.Right = KeyCode.RightArrow;
-
-            //keyBinds.RightStick.Up = KeyCode.Keypad8;
-            //keyBinds.RightStick.Down = KeyCode.Keypad2;
-            //keyBinds.RightStick.Left = KeyCode.Keypad4;
-            //keyBinds.RightStick.Right = KeyCode.Keypad6;
         }
 
         protected void Start()
