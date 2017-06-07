@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Drawing;
+using Newtonsoft.Json;
 
 namespace Strikeforce
 {
@@ -13,38 +14,11 @@ namespace Strikeforce
         protected int totalBuildings { get; set; }
         public float BuildingConstructionTimeBonus = 0.05f;
 
-        public Sector(int sectorId, Zone parent) : base() {
-            this.SectorId = sectorId;
-            this.Parent = parent;
-            this.Spawn = null;
-            this.Owner = null;
-            this.totalBuildings = 0;
-        }
-
-        public Sector(int sectorId, Zone parent, int x, int y, int width, int height, Spawnpoint spawn)
-            : base(x, y, width, height)
+        [JsonConstructor]
+        public Sector(int id, Vector2 location, Size size, Spawnpoint spawn) : base(location.X, location.Y, size.Width, size.Height)
         {
-            this.SectorId = sectorId;
-            this.Parent = parent;
+            this.SectorId = id;
             this.Spawn = spawn;
-            this.Owner = null;
-            this.totalBuildings = 0;
-        }
-
-        public override void AddGrid(Grid gridToAdd)
-        {
-            base.AddGrid(gridToAdd);
-
-            bool isSpawnpoint = gridToAdd.IsSectorSpawn || gridToAdd.IsHeadquartersSpawn;
-            if (isSpawnpoint == false)
-            {
-                return;
-            }
-
-            int x = (int)gridToAdd.Location.x;
-            int y = (int)gridToAdd.Location.y;
-
-            this.Spawn = new Spawnpoint(x, y, gridToAdd.IsHeadquartersSpawn);
         }
 
         public bool CanConstructStructure(int cost)
