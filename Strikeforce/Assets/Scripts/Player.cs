@@ -340,6 +340,9 @@ namespace Strikeforce
                     if (isInBuildMode == true)
                     {
                         Special2();
+                    } else
+                    {
+                        SetEquipmentActive(!keyEvent.IsComplete);
                     }
                     break;
 
@@ -870,6 +873,22 @@ namespace Strikeforce
             }
 
             raider.SetSpecialFire(isFiring);
+        }
+
+        protected void SetEquipmentActive(bool isActive)
+        {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
+            Raider raider = CurrentRaider;
+            if (raider == null)
+            {
+                return;
+            }
+
+            raider.SetEquipmentActive(isActive);
         }
 
         public bool IsConstructionSiteValid(Structure constructionSite)

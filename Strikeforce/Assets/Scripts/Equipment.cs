@@ -11,6 +11,7 @@ namespace Strikeforce
         public string Description = string.Empty;
         public bool IsRemovable = true;
         public bool IsWeapon = false;
+        public bool IsActive { get; protected set; }
         public Raider Parent;
         public float Cost;
         public int Level = 1;
@@ -56,6 +57,8 @@ namespace Strikeforce
             }
 
             this.CurrentStatus = Status.READY;
+
+            Use(IsActive);
         }
 
         public virtual bool Activate()
@@ -80,8 +83,21 @@ namespace Strikeforce
 
         public virtual void Use()
         {
-            bool active = Activate();
-            if (active == false)
+            Use(true);
+
+            this.IsActive = false;
+        }
+
+        public virtual void Use(bool isActive)
+        {
+            if(isActive == false)
+            {
+                this.IsActive = false;
+                return;
+            }
+
+            this.IsActive = Activate();
+            if (IsActive == false)
             {
                 return;
             }

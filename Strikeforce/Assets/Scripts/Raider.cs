@@ -158,6 +158,11 @@ namespace Strikeforce
             }
         }
 
+        public void SetEquipmentActive(bool isActive)
+        {
+            this.EquippedItem.Use(isActive);
+        }
+
         public void UpdateEnergy(float amount)
         {
             this.CurrentEnergy += amount;
