@@ -61,7 +61,7 @@ namespace Strikeforce
 
             Debug.Log(string.Format("{0} fired!", Type));
 
-            GameObject singleShotPrefab = projectilePrefabs[-1 + groupingBonus];
+            GameObject singleShotPrefab = projectilePrefabs[groupingBonus - 1]; //Grouping is 1 based
 
             Vector3 parentLocation = Parent.transform.position;
             float x = parentLocation.x;
