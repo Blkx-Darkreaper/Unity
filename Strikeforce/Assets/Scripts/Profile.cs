@@ -64,5 +64,24 @@ namespace Strikeforce
             //Network.DestroyPlayerObjects(Player);
             this.Player = null;
         }
+
+        public virtual void DrawPlayerAvatar()
+        {
+            float height = Menu.Attributes.TextHeight;
+            float x = Menu.Attributes.TextHeight;
+            float y = Screen.height - x - Menu.Attributes.Padding;
+            DrawPlayerAvatar(x, y, height);
+        }
+
+        public virtual void DrawPlayerAvatar(float x, float y, float height)
+        {
+            Texture2D avatar = GlobalAssets.GetAvatar(AvatarId);
+            if (avatar == null)
+            {
+                return;
+            }
+
+            GUI.DrawTexture(new Rect(x, y, height, height), avatar);
+        }
     }
 }
