@@ -113,7 +113,7 @@ namespace Strikeforce
 
             // Get the cursors
             GridCursor[] cursors = GetComponentsInChildren<GridCursor>() as GridCursor[];
-            if(cursors.Length != 2)
+            if (cursors.Length != 2)
             {
                 Debug.Log(String.Format("Failed to retrieve both cursors in player {0}", this.PlayerId));
                 return;
@@ -218,8 +218,9 @@ namespace Strikeforce
             MovePlayer(x, y, z);
         }
 
-        public void RightStick(float x, float y, float z) {
-            if(isInBuildMode == false)
+        public void RightStick(float x, float y, float z)
+        {
+            if (isInBuildMode == false)
             {
                 return;
             }
@@ -229,17 +230,17 @@ namespace Strikeforce
 
         public void DPad(float x, int y, float z)
         {
-            if(isInBuildMode == false)
+            if (isInBuildMode == false)
             {
                 return;
             }
 
-            if(z == 1)
+            if (z == 1)
             {
                 DpadUp();
             }
 
-            if(z == -1)
+            if (z == -1)
             {
                 DpadDown();
             }
@@ -283,7 +284,7 @@ namespace Strikeforce
         protected void SetCameraVelocity(float velocityX, float velocityY, float velocityZ)
         {
             Rigidbody cameraVelocity = mainCamera.GetComponent<Rigidbody>();
-            if(cameraVelocity == null)
+            if (cameraVelocity == null)
             {
                 Debug.Log("Main camera has no rigidbody");
                 return;
@@ -315,31 +316,35 @@ namespace Strikeforce
                     break;
 
                 case ActionKey.Action2:
-                    if(isInBuildMode == true)
+                    if (isInBuildMode == true)
                     {
                         Action2();
-                    } else
+                    }
+                    else
                     {
                         SetIsBoosting(!keyEvent.IsComplete);
                     }
                     break;
 
                 case ActionKey.Special1:
-                    if(isInBuildMode == true)
+                    if (isInBuildMode == true)
                     {
                         Special1(keyEvent);
+                    } else
+                    {
+                        SetSpecialFiring(!keyEvent.IsComplete);
                     }
                     break;
 
                 case ActionKey.Special2:
-                    if(isInBuildMode == true)
+                    if (isInBuildMode == true)
                     {
                         Special2();
                     }
                     break;
 
                 case ActionKey.DUp:
-                    if(isInBuildMode == true)
+                    if (isInBuildMode == true)
                     {
                         DpadUp();
                     }
@@ -361,18 +366,28 @@ namespace Strikeforce
                         SetPrimaryFiring(!keyEvent.IsComplete);
                     }
                     break;
+
+                case ActionKey.LeftTrigger:
+                    if (isInBuildMode == true)
+                    {
+                    }
+                    else
+                    {
+                        SetSecondaryFiring(!keyEvent.IsComplete);
+                    }
+                    break;
             }
         }
 
         protected void Action1()
         {
-            if(IsSellingStructure == true)
+            if (IsSellingStructure == true)
             {
                 ConfirmSale();
                 return;
             }
 
-            if(SelectedEntity != null)
+            if (SelectedEntity != null)
             {
                 ShowOptions();
                 return;
@@ -383,7 +398,7 @@ namespace Strikeforce
 
         protected void Action2()
         {
-            if(IsSellingStructure == true)
+            if (IsSellingStructure == true)
             {
                 CancelSale();
                 return;
@@ -434,7 +449,7 @@ namespace Strikeforce
 
         protected void DpadUp()
         {
-            if(SelectedEntity != null)
+            if (SelectedEntity != null)
             {
                 SetAlertStatus();
                 return;
@@ -445,7 +460,7 @@ namespace Strikeforce
 
         protected void DpadDown()
         {
-            if(SelectedEntity != null)
+            if (SelectedEntity != null)
             {
                 SetPatrolStatus();
                 return;
@@ -469,7 +484,7 @@ namespace Strikeforce
             RaycastHit hit;
             int groundMask = GameManager.Singleton.GroundMask;
 
-            if(Physics.Raycast(cursor.transform.position, Vector3.down, out hit, groundMask) == false)
+            if (Physics.Raycast(cursor.transform.position, Vector3.down, out hit, groundMask) == false)
             {
                 return null;
             }
@@ -483,15 +498,15 @@ namespace Strikeforce
             List<Structure> allOwned = GetAllOwnedStructures();
             List<Structure> allOnScreen = new List<Structure>();
 
-            foreach(Structure structure in allOwned)
+            foreach (Structure structure in allOwned)
             {
                 Renderer renderer = structure.GetComponent<Renderer>();
-                if(renderer == null)
+                if (renderer == null)
                 {
                     continue;
                 }
 
-                if(renderer.isVisible == false)
+                if (renderer.isVisible == false)
                 {
                     continue;
                 }
@@ -522,7 +537,7 @@ namespace Strikeforce
             }
 
             this.SelectedEntity = selectable;
-            if(selectable == null)
+            if (selectable == null)
             {
                 return;
             }
@@ -605,7 +620,7 @@ namespace Strikeforce
         protected void SellStructure()
         {
             Structure structure = SelectedEntity.GetComponent<Structure>();
-            if(structure == null)
+            if (structure == null)
             {
                 ActionFailed();
                 return;
@@ -669,7 +684,7 @@ namespace Strikeforce
         protected void ToggleRepairOnScreen()
         {
             List<Structure> onScreen = GetStructuresOnScreen();
-            foreach(Structure structure in onScreen)
+            foreach (Structure structure in onScreen)
             {
                 ToggleRepairing(structure);
             }
@@ -687,7 +702,7 @@ namespace Strikeforce
         protected void Scramble()
         {
             Shelter shelter = SelectedEntity.GetComponent<Shelter>();
-            if(shelter == null)
+            if (shelter == null)
             {
                 return;
             }
@@ -698,7 +713,7 @@ namespace Strikeforce
         protected void RotateStructure()
         {
             Structure structure = SelectedEntity.GetComponent<Structure>();
-            if(structure == null)
+            if (structure == null)
             {
                 ActionFailed();
                 return;
@@ -710,7 +725,7 @@ namespace Strikeforce
         protected void BuyStructure()
         {
             Structure structure = GetStructureHighlightedByBuyCursor();
-            if(structure == null)
+            if (structure == null)
             {
                 ActionFailed();
                 return;
@@ -719,7 +734,7 @@ namespace Strikeforce
             int cost = structure.Cost;
 
             bool hasSufficientFunds = CurrentInventory.HasSufficientResources(ResourceType.Money, cost);
-            if(hasSufficientFunds == false)
+            if (hasSufficientFunds == false)
             {
                 // Insufficient funds
                 ActionFailed();
@@ -728,14 +743,14 @@ namespace Strikeforce
 
             Vector3 spawnPoint = BuildCursor.transform.position;
             GameObject gameObjectToBuild = Instantiate(structure.gameObject, spawnPoint, Quaternion.identity) as GameObject;
-            if(gameObjectToBuild == null)
+            if (gameObjectToBuild == null)
             {
                 ActionFailed();
                 return;
             }
 
             Selectable selectable = gameObjectToBuild.GetComponent<Selectable>();
-            if(selectable == null)
+            if (selectable == null)
             {
                 ActionFailed();
                 return;
@@ -750,7 +765,7 @@ namespace Strikeforce
         protected void ToggleContextOption()
         {
             Structure structure = SelectedEntity.GetComponent<Structure>();
-            if(structure == null)
+            if (structure == null)
             {
                 return;
             }
@@ -795,13 +810,13 @@ namespace Strikeforce
 
         protected void SetIsBoosting(bool isBoosting)
         {
-            if(isLocalPlayer == false)
+            if (isLocalPlayer == false)
             {
                 return;
             }
 
             Raider raider = CurrentRaider;
-            if(raider == null)
+            if (raider == null)
             {
                 return;
             }
