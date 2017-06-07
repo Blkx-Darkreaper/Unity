@@ -29,22 +29,22 @@ namespace Strikeforce
 
     public class Inventory : MonoBehaviour
     {
-        public List<Raider> AllRaiders;
-        public List<Weapon> AllGuns;
-        public List<Weapon> AllOrdnance;
-        public List<Ordnance> AllMunitions;
-        public List<Equipment> AllEquipment;
+        public LinkedList<Raider> AllRaiders;
+        public LinkedList<Weapon> AllGuns;
+        public LinkedList<Weapon> AllOrdnance;
+        public LinkedList<Ordnance> AllMunitions;
+        public LinkedList<Equipment> AllEquipment;
         public int StartingMoney = 1000, MoneyLimit = 9999999, StartingFuel = 500, FuelLimit = 9999,
             StartingRockets = 0, RocketLimit = 9999, StartingMissiles = 0, MissileLimit = 9999, StartingBombs = 0, BombLimit = 9999;
         protected Dictionary<ResourceType, int> resources, resourceLimits;
 
         protected void Awake()
         {
-            AllRaiders = new List<Raider>();
-            AllGuns = new List<Weapon>();
-            AllOrdnance = new List<Weapon>();
-            AllMunitions = new List<Ordnance>();
-            AllEquipment = new List<Equipment>();
+            AllRaiders = new LinkedList<Raider>();
+            AllGuns = new LinkedList<Weapon>();
+            AllOrdnance = new LinkedList<Weapon>();
+            AllMunitions = new LinkedList<Ordnance>();
+            AllEquipment = new LinkedList<Equipment>();
             InitResources();
         }
 
@@ -121,6 +121,58 @@ namespace Strikeforce
         {
             int amount = resourceLimits[type];
             return amount;
+        }
+
+        public void TransferAllTo(Inventory other)
+        {
+            other.AllRaiders.AddLast(AllRaiders.First);
+            AllRaiders = new LinkedList<Raider>();
+
+            other.AllGuns.AddLast(AllGuns.First);
+            AllGuns = new LinkedList<Weapon>();
+
+            other.AllOrdnance.AddLast(AllOrdnance.First);
+            AllOrdnance = new LinkedList<Weapon>();
+
+            other.AllMunitions.AddLast(AllMunitions.First);
+            AllMunitions = new LinkedList<Ordnance>();
+
+            other.AllEquipment.AddLast(AllEquipment.First);
+            AllEquipment = new LinkedList<Equipment>();
+        }
+
+        protected Raider RemoveRaider(Raider raiderToRemove)
+        {
+            AllRaiders.Remove(raiderToRemove);
+            return raiderToRemove;
+        }
+
+        protected Equipment RemoveEquipment(Equipment itemToRemove)
+        {
+            Type itemType = itemToRemove.GetType();
+
+            if (itemType != typeof(Weapon))
+            {
+                AllEquipment.Remove(itemToRemove);
+                return itemToRemove;
+            }
+
+            Weapon weapon = (Weapon)itemToRemove;
+
+            if (weapon.IsOrdnanceWeapon == false)
+            {
+                AllOrdnance.Remove(weapon);
+                return weapon;
+            }
+
+            AllGuns.Remove(weapon);
+            return itemToRemove;
+        }
+
+        protected Ordnance RemoveMunition(Ordnance munitionToRemove)
+        {
+            AllMunitions.Remove(munitionToRemove);
+            return munitionToRemove;
         }
     }
 }

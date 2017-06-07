@@ -54,5 +54,15 @@ namespace Strikeforce
             string defaultUsername = GlobalAssets.DefaultUsername;
             return defaultUsername;
         }
+
+        public virtual void DropPlayer()
+        {
+            // Transfer player inventory to team
+            Player.CurrentInventory.TransferAllTo(Player.CurrentTeam.SharedInventory);
+
+            //Network.RemoveRPCs(Player);
+            //Network.DestroyPlayerObjects(Player);
+            this.Player = null;
+        }
     }
 }

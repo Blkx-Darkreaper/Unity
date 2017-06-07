@@ -26,16 +26,55 @@ namespace Strikeforce
                     MenuManager.Singleton.Resume();
                     break;
 
+                case RAID:
+                    RaidMenu();
+                    break;
+
+                case MANAGE_TEAM:
+                    TeamMenu();
+                    break;
+
+                case MARKET:
+                    BlackMarketMenu();
+                    break;
+
+                case OPTIONS:
+                    OptionsMenu();
+                    break;
+
                 case QUIT_GAME:
                     QuitGame();
                     break;
             }
         }
 
+        protected virtual void RaidMenu()
+        {
+
+        }
+
+        protected virtual void TeamMenu()
+        {
+
+        }
+
+        protected virtual void BlackMarketMenu()
+        {
+
+        }
+
+        protected virtual void OptionsMenu()
+        {
+
+        }
+
         protected virtual void QuitGame()
         {
             MenuManager.Singleton.SetLoadingScreenActive(true);
             MenuManager.Singleton.ShowMenu(PreviousMenu);
+
+            // Drop player
+            ProfileManager.Singleton.CurrentProfile.DropPlayer();
         }
     }
 }

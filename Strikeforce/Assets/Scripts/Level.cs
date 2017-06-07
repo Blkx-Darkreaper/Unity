@@ -22,6 +22,8 @@ namespace Strikeforce
         protected List<GameObject> allMapTiles;
         protected GameObject allGridObjects;
         protected Dictionary<int, Zone> allZones;
+        public GameObject CheckpointPrefab;
+        protected Dictionary<int, Checkpoint> allCheckpoints;
         protected Zone lastUnlockedZone;
         protected Sector nextAvailableSector { get; set; }
         public const string BOUNDING_BOX = "BoundingBox";
@@ -30,6 +32,7 @@ namespace Strikeforce
         {
             this.allMapTiles = new List<GameObject>();
             this.allZones = new Dictionary<int, Zone>();
+            this.allCheckpoints = new Dictionary<int, Checkpoint>();
 
             LoadMap();
         }
@@ -98,6 +101,15 @@ namespace Strikeforce
 
             this.lastUnlockedZone = allZones[1];
             LinkZones();
+
+            foreach(Vector2 location in map.AllCheckpoints)
+            {
+                int y = (int)location.y;
+                GameObject gameObject = Instantiate(CheckpointPrefab, new Vector3(0, y, 0), Quaternion.Identity) as GameObject;
+                Checkpoint checkpoint = gameObject.GetComponent<Checkpoint>();
+
+                allCheckpoints.Add(y, checkpoint);
+            }
         }
 
         protected void AddGridToZones(Grid grid)

@@ -12,17 +12,17 @@ namespace Strikeforce
         public bool IsNPC;
         public Team CurrentTeam { get; set; }
         protected Camera mainCamera;
-        [HideInInspector]
-        public Hud PlayerHud;
+        public Hud BuildHud;
+        public Hud RaidHud;
         [HideInInspector]
         public Raider CurrentRaider;
         public string RaiderPrefabName = "Raider";
         [HideInInspector]
+        public Checkpoint PreviousCheckpoint = null;
+        [HideInInspector]
         public Inventory CurrentInventory;
         protected bool isInBuildMode = true;
-        [HideInInspector]
         public GridCursor BuildCursor;
-        [HideInInspector]
         public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
@@ -48,6 +48,9 @@ namespace Strikeforce
 
             this.CurrentTeam = null;
 
+            this.BuildHud.enabled = isInBuildMode;
+            this.RaidHud.enabled = !isInBuildMode;
+
             // Get the main camera
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
             this.CurrentInventory = GetComponent<Inventory>();
@@ -64,7 +67,6 @@ namespace Strikeforce
 
         protected void Start()
         {
-            this.PlayerHud = GetComponentInChildren<Hud>();
             this.IsSettingConstructionPoint = false;
             this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
 
@@ -126,6 +128,8 @@ namespace Strikeforce
         protected void SpawnRaider()	// Testing
         {
             this.isInBuildMode = false;
+            this.BuildHud.enabled = isInBuildMode;
+            this.RaidHud.enabled = !isInBuildMode;
 
             // Get spawn point from level
             Vector3 spawnLocation = CurrentLevel.GetRaiderSpawnLocation();
@@ -181,8 +185,8 @@ namespace Strikeforce
             allHardpoints[5].Init(CurrentRaider.transform, relativeToCenterX, relativeToCenterY, width, height, position);
 
             CurrentRaider.SetLayout(new Vector3[] {
-                new Vector3(-0.25f, 0, 0),
-                new Vector3(-0.125f, 0, 0),
+                new Vector3(-0.25f, -0.25f, 0),
+                new Vector3(-0.125f, -0.125f, 0),
                 new Vector3(0, 0, 0),
                 new Vector3(0.125f, 0, 0),
                 new Vector3(0.25f, 0, 0)},
@@ -207,8 +211,8 @@ namespace Strikeforce
             bolt.transform.parent = CurrentRaider.transform;
             GameManager.Singleton.RegisterEntity(bolt);
 
-            bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.LeftOuterWing, 0, 0, 0);
-            equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.RightOuterWing, 0, 0, 0);
+            bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.Center, 0, 1, 0);
+            equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.Center, 0, 2, 0);
             equipped &= CurrentRaider.EquipWeapon(bolt, HardpointPosition.Center, 0, 0, 0);
             if (equipped == true)
             {
@@ -940,7 +944,7 @@ namespace Strikeforce
             vehicleToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId));
 
-            if (rallyPoint == GlobalAssets.InvalidPoint)
+            if (rallyPoint == GlobalAssets.InvalidLocation)
             {
                 return;
             }
@@ -970,7 +974,7 @@ namespace Strikeforce
             vehicleToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId.ToString()));
 
-            if (rallyPoint == GlobalAssets.InvalidPoint)
+            if (rallyPoint == GlobalAssets.InvalidLocation)
             {
                 return;
             }

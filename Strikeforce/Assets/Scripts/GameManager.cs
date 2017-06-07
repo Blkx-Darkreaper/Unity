@@ -95,7 +95,7 @@ namespace Strikeforce
 
                 Debug.Log(string.Format("Win condition {0} met"));
                 Profile winner = winCondition.GetWinningPlayer();
-                EndGameMenu resultsScreen = winner.Player.PlayerHud.GetComponent<EndGameMenu>();
+                EndGameMenu resultsScreen = winner.Player.GetComponent<EndGameMenu>();
                 if (resultsScreen == null)
                 {
                     return;
@@ -106,7 +106,8 @@ namespace Strikeforce
                 Time.timeScale = 0f;
                 Cursor.visible = true;
                 //winner.MenuManager.ShowMenu(resultsScreen);
-                winner.Player.PlayerHud.enabled = false;
+                winner.Player.BuildHud.enabled = false;
+                winner.Player.RaidHud.enabled = false;
             }
         }
 

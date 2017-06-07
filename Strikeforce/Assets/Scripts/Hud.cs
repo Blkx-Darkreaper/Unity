@@ -31,6 +31,10 @@ namespace Strikeforce
         public Texture2D ButtonHover, ButtonClick;
         public Texture2D BuildFrame, BuildMask;
         public Texture2D SmallButtonHover, SmallButtonClick;
+        protected struct Styles
+        {
+            public const string label = "label";
+        }
 
         protected void Start()
         {
@@ -47,13 +51,13 @@ namespace Strikeforce
                 return;
             }
 
-            HealthStyle = new GUIStyle(GUI.skin.box);
-            HealthStyle.normal.background = GlobalAssets.MakeTexture(2, 2, new Color(0f, 1f, 0f, 1.0f));
+            this.HealthStyle = new GUIStyle(GUI.skin.box);
+            this.HealthStyle.normal.background = GlobalAssets.MakeTexture(2, 2, new Color(0f, 1f, 0f, 1.0f));
 
-            BackStyle = new GUIStyle(GUI.skin.box);
-            BackStyle.normal.background = GlobalAssets.MakeTexture(2, 2, new Color(0f, 0f, 0f, 1.0f));
+            this.BackStyle = new GUIStyle(GUI.skin.box);
+            this.BackStyle.normal.background = GlobalAssets.MakeTexture(2, 2, new Color(0f, 0f, 0f, 1.0f));
 
-            areStylesSet = true;
+            this.areStylesSet = true;
         }
 
         protected void InitResources()
@@ -117,9 +121,19 @@ namespace Strikeforce
             }
 
             InitStyles();
-            DrawPlayerDetails();
-            DrawHealthBar();
+            //DrawPlayerDetails();
+            //DrawHealthBar();
             //DrawMouseCursor();
+        }
+
+        protected void DrawBuildHud()
+        {
+
+        }
+
+        protected void DrawRaidHud()
+        {
+
         }
 
         protected void DrawPlayerDetails()
@@ -147,7 +161,7 @@ namespace Strikeforce
             //    Debug.Log(string.Format("Usernames do not match"));
             //}
 
-            PlayerDetailsSkin.GetStyle("label").CalcMinMaxWidth(new GUIContent(username), out minWidth, out maxWidth);
+            PlayerDetailsSkin.GetStyle(Styles.label).CalcMinMaxWidth(new GUIContent(username), out minWidth, out maxWidth);
             GUI.Label(new Rect(x, y, maxWidth, height), username);
 
             GUI.EndGroup();

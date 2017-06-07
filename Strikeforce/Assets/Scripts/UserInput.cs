@@ -149,10 +149,10 @@ namespace Strikeforce
 
         protected void Update()
         {
-            //if (isLocalPlayer == false)
-            //{
-            //    return;
-            //}
+            if (isLocalPlayer == false)
+            {
+                //    return;
+            }
 
             LeftStick();
             RightStick();
@@ -231,20 +231,20 @@ namespace Strikeforce
             return gameObject;
         }
 
-        public static Vector3 GetHitPoint()
+        public static Vector3 GetHitLocation()
         {
             Vector3 mousePosition = Input.mousePosition;
-            return GetHitPoint(mousePosition);
+            return GetHitLocation(mousePosition);
         }
 
-        public static Vector3 GetHitPoint(Vector3 origin)
+        public static Vector3 GetHitLocation(Vector3 origin)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             bool foundPoint = Physics.Raycast(ray, out hit);
             if (foundPoint == false)
             {
-                return GlobalAssets.InvalidPoint;
+                return GlobalAssets.InvalidLocation;
             }
 
             return hit.point;
@@ -461,6 +461,15 @@ namespace Strikeforce
 
         protected void TogglePauseMenu()
         {
+            // If not in match go back
+            if(profile.Player == null)
+            {
+                Menu currentMenu = MenuManager.Singleton.CurrentMenu;
+                MenuManager.Singleton.ShowMenu(currentMenu.PreviousMenu);
+                return;
+            }
+
+            // If in match toggle game menu
             if (MenuManager.Singleton.IsMenuOpen == true)
             {
                 MenuManager.Singleton.Resume();
