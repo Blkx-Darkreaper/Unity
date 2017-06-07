@@ -356,7 +356,22 @@ namespace Strikeforce
 
         public static GameObject[] GetProjectilePrefabs(string name)
         {
-            return new[] { getPrefabFromCollection(name, projectilePrefabs) };  // testing
+            List<GameObject> prefabs = new List<GameObject>();
+
+            GameObject nextPrefab = getPrefabFromCollection(name, projectilePrefabs);
+            int index = 2;
+
+            while (nextPrefab != null)
+            {
+                prefabs.Add(nextPrefab);
+
+                string fullName = string.Format("{0}{1}", name, index);
+                nextPrefab = getPrefabFromCollection(fullName, projectilePrefabs);
+
+                index++;
+            }
+
+            return prefabs.ToArray();
         }
 
         public static GameObject GetMiscPrefab(string name)
