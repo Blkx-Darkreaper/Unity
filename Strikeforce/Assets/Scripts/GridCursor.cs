@@ -1,9 +1,12 @@
 using UnityEngine;
+using System.Drawing;
 
 namespace Strikeforce
 {
     public class GridCursor : Entity
     {
+        public Rectangle Bounds = new Rectangle();
+
         protected override void Awake()
         {
             base.Awake();
@@ -27,7 +30,7 @@ namespace Strikeforce
             int signZ = (int)Mathf.Sign(z);
             z = signZ;
 
-            CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
+            GlobalAssets.KeepInBounds(Bounds, currentPosition.x, currentPosition.z, ref x, ref z);
 
             transform.Translate(x, 0, z);
         }

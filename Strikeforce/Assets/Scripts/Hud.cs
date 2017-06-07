@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Strikeforce
 {
@@ -24,6 +25,8 @@ namespace Strikeforce
         private CursorState activeCursorState;
         private int currentFrame = 0;
         public CursorState PreviousCursorState { get; private set; }
+        public Rectangle Bounds = new Rectangle();
+
         public Texture2D[] ResourceIcons;
         private Dictionary<ResourceType, Texture2D> allResources;
         private Selectable previousSelection = null;

@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Drawing;
 
 namespace Strikeforce
 {
@@ -500,6 +501,17 @@ namespace Strikeforce
             result.SetPixels(pix);
             result.Apply();
             return result;
+        }
+
+        public static void KeepInBounds(Rectangle bounds, float x, float z, ref float deltaX, ref float deltaZ)
+        {
+            float finalX = x + deltaX;
+            float finalZ = z + deltaZ;
+
+            float halfWidth = bounds.Width / 2;
+
+            deltaX = Mathf.Clamp(finalX, -halfWidth, halfWidth) - x;
+            deltaZ = Mathf.Clamp(finalZ, 0, bounds.Height) - z;
         }
     }
 }

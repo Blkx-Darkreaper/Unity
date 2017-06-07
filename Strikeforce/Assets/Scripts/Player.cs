@@ -120,7 +120,10 @@ namespace Strikeforce
             }
 
             this.BuildCursor = cursors[0];
+            this.BuildCursor.Bounds = CurrentLevel.Bounds;
+
             this.BuyCursor = cursors[1];
+            this.BuyCursor.Bounds = BuildHud.Bounds;
 
             BuildCursor.transform.position = new Vector3(spawnpoint.Location.x, spawnpoint.Location.y, spawnpoint.Location.z);
         }

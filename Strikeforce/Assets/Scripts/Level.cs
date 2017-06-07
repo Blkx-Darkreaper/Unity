@@ -246,13 +246,7 @@ namespace Strikeforce
         public void KeepInBounds(float x, float z, ref float deltaX, ref float deltaZ)
         {
             // Keep in level bounds
-            float finalX = x + deltaX;
-            float finalZ = z + deltaZ;
-
-            float halfWidth = Bounds.Width / 2;
-
-            deltaX = Mathf.Clamp(finalX, -halfWidth, halfWidth) - x;
-            deltaZ = Mathf.Clamp(finalZ, 0, Bounds.Height) - z;
+            GlobalAssets.KeepInBounds(Bounds, x, z, ref deltaX, ref deltaZ);
         }
     }
 }
