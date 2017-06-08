@@ -252,7 +252,6 @@ namespace Strikeforce
 
         protected void MovePlayer(float x, float y, float z)
         {
-            Vector3 cameraPosition = Vector3.zero;
             if (isInBuildMode == true)
             {
                 BuildCursor.Move(x, z);
@@ -263,7 +262,6 @@ namespace Strikeforce
                 z *= 0.3f;
 
                 CurrentRaider.Move(x, z);
-                cameraPosition = CurrentRaider.transform.position;
             }
 
             MoveMainCamera(x, y, z);
@@ -279,15 +277,15 @@ namespace Strikeforce
             mainCamera.transform.Translate(deltaX, deltaZ, deltaY);
         }
 
-        protected void SetMainCameraPosition(float x, float y)
+        protected void SetMainCameraPosition(float x, float z)
         {
-            SetMainCameraPosition(new Vector3(x, 0, y));
+            float y = mainCamera.transform.position.y;
+            SetMainCameraPosition(new Vector3(x, y, z));
         }
 
         protected void SetMainCameraPosition(Vector3 position)
         {
-            float y = mainCamera.transform.position.y;
-            mainCamera.transform.position = new Vector3(position.x, y, position.z);
+            mainCamera.transform.position = new Vector3(position.x, position.y, position.z);
         }
 
         protected void SetMainCameraVelocity(float velocityX, float velocityY, float velocityZ)
