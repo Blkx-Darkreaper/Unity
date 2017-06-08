@@ -266,17 +266,17 @@ namespace Strikeforce
                 cameraPosition = CurrentRaider.transform.position;
             }
 
-            //MoveCamera(x, y, z);
-            SetMainCameraPosition(cameraPosition);
+            MoveMainCamera(x, y, z);
+            //SetMainCameraPosition(cameraPosition);
         }
 
-        protected void MoveMainCamera(float x, float y, float z)
+        protected void MoveMainCamera(float deltaX, float deltaY, float deltaZ)
         {
             Vector3 currentPosition = transform.position;
 
-            CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
+            KeepLevelInMainView(currentPosition.x, currentPosition.z, ref deltaX, ref deltaZ);
 
-            mainCamera.transform.Translate(x, z, y);
+            mainCamera.transform.Translate(deltaX, deltaZ, deltaY);
         }
 
         protected void SetMainCameraPosition(float x, float y)
@@ -313,8 +313,11 @@ namespace Strikeforce
             return cameraBounds;
         }
 
-        protected void KeepLevelInView()
+        protected void KeepLevelInMainView(float x, float y, ref float deltaX, ref float deltaY)
         {
+            float finalX = x + deltaX;
+            float finalY = y + deltaY;
+
             RectangleF mainCameraBounds = GetMainCameraViewBounds();
             float viewWidth = mainCameraBounds.Width;
             float viewHeight = mainCameraBounds.Height;
@@ -328,13 +331,8 @@ namespace Strikeforce
             float minY = (viewHeight - levelHeight) / 2f;
             float maxY = (levelHeight - viewHeight) / 2f;
 
-            float cameraX = mainCameraBounds.X;
-            float cameraY = mainCameraBounds.Y;
-
-            cameraX = Mathf.Clamp(cameraX, minX, maxX);
-            cameraY = Mathf.Clamp(cameraY, minY, maxY);
-
-            SetMainCameraPosition(cameraX, cameraY);
+            deltaX = Mathf.Clamp(finalX, minX, maxX) - x;
+            deltaY = Mathf.Clamp(finalY, minY, maxY) - y;
         }
 
         public void RespondToKeyEvent(KeyEvent keyEvent)
