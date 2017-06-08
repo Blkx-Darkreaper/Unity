@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.Networking;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
+using System.Drawing;
 
 namespace Strikeforce
 {
@@ -266,10 +267,10 @@ namespace Strikeforce
             }
 
             //MoveCamera(x, y, z);
-            SetCameraPosition(cameraPosition);
+            SetMainCameraPosition(cameraPosition);
         }
 
-        protected void MoveCamera(float x, float y, float z)
+        protected void MoveMainCamera(float x, float y, float z)
         {
             Vector3 currentPosition = transform.position;
 
@@ -278,13 +279,18 @@ namespace Strikeforce
             mainCamera.transform.Translate(x, z, y);
         }
 
-        protected void SetCameraPosition(Vector3 position)
+        protected void SetMainCameraPosition(float x, float y)
+        {
+            SetMainCameraPosition(new Vector3(x, 0, y));
+        }
+
+        protected void SetMainCameraPosition(Vector3 position)
         {
             float y = mainCamera.transform.position.y;
             mainCamera.transform.position = new Vector3(position.x, y, position.z);
         }
 
-        protected void SetCameraVelocity(float velocityX, float velocityY, float velocityZ)
+        protected void SetMainCameraVelocity(float velocityX, float velocityY, float velocityZ)
         {
             Rigidbody cameraVelocity = mainCamera.GetComponent<Rigidbody>();
             if (cameraVelocity == null)
@@ -294,6 +300,41 @@ namespace Strikeforce
             }
 
             cameraVelocity.velocity = new Vector3(velocityX, velocityY, velocityZ);
+        }
+
+        protected RectangleF GetMainCameraViewBounds()
+        {
+            float x = mainCamera.transform.position.x;
+            float y = mainCamera.transform.position.y;
+            float height = 2 * mainCamera.orthographicSize;
+            float width = height * Screen.width / Screen.height;
+
+            RectangleF cameraBounds = new RectangleF(x, y, width, height);
+            return cameraBounds;
+        }
+
+        protected void KeepLevelInView()
+        {
+            RectangleF mainCameraBounds = GetMainCameraViewBounds();
+            float viewWidth = mainCameraBounds.Width;
+            float viewHeight = mainCameraBounds.Height;
+
+            int levelWidth = CurrentLevel.Width;
+            int levelHeight = CurrentLevel.Height;
+
+            float minX = (viewWidth - levelWidth) / 2f;
+            float maxX = (levelWidth - viewWidth) / 2f;
+
+            float minY = (viewHeight - levelHeight) / 2f;
+            float maxY = (levelHeight - viewHeight) / 2f;
+
+            float cameraX = mainCameraBounds.X;
+            float cameraY = mainCameraBounds.Y;
+
+            cameraX = Mathf.Clamp(cameraX, minX, maxX);
+            cameraY = Mathf.Clamp(cameraY, minY, maxY);
+
+            SetMainCameraPosition(cameraX, cameraY);
         }
 
         public void RespondToKeyEvent(KeyEvent keyEvent)

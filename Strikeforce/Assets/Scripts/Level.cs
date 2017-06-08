@@ -9,13 +9,13 @@ namespace Strikeforce
 {
     public class Level : MonoBehaviour
     {
-        public int Columns;
-        public int Rows;
+        public int Width;
+        public int Height;
         public static int TileLength = 32;
         public string LevelName;
         [HideInInspector]
         public GameObject BoundingBox;
-        public Rectangle Bounds { get { return new Rectangle(0, 0, Columns, Rows); } }
+        public Rectangle Bounds { get { return new Rectangle(0, 0, Width, Height); } }
         public Spawnpoint HeadquartersSpawn;
         public GameObject TilePrefab;
         public Sprite[] Tileset;
@@ -66,12 +66,12 @@ namespace Strikeforce
 
             Level.TileLength = map.TileLength;
 
-            this.Columns = (int)map.MapSize.Width;
-            int halfWidth = Columns / 2;
-            this.Rows = (int)map.MapSize.Height;
+            this.Width = (int)map.MapSize.Width;
+            int halfWidth = Width / 2;
+            this.Height = (int)map.MapSize.Height;
 
             // Set build Bounding box
-            LoadBoundingBox(Columns, Rows);
+            LoadBoundingBox(Width, Height);
 
             allGridObjects = new GameObject("GridsObject");
             allGridObjects.transform.parent = gameObject.transform;
@@ -85,7 +85,7 @@ namespace Strikeforce
                 int x = (int)grid.Location.x;
                 x -= halfWidth;
 
-                int z = Rows - (int)grid.Location.y;
+                int z = Height - (int)grid.Location.y;
                 Vector3 position = new Vector3(x, 0, z);
 
                 GameObject tile = Instantiate(TilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
