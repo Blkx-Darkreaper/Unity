@@ -59,11 +59,10 @@ namespace Strikeforce
 
         protected virtual void Start()
         {
-            //account = transform.root.GetComponent<PlayerAccount>();
-            if(MenuManager.Singleton.CurrentMenu != this)
-            {
-                return;
-            }
+            //if(MenuManager.Singleton.CurrentMenu != this)
+            //{
+            //    return;
+            //}
 
             this.SelectedIndex = 0;
             SelectMenuButton(SelectedIndex);
