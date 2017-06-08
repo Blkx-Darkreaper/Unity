@@ -17,7 +17,7 @@ namespace Strikeforce
             this.isEmpty = true;
         }
 
-        public Region(int x, int y, int width, int height)
+        public Region(float x, float y, int width, int height)
         {
             this.Location = new Vector2(x, y);
             this.Size = new Size(width, height);

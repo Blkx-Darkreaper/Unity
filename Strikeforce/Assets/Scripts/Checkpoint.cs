@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Drawing;
 using Newtonsoft.Json;
+using Serializable = System.SerializableAttribute;
 
 namespace Strikeforce
 {

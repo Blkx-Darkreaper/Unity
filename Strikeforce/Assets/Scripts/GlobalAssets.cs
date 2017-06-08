@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
+using Color = UnityEngine.Color;
 
 namespace Strikeforce
 {

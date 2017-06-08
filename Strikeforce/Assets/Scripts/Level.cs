@@ -137,15 +137,15 @@ namespace Strikeforce
         protected void AddCheckpoints(List<Checkpoint> checkpointsToAdd)
         {
             this.allCheckpoints = new Dictionary<int, Checkpoint>();
+            throw new NotImplementedException();
+            //foreach (Vector2 location in checkpointsToAdd)
+            //{
+            //    int y = (int)location.y;
+            //    GameObject gameObject = Instantiate(CheckpointPrefab, new Vector3(0, y, 0), Quaternion.identity) as GameObject;
+            //    Checkpoint checkpoint = gameObject.GetComponent<Checkpoint>();
 
-            foreach (Vector2 location in checkpointsToAdd)
-            {
-                int y = (int)location.y;
-                GameObject gameObject = Instantiate(CheckpointPrefab, new Vector3(0, y, 0), Quaternion.Identity) as GameObject;
-                Checkpoint checkpoint = gameObject.GetComponent<Checkpoint>();
-
-                allCheckpoints.Add(y, checkpoint);
-            }
+            //    allCheckpoints.Add(y, checkpoint);
+            //}
         }
 
         protected void LinkZones()
