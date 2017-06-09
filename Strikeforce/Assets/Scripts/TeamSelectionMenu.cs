@@ -46,9 +46,9 @@ namespace Strikeforce
                 return;
             }
 
-            switch(buttonName) {
-                case QUIT:
-                    break;
+            if(buttonName.Equals(QUIT) == true)
+            {
+
             }
         }
 
