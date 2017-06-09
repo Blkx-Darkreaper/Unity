@@ -7,33 +7,47 @@ namespace Strikeforce
     public class TeamSelectionMenu : Menu
     {
         protected Team teamA;
-        public const string JOIN_TEAM_A = "Join Maurauders";
+        public const string JOIN_TEAM = "Join";
+        public string JoinTeamA;
         protected Team teamB;
-        public const string JOIN_TEAM_B = "Join Privateers";
+        public string JoinTeamB;
+        public const string QUIT = "Leave Game";
 
         protected override void Start()
         {
             base.Start();
 
             this.teamA = GameManager.Singleton.AllTeams[0];
+            this.JoinTeamA = string.Format("{0} {1}", JOIN_TEAM, teamA.Name);
+
             this.teamB = GameManager.Singleton.AllTeams[1];
+            this.JoinTeamB = string.Format("{0} {1}", JOIN_TEAM, teamB.Name);
         }
 
         protected override void SetButtonNames()
         {
-            this.buttonNames = new string[] { };
+            this.buttonNames = new string[] { JoinTeamA, JoinTeamB, QUIT };
+        }
+
+        protected override string[] GetMenuButtonNamesToAdd()
+        {
+            return new string[] { JoinTeamA, JoinTeamB };
         }
 
         protected override void HandleButtonPress(string buttonName)
         {
-            switch(buttonName)
-            {
-                case JOIN_TEAM_A:
-                    SelectTeam(teamA, teamB);
-                    break;
+            if (buttonName.Equals(JoinTeamA) == true) {
+                SelectTeam(teamA, teamB);
+                return;
+            }
 
-                case JOIN_TEAM_B:
-                    SelectTeam(teamB, teamA);
+            if (buttonName.Equals(JoinTeamB) == true) {
+                SelectTeam(teamB, teamA);
+                return;
+            }
+
+            switch(buttonName) {
+                case QUIT:
                     break;
             }
         }
