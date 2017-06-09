@@ -186,6 +186,17 @@ namespace Strikeforce
             teamB.ResetRaidCountdown(teamBPlayers, teamAPlayers);
 
             this.IsGameInProgress = true;
+
+            foreach(Profile playerAccount in AllPlayerAccounts.Values)
+            {
+                Player player = playerAccount.Player;
+                if(player == null)
+                {
+                    continue;
+                }
+
+                player.StartGame();
+            }
         }
 
         public void LoadGame(string gameToLoad, string levelToLoad)

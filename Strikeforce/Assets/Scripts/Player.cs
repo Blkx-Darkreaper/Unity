@@ -49,9 +49,6 @@ namespace Strikeforce
 
             this.CurrentTeam = null;
 
-            this.BuildHud.enabled = isInBuildMode;
-            this.RaidHud.enabled = !isInBuildMode;
-
             // Get the main camera
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
             this.CurrentInventory = GetComponent<Inventory>();
@@ -59,6 +56,7 @@ namespace Strikeforce
             this.CurrentLevel = GameManager.Singleton.CurrentLevels[0];
             this.allUnits = new LinkedList<Vehicle>();
             this.allStructures = new LinkedList<Structure>();
+            this.IsSettingConstructionPoint = false;
         }
 
         public override void OnStartLocalPlayer()
@@ -66,12 +64,14 @@ namespace Strikeforce
             //CurrentRaider.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
         }
 
-        protected void Start()
+        public void StartGame()
         {
-            this.IsSettingConstructionPoint = false;
-            this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
+            this.CurrentLevel = CurrentTeam.HomeBase;
 
-            //SpawnCursors();
+            this.BuildHud.enabled = isInBuildMode;
+            this.RaidHud.enabled = !isInBuildMode;
+
+            //SetCursors();
             SpawnRaider();  // Testing
         }
 
