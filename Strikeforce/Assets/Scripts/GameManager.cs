@@ -111,6 +111,12 @@ namespace Strikeforce
             }
         }
 
+        public virtual Team GetOtherTeam(Team team)
+        {
+            Team otherTeam = team == AllTeams[0] ? AllTeams[1] : AllTeams[0];
+            return otherTeam;
+        }
+
         protected void LoadDetails()
         {
             GameObject[] playerObjects = GameObject.FindGameObjectsWithTag(Tags.PLAYER);
@@ -138,14 +144,15 @@ namespace Strikeforce
             }
         }
 
-        public bool CanJoinTeam(Profile playerAccount, Team teamToCheck, Team otherTeam)
+        public bool CanJoinTeam(Profile playerAccount, Team teamToCheck)
         {
             int rank = playerAccount.Ranking.Grade;
 
-            int teamMembers = teamToCheck.Members.Count;
+            int teamMembers = teamToCheck.TotalMembers;
             int totalTeamRank = teamToCheck.TotalRank;
 
-            int otherTeamMembers = otherTeam.Members.Count;
+            Team otherTeam = GetOtherTeam(teamToCheck);
+            int otherTeamMembers = otherTeam.TotalMembers;
             int otherTotalTeamRank = otherTeam.TotalRank;
 
             float threshold = 3 * (otherTeamMembers - teamMembers) + 0.5f * (otherTotalTeamRank - totalTeamRank) / rank;
@@ -177,10 +184,10 @@ namespace Strikeforce
             }
 
             Team teamA = AllTeams[0];
-            int teamAPlayers = teamA.Members.Count;
+            int teamAPlayers = teamA.TotalMembers;
 
             Team teamB = AllTeams[1];
-            int teamBPlayers = teamB.Members.Count;
+            int teamBPlayers = teamB.TotalMembers;
 
             teamA.ResetRaidCountdown(teamAPlayers, teamBPlayers);
             teamB.ResetRaidCountdown(teamBPlayers, teamAPlayers);
@@ -215,6 +222,32 @@ namespace Strikeforce
         {
             CurrentGameName = string.Empty;
             CurrentLevelName = Scenes.MainMenu;
+        }
+
+        public void CompleteRaid(Profile playerAccount, float damageInflictedDuringRaid)
+        {
+            // Clear checkpoint
+            playerAccount.Player.PreviousCheckpoint = null;
+
+            Team playerTeam = playerAccount.Player.CurrentTeam;
+
+            playerTeam.CompleteRaid(playerAccount, damageInflictedDuringRaid);
+
+            if (playerTeam.RaidWindowRemaining > 0)
+            {
+                return;
+            }
+            if (playerTeam.AreMembersCurrentlyRaiding == true)
+            {
+                return;
+            }
+
+            // Close Raid window
+            int playerTeamMembers = playerTeam.TotalMembers;
+            Team otherTeam = GetOtherTeam(playerTeam);
+            int otherTeamMembers = otherTeam.TotalMembers;
+
+            playerTeam.ResetRaidCountdown(playerTeamMembers, otherTeamMembers, playerTeam.TotalDamageInflictedDuringRaid, ElapsedGameTime);
         }
 
         public void GameOver()
@@ -327,43 +360,18 @@ namespace Strikeforce
             return account;
         }
 
-        public void AddPlayerAccount(string username, int avatarId)
+        public void AddPlayerAccount(Profile playerAccount)
         {
-            AddPlayerAccount(username, avatarId, false);
-        }
+            string username = playerAccount.Username;
 
-        public void AddPlayerAccount(string username, int avatarId, bool isSelectedProfile)
-        {
             bool usernameConflict = AllPlayerAccounts.ContainsKey(username);
             if (usernameConflict == true)
             {
-                Debug.Log(string.Format("Username {0} is already taken", username));
+                Debug.Log(string.Format("User {0} has already joined", username));
                 return;
             }
 
-            Profile accountToAdd = new Profile(username, avatarId, isSelectedProfile);
             AllPlayerAccounts.Add(username, accountToAdd);
-        }
-
-        private void VerifyAccounts()
-        {
-            string[] allUsernames = GameManager.GetAllUsernames(AllPlayerAccounts);
-            int count = AllPlayerAccounts.Count;
-            if (allUsernames.Length != count)
-            {
-                Debug.Log(string.Format("{0} usernames but {1} entries", allUsernames.Length, count));
-            }
-
-            foreach (string username in allUsernames)
-            {
-                Profile account = GetPlayerAccount(username);
-                if (account == null)
-                {
-                    Debug.Log(string.Format("No account for {0}", username));
-                    continue;
-                }
-                Debug.Log(string.Format("Username: {0}, Account Username: {1}, Account avatar id: {2}", username, account.Username, account.AvatarId));
-            }
         }
 
         public Texture2D GetBuildIcon(string name)
