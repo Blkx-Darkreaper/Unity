@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections.Generic;
 
 namespace Strikeforce
 {
@@ -11,7 +10,7 @@ namespace Strikeforce
         public string JoinTeamA;
         protected Team teamB;
         public string JoinTeamB;
-        public const string QUIT = "Leave Game";
+        public const string WITHDRAW = "Leave Match";
 
         protected override void Start()
         {
@@ -26,7 +25,7 @@ namespace Strikeforce
 
         protected override void SetButtonNames()
         {
-            this.buttonNames = new string[] { JoinTeamA, JoinTeamB, QUIT };
+            this.buttonNames = new string[] { JoinTeamA, JoinTeamB, WITHDRAW };
         }
 
         protected override string[] GetMenuButtonNamesToAdd()
@@ -46,7 +45,7 @@ namespace Strikeforce
                 return;
             }
 
-            if(buttonName.Equals(QUIT) == true)
+            if(buttonName.Equals(WITHDRAW) == true)
             {
 
             }
