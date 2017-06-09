@@ -36,12 +36,12 @@ namespace Strikeforce
         protected override void HandleButtonPress(string buttonName)
         {
             if (buttonName.Equals(JoinTeamA) == true) {
-                SelectTeam(teamA, teamB);
+                SelectTeam(teamA);
                 return;
             }
 
             if (buttonName.Equals(JoinTeamB) == true) {
-                SelectTeam(teamB, teamA);
+                SelectTeam(teamB);
                 return;
             }
 
@@ -51,7 +51,7 @@ namespace Strikeforce
             }
         }
 
-        protected void SelectTeam(Team selectedTeam, Team otherTeam)
+        protected void SelectTeam(Team selectedTeam)
         {
             Profile playerAccount = ProfileManager.Singleton.CurrentProfile;
             if(playerAccount == null)
@@ -60,7 +60,7 @@ namespace Strikeforce
                 return;
             }
 
-            bool canJoinTeam = GameManager.Singleton.CanJoinTeam(playerAccount, selectedTeam, otherTeam);
+            bool canJoinTeam = GameManager.Singleton.CanJoinTeam(playerAccount, selectedTeam);
             if(canJoinTeam == false)
             {
                 SelectionError(string.Format("Cannot join team {0}. Teams would be too unbalanced.", selectedTeam.Name));

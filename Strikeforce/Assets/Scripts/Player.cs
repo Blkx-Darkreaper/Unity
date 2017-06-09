@@ -58,6 +58,17 @@ namespace Strikeforce
             this.IsSettingConstructionPoint = false;
         }
 
+        protected void Start()
+        {
+            Profile profile = ProfileManager.Singleton.CurrentProfile;
+            if (profile == null)
+            {
+                return;
+            }
+
+            GameManager.Singleton.AddProfile(profile);
+        }
+
         public override void OnStartLocalPlayer()
         {
             //CurrentRaider.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
@@ -369,7 +380,8 @@ namespace Strikeforce
                     if (isInBuildMode == true)
                     {
                         Special1(keyEvent);
-                    } else
+                    }
+                    else
                     {
                         SetSpecialFiring(!keyEvent.IsComplete);
                     }
@@ -379,7 +391,8 @@ namespace Strikeforce
                     if (isInBuildMode == true)
                     {
                         Special2();
-                    } else
+                    }
+                    else
                     {
                         SetEquipmentActive(!keyEvent.IsComplete);
                     }

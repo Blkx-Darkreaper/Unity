@@ -11,7 +11,7 @@ namespace Strikeforce
     {
         public static GameManager Singleton = null;
         protected VictoryCondition[] victoryConditions;
-        public Dictionary<string, Profile> AllPlayerAccounts = new Dictionary<string, Profile>();
+        public Dictionary<string, Profile> AllProfiles = new Dictionary<string, Profile>();
         public string CurrentGameName { get; protected set; }
         public string CurrentLevelName { get; protected set; }
         public Level[] CurrentLevels { get; protected set; }
@@ -194,7 +194,7 @@ namespace Strikeforce
 
             this.IsGameInProgress = true;
 
-            foreach(Profile playerAccount in AllPlayerAccounts.Values)
+            foreach(Profile playerAccount in AllProfiles.Values)
             {
                 Player player = playerAccount.Player;
                 if(player == null)
@@ -350,28 +350,28 @@ namespace Strikeforce
 
         public Profile GetPlayerAccount(string username)
         {
-            bool accountExists = AllPlayerAccounts.ContainsKey(username);
+            bool accountExists = AllProfiles.ContainsKey(username);
             if (accountExists == false)
             {
                 return null;
             }
 
-            Profile account = AllPlayerAccounts[username];
+            Profile account = AllProfiles[username];
             return account;
         }
 
-        public void AddPlayerAccount(Profile playerAccount)
+        public void AddProfile(Profile playerAccount)
         {
             string username = playerAccount.Username;
 
-            bool usernameConflict = AllPlayerAccounts.ContainsKey(username);
+            bool usernameConflict = AllProfiles.ContainsKey(username);
             if (usernameConflict == true)
             {
                 Debug.Log(string.Format("User {0} has already joined", username));
                 return;
             }
 
-            AllPlayerAccounts.Add(username, accountToAdd);
+            AllProfiles.Add(username, accountToAdd);
         }
 
         public Texture2D GetBuildIcon(string name)
