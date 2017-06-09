@@ -28,7 +28,7 @@ namespace Strikeforce
         protected Sector nextAvailableSector { get; set; }
         public const string BOUNDING_BOX = "BoundingBox";
 
-        public void Start()
+        public void Awake()
         {
             this.allMapTiles = new List<GameObject>();
             this.allZones = new Dictionary<int, Zone>();
@@ -199,14 +199,13 @@ namespace Strikeforce
             }
 
             this.nextAvailableSector = zoneToCheck.AllSectors[nextSectorId];
-
             return availableSector;
         }
 
-        protected void LoadBoundingBox(int columns, int rows)
+        protected void LoadBoundingBox(int width, int height)
         {
-            int midRow = rows / 2;
-            Vector3 position = new Vector3(0, 10, midRow);
+            int halfHeight = height / 2;
+            Vector3 position = new Vector3(0, 10, halfHeight);
             GameObject boundingBoxPrefab = GlobalAssets.GetMiscPrefab(BOUNDING_BOX);
             if (boundingBoxPrefab == null)
             {
@@ -214,7 +213,7 @@ namespace Strikeforce
             }
 
             this.BoundingBox = Instantiate(boundingBoxPrefab, position, Quaternion.identity) as GameObject;
-            this.BoundingBox.transform.localScale = new Vector3(columns, 20, rows);
+            this.BoundingBox.transform.localScale = new Vector3(width, 20, height);
             this.BoundingBox.transform.parent = gameObject.transform;
         }
 

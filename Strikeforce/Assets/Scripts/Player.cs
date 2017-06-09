@@ -53,7 +53,6 @@ namespace Strikeforce
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
             this.CurrentInventory = GetComponent<Inventory>();
             this.Sectors = new LinkedList<Sector>();
-            this.CurrentLevel = GameManager.Singleton.CurrentLevels[0];
             this.allUnits = new LinkedList<Vehicle>();
             this.allStructures = new LinkedList<Structure>();
             this.IsSettingConstructionPoint = false;
