@@ -28,7 +28,7 @@ namespace Strikeforce
         protected Sector nextAvailableSector { get; set; }
         public const string BOUNDING_BOX = "BoundingBox";
 
-        public void Start()
+        public void Awake()
         {
             this.allMapTiles = new List<GameObject>();
             this.allZones = new Dictionary<int, Zone>();
@@ -137,7 +137,7 @@ namespace Strikeforce
         protected void AddCheckpoints(List<Checkpoint> checkpointsToAdd)
         {
             this.allCheckpoints = new Dictionary<int, Checkpoint>();
-            throw new NotImplementedException();
+            
             //foreach (Vector2 location in checkpointsToAdd)
             //{
             //    int y = (int)location.y;

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using Color = UnityEngine.Color;
 
 namespace Strikeforce
 {
@@ -72,7 +73,7 @@ namespace Strikeforce
             this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
 
             //SpawnCursors();
-            SpawnRaider();  // Testing
+            //SpawnRaider();  // Testing
         }
 
         protected void Update()
@@ -200,7 +201,7 @@ namespace Strikeforce
             CurrentRaider.SetForwardVelocity(initialVelocity);
 
             Vector3 raiderVelocity = CurrentRaider.GetVelocity();
-            SetCameraVelocity(raiderVelocity.x, raiderVelocity.y, raiderVelocity.z);
+            SetMainCameraVelocity(raiderVelocity.x, raiderVelocity.y, raiderVelocity.z);
 
             // Make raider airbourne
             CurrentRaider.TakeOff();
