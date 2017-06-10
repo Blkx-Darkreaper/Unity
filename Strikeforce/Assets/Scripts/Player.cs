@@ -50,16 +50,24 @@ namespace Strikeforce
 
             this.CurrentTeam = null;
 
-            this.BuildHud.enabled = isInBuildMode;
-            this.RaidHud.enabled = !isInBuildMode;
-
             // Get the main camera
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
             this.CurrentInventory = GetComponent<Inventory>();
             this.Sectors = new LinkedList<Sector>();
-            this.CurrentLevel = GameManager.Singleton.CurrentLevels[0];
             this.allUnits = new LinkedList<Vehicle>();
             this.allStructures = new LinkedList<Structure>();
+            this.IsSettingConstructionPoint = false;
+        }
+
+        protected void Start()
+        {
+            Profile profile = ProfileManager.Singleton.CurrentProfile;
+            if (profile == null)
+            {
+                return;
+            }
+
+            GameManager.Singleton.AddProfile(profile);
         }
 
         public override void OnStartLocalPlayer()
@@ -67,10 +75,9 @@ namespace Strikeforce
             //CurrentRaider.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
         }
 
-        protected void Start()
+        public void StartGame()
         {
-            this.IsSettingConstructionPoint = false;
-            this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
+            this.CurrentLevel = CurrentTeam.HomeBase;
 
             //SpawnCursors();
             //SpawnRaider();  // Testing
@@ -371,7 +378,8 @@ namespace Strikeforce
                     if (isInBuildMode == true)
                     {
                         Special1(keyEvent);
-                    } else
+                    }
+                    else
                     {
                         SetSpecialFiring(!keyEvent.IsComplete);
                     }
@@ -381,7 +389,8 @@ namespace Strikeforce
                     if (isInBuildMode == true)
                     {
                         Special2();
-                    } else
+                    }
+                    else
                     {
                         SetEquipmentActive(!keyEvent.IsComplete);
                     }

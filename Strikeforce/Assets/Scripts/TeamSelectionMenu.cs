@@ -1,44 +1,57 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections.Generic;
 
 namespace Strikeforce
 {
     public class TeamSelectionMenu : Menu
     {
         protected Team teamA;
-        public const string JOIN_TEAM_A = "Join Maurauders";
+        public const string JOIN_TEAM = "Join";
+        public string JoinTeamA;
         protected Team teamB;
-        public const string JOIN_TEAM_B = "Join Privateers";
+        public string JoinTeamB;
+        public const string WITHDRAW = "Leave Match";
 
         protected override void Start()
         {
             base.Start();
 
             this.teamA = GameManager.Singleton.AllTeams[0];
+            this.JoinTeamA = string.Format("{0} {1}", JOIN_TEAM, teamA.Name);
+
             this.teamB = GameManager.Singleton.AllTeams[1];
+            this.JoinTeamB = string.Format("{0} {1}", JOIN_TEAM, teamB.Name);
         }
 
         protected override void SetButtonNames()
         {
-            this.buttonNames = new string[] { };
+            this.buttonNames = new string[] { JoinTeamA, JoinTeamB, WITHDRAW };
+        }
+
+        protected override string[] GetMenuButtonNamesToAdd()
+        {
+            return new string[] { JoinTeamA, JoinTeamB };
         }
 
         protected override void HandleButtonPress(string buttonName)
         {
-            switch(buttonName)
-            {
-                case JOIN_TEAM_A:
-                    SelectTeam(teamA, teamB);
-                    break;
+            if (buttonName.Equals(JoinTeamA) == true) {
+                SelectTeam(teamA);
+                return;
+            }
 
-                case JOIN_TEAM_B:
-                    SelectTeam(teamB, teamA);
-                    break;
+            if (buttonName.Equals(JoinTeamB) == true) {
+                SelectTeam(teamB);
+                return;
+            }
+
+            if(buttonName.Equals(WITHDRAW) == true)
+            {
+
             }
         }
 
-        protected void SelectTeam(Team selectedTeam, Team otherTeam)
+        protected void SelectTeam(Team selectedTeam)
         {
             Profile playerAccount = ProfileManager.Singleton.CurrentProfile;
             if(playerAccount == null)
@@ -47,7 +60,7 @@ namespace Strikeforce
                 return;
             }
 
-            bool canJoinTeam = GameManager.Singleton.CanJoinTeam(playerAccount, selectedTeam, otherTeam);
+            bool canJoinTeam = GameManager.Singleton.CanJoinTeam(playerAccount, selectedTeam);
             if(canJoinTeam == false)
             {
                 SelectionError(string.Format("Cannot join team {0}. Teams would be too unbalanced.", selectedTeam.Name));

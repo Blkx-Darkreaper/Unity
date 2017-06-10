@@ -40,6 +40,11 @@ namespace Strikeforce
             public const string label = "label";
         }
 
+        protected void Awake()
+        {
+            enabled = false;
+        }
+
         protected void Start()
         {
             profile = ProfileManager.Singleton.CurrentProfile;
