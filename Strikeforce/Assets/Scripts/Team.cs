@@ -6,12 +6,13 @@ namespace Strikeforce
 {
     public class Team : MonoBehaviour
     {
-        public string Name { get; protected set; }
+        public string Name;
         public Level HomeBase { get; protected set; }
         public Color Colour;
         public int TotalRank { get; protected set; }
         protected Dictionary<string, Profile> members;
         public int TotalMembers { get { return members.Count; } }
+        [HideInInspector]
         public Inventory SharedInventory;
         public bool IsRaidInProgress { get; protected set; }
         public float RaidCountdown { get; protected set; }

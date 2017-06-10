@@ -6,7 +6,7 @@ namespace Strikeforce {
         //public Point Location { get; protected set; }
         public int TilesetIndex { get; set; }
 
-        public Tile(int index, Point corner)
+        public Tile(Point corner, int index)
         {
             this.TilesetIndex = index;
             //this.Location = location;

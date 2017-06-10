@@ -9,7 +9,9 @@ namespace Strikeforce
 {
     public class Level : MonoBehaviour
     {
+        [HideInInspector]
         public int Width;
+        [HideInInspector]
         public int Height;
         public static int TileLength = 32;
         public string LevelName;
@@ -54,9 +56,39 @@ namespace Strikeforce
                 Debug.Log(string.Format("Failed to load level. {0}", ex.Message));
                 return;
             }
+
+            // Testing
+            //Tile testTile = new Tile(new Point(0, 0), 0);
+
+            //List<Grid> mapGrids = new List<Grid>();
+            //mapGrids.Add(new Grid(1, new Point(0, 0), true, true, true, testTile));
+            //mapGrids.Add(new Grid(2, new Point(1, 0), true, true, true, testTile));
+
+            //List<Zone> allZones = new List<Zone>();
+
+            //List<Sector> allSectors = new List<Sector>();
+            //allSectors.Add(new Sector(1, new Point(-13, 3), new Size(13,7), new Spawnpoint(false, new Point(6, 6), new Size(1, 1))));
+            //allZones.Add(new Zone(1, new Point(0, 3), new Size(26, 7), allSectors));
+
+            //List<Checkpoint> allCheckpoints = new List<Checkpoint>();
+            //allCheckpoints.Add(new Checkpoint(new Point(0, 9), new Size(26, 1)));
+
+            //map = new StrikeforceMap("Nic Bunting", new DateTime(2017, 05, 26), "\\tilea2.png", 32, 13, 7, new Size(26, 50), mapGrids, allZones, allCheckpoints);
+            //string unityJson = JsonUtility.ToJson(map);
+            //try
+            //{
+            //    levelPath = string.Format("{0}/Levels/{1}-unity.json", appPath, LevelName);
+            //    GlobalAssets.WriteTextFile(levelPath, unityJson);
+            //} catch(Exception ex)
+            //{
+            //    Debug.Log(ex.Message);
+            //}
+            // End testing
+
             try
             {
                 map = JsonConvert.DeserializeObject<StrikeforceMap>(json);
+                //map = JsonUtility.FromJson<StrikeforceMap>(json);
             }
             catch (Exception ex)
             {

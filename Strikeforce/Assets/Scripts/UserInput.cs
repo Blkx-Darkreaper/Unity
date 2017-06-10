@@ -143,6 +143,8 @@ namespace Strikeforce
             LeftStick();
             RightStick();
 
+            DirectionPad();
+
             LeftTrigger();
             RightTrigger();
 
@@ -332,10 +334,10 @@ namespace Strikeforce
             player.RightStick(x, 0, y);
         }
 
-        protected void DPad()
+        protected void DirectionPad()
         {
-            string dpadX = string.Format("{0}{1}", Axis.DIRECTION_PAD, Direction.X);
-            string dpadY = string.Format("{0}{1}", Axis.DIRECTION_PAD, Direction.Y);
+            string dpadX = string.Format("{0} {1}", Axis.DIRECTION_PAD, Axis.HORIZONTAL);
+            string dpadY = string.Format("{0} {1}", Axis.DIRECTION_PAD, Axis.VERTICAL);
 
             float x = Input.GetAxis(dpadX);
             float y = Input.GetAxis(dpadY);

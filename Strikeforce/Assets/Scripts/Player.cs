@@ -25,7 +25,7 @@ namespace Strikeforce
         public Inventory CurrentInventory;
         protected bool isInBuildMode = true;
         public GridCursor BuildCursor;
-        public GridCursor BuyCursor;
+        //public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
         public Color SelectionColour = Color.red;
@@ -79,7 +79,7 @@ namespace Strikeforce
         {
             this.CurrentLevel = CurrentTeam.HomeBase;
 
-            //SpawnCursors();
+            SetCursors();
             //SpawnRaider();  // Testing
         }
 
@@ -131,8 +131,8 @@ namespace Strikeforce
             this.BuildCursor = cursors[0];
             this.BuildCursor.Bounds = CurrentLevel.Bounds;
 
-            this.BuyCursor = cursors[1];
-            this.BuyCursor.Bounds = BuildHud.Bounds;
+            //this.BuyCursor = cursors[1];
+            //this.BuyCursor.Bounds = BuildHud.Bounds;
 
             BuildCursor.transform.position = new Vector3(spawnpoint.Location.x, spawnpoint.Location.y, spawnpoint.Location.z);
         }
@@ -237,7 +237,7 @@ namespace Strikeforce
                 return;
             }
 
-            BuyCursor.Move(x, z);
+            //BuyCursor.Move(x, z);
         }
 
         public void DPad(float x, int y, float z)
@@ -487,7 +487,7 @@ namespace Strikeforce
         {
             if (SelectedEntity == null)
             {
-                BuyStructure();
+                //BuyStructure();
                 return;
             }
 
@@ -527,10 +527,10 @@ namespace Strikeforce
             return GetHighlightedStructure(BuildCursor);
         }
 
-        protected Structure GetStructureHighlightedByBuyCursor()
-        {
-            return GetHighlightedStructure(BuyCursor);
-        }
+        //protected Structure GetStructureHighlightedByBuyCursor()
+        //{
+        //    return GetHighlightedStructure(BuyCursor);
+        //}
 
         protected Structure GetHighlightedStructure(GridCursor cursor)
         {
@@ -775,45 +775,45 @@ namespace Strikeforce
             structure.transform.Rotate(0, 90, 0);
         }
 
-        protected void BuyStructure()
-        {
-            Structure structure = GetStructureHighlightedByBuyCursor();
-            if (structure == null)
-            {
-                ActionFailed();
-                return;
-            }
+        //protected void BuyStructure()
+        //{
+        //    Structure structure = GetStructureHighlightedByBuyCursor();
+        //    if (structure == null)
+        //    {
+        //        ActionFailed();
+        //        return;
+        //    }
 
-            int cost = structure.Cost;
+        //    int cost = structure.Cost;
 
-            bool hasSufficientFunds = CurrentInventory.HasSufficientResources(ResourceType.Money, cost);
-            if (hasSufficientFunds == false)
-            {
-                // Insufficient funds
-                ActionFailed();
-                return;
-            }
+        //    bool hasSufficientFunds = CurrentInventory.HasSufficientResources(ResourceType.Money, cost);
+        //    if (hasSufficientFunds == false)
+        //    {
+        //        // Insufficient funds
+        //        ActionFailed();
+        //        return;
+        //    }
 
-            Vector3 spawnPoint = BuildCursor.transform.position;
-            GameObject gameObjectToBuild = Instantiate(structure.gameObject, spawnPoint, Quaternion.identity) as GameObject;
-            if (gameObjectToBuild == null)
-            {
-                ActionFailed();
-                return;
-            }
+        //    Vector3 spawnPoint = BuildCursor.transform.position;
+        //    GameObject gameObjectToBuild = Instantiate(structure.gameObject, spawnPoint, Quaternion.identity) as GameObject;
+        //    if (gameObjectToBuild == null)
+        //    {
+        //        ActionFailed();
+        //        return;
+        //    }
 
-            Selectable selectable = gameObjectToBuild.GetComponent<Selectable>();
-            if (selectable == null)
-            {
-                ActionFailed();
-                return;
-            }
+        //    Selectable selectable = gameObjectToBuild.GetComponent<Selectable>();
+        //    if (selectable == null)
+        //    {
+        //        ActionFailed();
+        //        return;
+        //    }
 
-            SetSelected(selectable);
-            IsSettingConstructionPoint = true;
+        //    SetSelected(selectable);
+        //    IsSettingConstructionPoint = true;
 
-            CurrentInventory.UpdateResource(ResourceType.Money, -cost);
-        }
+        //    CurrentInventory.UpdateResource(ResourceType.Money, -cost);
+        //}
 
         protected void ToggleContextOption()
         {

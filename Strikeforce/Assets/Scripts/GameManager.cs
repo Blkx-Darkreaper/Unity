@@ -19,9 +19,13 @@ namespace Strikeforce
         public bool IsGameInProgress { get; protected set; }
         public float ElapsedGameTime { get; protected set; }
         public Color DefaultColour;
+        [HideInInspector]
         public int BaseMask;
+        [HideInInspector]
         public int GroundMask;
+        [HideInInspector]
         public int AirMask;
+        [HideInInspector]
         public int EffectsMask;
         protected int nextEntityId = 0;
         protected Dictionary<int, Entity> allGameEntities;

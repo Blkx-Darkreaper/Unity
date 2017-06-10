@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
+    [Serializable]
     public class Sector : Region
     {
         public int SectorId { get; protected set; }
@@ -15,7 +16,7 @@ namespace Strikeforce
         public float BuildingConstructionTimeBonus = 0.05f;
 
         [JsonConstructor]
-        public Sector(int id, Vector2 location, Size size, Spawnpoint spawn) : base(location.x, location.y, size.Width, size.Height)
+        public Sector(int id, Point location, Size size, Spawnpoint spawn) : base(location.X, location.Y, size.Width, size.Height)
         {
             this.SectorId = id;
             this.Spawn = spawn;

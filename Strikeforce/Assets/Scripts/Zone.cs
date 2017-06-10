@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
+    [Serializable]
     public class Zone : Region
     {
         public int ZoneId { get; protected set; }
@@ -18,7 +19,7 @@ namespace Strikeforce
         protected int unlockThreshold { get; set; }
 
         [JsonConstructor]
-        public Zone(int id, Vector2 location, Size size, List<Sector> allSectors) : base(location.x, location.y, size.Width, size.Height)
+        public Zone(int id, Point location, Size size, List<Sector> allSectors) : base(location.X, location.Y, size.Width, size.Height)
         {
             this.ZoneId = id;
 

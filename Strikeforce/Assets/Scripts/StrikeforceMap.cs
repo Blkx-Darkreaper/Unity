@@ -5,6 +5,7 @@ using System.Drawing;
 
 namespace Strikeforce
 {
+    [Serializable]
     public class StrikeforceMap
     {
         // Meta data
