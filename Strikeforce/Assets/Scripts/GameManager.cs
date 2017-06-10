@@ -360,9 +360,9 @@ namespace Strikeforce
             return account;
         }
 
-        public void AddProfile(Profile playerAccount)
+        public void AddProfile(Profile accountToAdd)
         {
-            string username = playerAccount.Username;
+            string username = accountToAdd.Username;
 
             bool usernameConflict = AllProfiles.ContainsKey(username);
             if (usernameConflict == true)
