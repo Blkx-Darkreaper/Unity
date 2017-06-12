@@ -8,9 +8,9 @@ namespace Strikeforce
         public GUISkin PauseMenuSkin;
         protected const string RESUME = "Resume";
 
-        protected override void SetButtonNames()
+        protected override void SetButtonTextValues()
         {
-            buttonNames = new string[] { RESUME, EXIT };
+            allButtonTextValues = new string[] { RESUME, EXIT };
         }
 
         protected override void OnGUI()
@@ -42,9 +42,9 @@ namespace Strikeforce
             width = Attributes.ButtonWidth;
             height = Attributes.ButtonHeight;
 
-            for (int i = 0; i < buttonNames.Length; i++)
+            for (int i = 0; i < allButtonTextValues.Length; i++)
             {
-                string buttonName = buttonNames[i];
+                string buttonName = allButtonTextValues[i];
                 bool buttonPressed = GUI.Button(new Rect(x, y, width, height), buttonName);
 
                 y += Attributes.ButtonHeight + Attributes.Padding;

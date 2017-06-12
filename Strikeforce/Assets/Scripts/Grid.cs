@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
-    [Serializable]
     public class Grid
     {
         public int Id { get; protected set; }

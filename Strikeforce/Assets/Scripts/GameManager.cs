@@ -12,9 +12,9 @@ namespace Strikeforce
         public static GameManager Singleton = null;
         protected VictoryCondition[] victoryConditions;
         public Dictionary<string, Profile> AllProfiles = new Dictionary<string, Profile>();
-        public string CurrentGameName { get; protected set; }
-        public string CurrentLevelName { get; protected set; }
-        public Level[] CurrentLevels { get; protected set; }
+        public string GameName { get; protected set; }
+        public string LevelName;
+        public Level[] AllLevels { get; protected set; }
         public Team[] AllTeams { get; protected set; }
         public bool IsGameInProgress { get; protected set; }
         public float ElapsedGameTime { get; protected set; }
@@ -27,9 +27,13 @@ namespace Strikeforce
         public int AirMask;
         [HideInInspector]
         public int EffectsMask;
+        public GameObject TilePrefab;
+        public GameObject CheckpointPrefab;
         protected int nextEntityId = 0;
         protected Dictionary<int, Entity> allGameEntities;
         public int MaxEntities = 1000;
+        protected TeamSelectionMenu teamMenu;
+        protected GameMenu gameMenu;
 
         private void Awake()
         {
@@ -51,7 +55,17 @@ namespace Strikeforce
             this.AirMask = LayerMask.GetMask(Layers.AIR);
             this.EffectsMask = LayerMask.GetMask(Layers.EFFECTS);
 
-            this.CurrentLevels = new Level[2];
+            GameObject menuObject = GameObject.FindGameObjectWithTag(Tags.MENU_OBJECT);
+            Canvas canvas = menuObject.GetComponentInChildren<Canvas>();
+            //this.teamMenu = menuObject.GetComponentInChildren<TeamSelectionMenu>();
+            //this.gameMenu = menuObject.GetComponentInChildren<GameMenu>();
+            this.teamMenu = FindObjectOfType<TeamSelectionMenu>();
+            this.teamMenu.transform.SetParent(canvas.transform);
+
+            this.gameMenu = FindObjectOfType<GameMenu>();
+            this.gameMenu.transform.SetParent(canvas.transform);
+
+            this.AllLevels = new Level[2];
             this.allGameEntities = new Dictionary<int, Entity>();
 
             GameObject[] allLevels = GameObject.FindGameObjectsWithTag(Tags.LEVEL);
@@ -64,15 +78,25 @@ namespace Strikeforce
             for (int i = 0; i < allLevels.Length; i++)
             {
                 Level level = allLevels[i].GetComponent<Level>();
+                level.LoadMap(LevelName);
+
                 Team team = allLevels[i].GetComponent<Team>();
                 team.SetHomeBase(level);
-                //this.CurrentLevels[i] = levels[i].GetComponent<Level>();
+
+                this.AllLevels[i] = level;
+                this.AllTeams[i] = team;
             }
         }
 
         protected void Start()
         {
+            if(teamMenu == null)
+            {
+                throw new InvalidOperationException("Could not find Team Selection Menu");
+            }
 
+            MenuManager.Singleton.HideLoadingScreenDelayed();
+            MenuManager.Singleton.ShowMenu(teamMenu);
         }
 
         protected void Update()
@@ -212,20 +236,20 @@ namespace Strikeforce
 
         public void LoadGame(string gameToLoad, string levelToLoad)
         {
-            CurrentGameName = gameToLoad;
+            GameName = gameToLoad;
             LoadLevel(levelToLoad);
         }
 
         public void LoadLevel(string levelToLoad)
         {
-            CurrentLevelName = levelToLoad;
+            LevelName = levelToLoad;
             //isLoading = true;
         }
 
         public void ExitGame()
         {
-            CurrentGameName = string.Empty;
-            CurrentLevelName = Scenes.MainMenu;
+            GameName = string.Empty;
+            LevelName = Scenes.MainMenu;
         }
 
         public void CompleteRaid(Profile playerAccount, float damageInflictedDuringRaid)

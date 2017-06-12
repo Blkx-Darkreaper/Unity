@@ -13,9 +13,14 @@ namespace Strikeforce
         public const string OPTIONS = "Options";
         public const string QUIT_GAME = "Resign";
 
-        protected override void SetButtonNames()
+        protected override void Awake()
         {
-            this.buttonNames = new string[] { RESUME, RAID, MANAGE_TEAM, MARKET, OPTIONS, QUIT_GAME, EXIT };
+            Init();
+        }
+
+        protected override void SetButtonTextValues()
+        {
+            this.allButtonTextValues = new string[] { RESUME, RAID, MANAGE_TEAM, MARKET, OPTIONS, QUIT_GAME, EXIT };
         }
 
         protected override void HandleButtonPress(string buttonName)

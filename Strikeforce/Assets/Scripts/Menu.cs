@@ -8,6 +8,7 @@ namespace Strikeforce
 {
     public class Menu : MonoBehaviour
     {
+        public bool IsReady { get; protected set; }
         public bool IsDrawingMenu;
         public Menu PreviousMenu;
         public GUISkin MenuSkin;
@@ -21,9 +22,11 @@ namespace Strikeforce
         protected MenuManager menuManager;
         protected Animator animator;
         protected CanvasGroup canvasGroup;
+        [HideInInspector]
         public int SelectedIndex = 0;
-        public bool LoopSelection = true;
-        protected string[] buttonNames;
+        public bool LoopSelection = false;
+        public string[] AllButtonNames;
+        protected string[] allButtonTextValues;
         protected Dictionary<string, Button> allButtons;
         protected const string BACK = "Back";
         protected const string EXIT = "Quit Game";
@@ -41,31 +44,8 @@ namespace Strikeforce
 
         protected virtual void Awake()
         {
-            this.menuManager = GetComponentInParent<MenuManager>();
-
-            this.animator = GetComponent<Animator>();
-            this.canvasGroup = GetComponent<CanvasGroup>();
-
-            RectTransform rect = GetComponent<RectTransform>();
-            if (rect != null)
-            {
-                rect.offsetMax = rect.offsetMin = new Vector2(0, 0);
-            }
-
-            SetButtonNames();
-			SetHeaderText();
-            AddMenuButtons();
-        }
-
-        protected virtual void Start()
-        {
-            //if(MenuManager.Singleton.CurrentMenu != this)
-            //{
-            //    return;
-            //}
-
-            this.SelectedIndex = 0;
-            SelectMenuButton(SelectedIndex);
+            Init();
+            ReadyMenu();
         }
 
         protected virtual void Update()
@@ -96,14 +76,62 @@ namespace Strikeforce
             DrawMenu();
         }
 
-        protected virtual void SetButtonNames()
+        protected virtual void Init()
         {
-            this.buttonNames = new string[] { BACK, EXIT };
+            this.IsReady = false;
+
+            this.menuManager = GetComponentInParent<MenuManager>();
+
+            this.animator = GetComponent<Animator>();
+            this.canvasGroup = GetComponent<CanvasGroup>();
+            this.allButtons = new Dictionary<string, Button>();
+
+            // Center menu in view
+            RectTransform rect = GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.offsetMax = rect.offsetMin = new Vector2(0, 0);
+            }
+        }
+
+        public void ReadyMenu()
+        {
+            if(IsReady == true)
+            {
+                return;
+            }
+
+            BuildMenu();
+            IsReady = true;
+        }
+
+        protected virtual void BuildMenu()
+        {
+            SetButtonTextValues();
+            SetHeaderText();
+            GetExistingButtons();
+            AddMenuButtons();
+            SetMenuButtonsTextAndHandlers();
+        }
+
+        protected virtual void SetButtonTextValues()
+        {
+            this.allButtonTextValues = new string[] { BACK, EXIT };
         }
 
         protected virtual string[] GetMenuButtonNamesToAdd()
         {
-            return buttonNames;
+            return AllButtonNames;
+        }
+
+        protected void GetExistingButtons()
+        {
+            Button[] buttons = GetComponentsInChildren<Button>();
+            foreach(Button button in buttons)
+            {
+                string buttonName = button.name;
+                allButtons.Add(buttonName, button);
+            }
         }
 
         protected void AddMenuButtons()
@@ -130,7 +158,7 @@ namespace Strikeforce
             }
 
             // Get the button group
-            VerticalLayoutGroup buttonGroup = GetComponentInChildren<VerticalLayoutGroup>();
+            LayoutGroup buttonGroup = GetComponentInChildren<LayoutGroup>();
             if (buttonGroup == null)
             {
                 return;
@@ -140,30 +168,45 @@ namespace Strikeforce
             {
                 GameObject buttonObject = Instantiate(ButtonPrefab) as GameObject;
                 buttonObject.transform.SetParent(buttonGroup.transform, false);
-                buttonObject.GetComponentInChildren<Text>().text = buttonName;
+                
                 buttonObject.transform.localRotation = buttonGroup.transform.localRotation;
                 buttonObject.transform.localScale = buttonGroup.transform.localScale;
 
                 Button button = buttonObject.GetComponent<Button>();
-                AddButtonHandler(button, buttonName);
+                button.name = buttonName;
+
+                allButtons.Add(buttonName, button);
             }
         }
 
-        protected virtual void AddButtonHandler(Button button, string buttonName)
+        protected void SetMenuButtonsTextAndHandlers()
+        {
+            for(int i = 0; i < AllButtonNames.Length; i++)
+            {
+                string buttonName = AllButtonNames[i];
+                string buttonText = allButtonTextValues[i];
+
+                if(allButtons.ContainsKey(buttonName) == false)
+                {
+                    throw new InvalidOperationException(string.Format("No such button {0}", buttonName));
+                }
+
+                // Set text
+                Button button = allButtons[buttonName];
+                button.GetComponentInChildren<Text>().text = buttonText;
+
+                AddButtonHandler(button);
+            }
+        }
+
+        protected virtual void AddButtonHandler(Button button)
         {
             if (button == null)
             {
                 return;
             }
 
-            button.name = buttonName;
             button.onClick.AddListener(() => { HandleButtonPress(button); });
-            if (allButtons == null)
-            {
-                allButtons = new Dictionary<string, Button>();
-            }
-
-            allButtons.Add(buttonName, button);
         }
 
         private void SetHeaderText()
@@ -215,7 +258,6 @@ namespace Strikeforce
                             {
                                 // Play error sound
                                 throw new NotImplementedException();
-                                return;
                             }
                         }
 
@@ -229,7 +271,6 @@ namespace Strikeforce
                             {
                                 // Player error sound
                                 throw new NotImplementedException();
-                                return;
                             }
                         }
 
@@ -262,7 +303,7 @@ namespace Strikeforce
 
         protected virtual Button GetButtonAtIndex(int index)
         {
-            string name = buttonNames[index];
+            string name = AllButtonNames[index];
 
             if (allButtons.ContainsKey(name) == false)
             {
@@ -280,7 +321,7 @@ namespace Strikeforce
 
         protected virtual void SelectMenuButton(int index)
         {
-            if(buttonNames == null)
+            if(allButtonTextValues == null)
             {
                 return;
             }
@@ -301,14 +342,12 @@ namespace Strikeforce
             }
 
             button.Select();
-
-            string name = buttonNames[index];
-            Debug.Log(string.Format("{0} button selected", name));
+            Debug.Log(string.Format("{0} button selected", button.name));
         }
 
         protected virtual void ClickMenuButton(int index)
         {
-            if (buttonNames == null)
+            if (allButtonTextValues == null)
             {
                 return;
             }
@@ -317,7 +356,7 @@ namespace Strikeforce
                 return;
             }
 
-            string name = buttonNames[index];
+            string name = allButtonTextValues[index];
 
             if (allButtons.ContainsKey(name) == false)
             {
@@ -362,12 +401,12 @@ namespace Strikeforce
             //GUI.Label(new Rect(x, y, width, height), welcomeMessage);
 
             // Menu buttons
-            if (buttonNames == null)
+            if (allButtonTextValues == null)
             {
                 GUI.EndGroup();
                 return;
             }
-            if (buttonNames.Length == 0)
+            if (allButtonTextValues.Length == 0)
             {
                 GUI.EndGroup();
                 return;
@@ -379,9 +418,9 @@ namespace Strikeforce
             width = Attributes.ButtonWidth;
             height = Attributes.ButtonHeight;
 
-            for (int i = 0; i < buttonNames.Length; i++)
+            for (int i = 0; i < allButtonTextValues.Length; i++)
             {
-                string buttonName = buttonNames[i];
+                string buttonName = allButtonTextValues[i];
                 bool buttonPressed = GUI.Button(new Rect(x, y, width, height), buttonName);
 
                 y += Attributes.ButtonHeight + Attributes.Padding;
@@ -401,10 +440,10 @@ namespace Strikeforce
         {
             float buttonHeight = 0;
             float paddingHeight = 2 * Attributes.Padding;
-            if (buttonNames != null)
+            if (allButtonTextValues != null)
             {
-                buttonHeight = buttonNames.Length * Attributes.ButtonHeight;
-                paddingHeight += buttonNames.Length * Attributes.Padding;
+                buttonHeight = allButtonTextValues.Length * Attributes.ButtonHeight;
+                paddingHeight += allButtonTextValues.Length * Attributes.Padding;
             }
 
             float messageHeight = Attributes.TextHeight + Attributes.Padding;
@@ -426,13 +465,13 @@ namespace Strikeforce
                 return;
             }
 
-            string buttonName = button.name;
-            HandleButtonPress(buttonName);
+            string buttonText = button.GetComponentInChildren<Text>().text;
+            HandleButtonPress(buttonText);
         }
 
-        protected virtual void HandleButtonPress(string buttonName)
+        protected virtual void HandleButtonPress(string buttonText)
         {
-            switch (buttonName)
+            switch (buttonText)
             {
                 case BACK:
                     Back();

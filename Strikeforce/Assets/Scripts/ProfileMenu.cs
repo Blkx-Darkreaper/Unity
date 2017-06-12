@@ -12,9 +12,8 @@ namespace Strikeforce
         private int avatarIndex = 0;
         public GUISkin SelectionSkin;
 
-        protected override void Start()
+        protected void Start()
         {
-            base.Start();
             selectedUsername = GlobalAssets.DefaultUsername;
             LoadAvatars();
             LoadUsernames();
@@ -32,9 +31,9 @@ namespace Strikeforce
             base.OnGUI();
         }
 
-        protected override void SetButtonNames()
+        protected override void SetButtonTextValues()
         {
-            this.buttonNames = new string[] { BACK };
+            this.allButtonTextValues = new string[] { BACK };
         }
 
         private static void LoadUsernames()

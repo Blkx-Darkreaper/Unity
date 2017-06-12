@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
-    [Serializable]
     public class Spawnpoint
     {
         public Vector3 Location;

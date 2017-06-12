@@ -14,17 +14,15 @@ namespace Strikeforce
         [HideInInspector]
         public int Height;
         public static int TileLength = 32;
-        public string LevelName;
+        protected string levelName;
         [HideInInspector]
         public GameObject BoundingBox;
         public Rectangle Bounds { get { return new Rectangle(0, 0, Width, Height); } }
         public Spawnpoint HeadquartersSpawn;
-        public GameObject TilePrefab;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
         protected GameObject allGridObjects;
         protected Dictionary<int, Zone> allZones;
-        public GameObject CheckpointPrefab;
         protected Dictionary<int, Checkpoint> allCheckpoints;
         protected Zone lastUnlockedZone;
         protected Sector nextAvailableSector { get; set; }
@@ -35,14 +33,27 @@ namespace Strikeforce
             this.allMapTiles = new List<GameObject>();
             this.allZones = new Dictionary<int, Zone>();
             this.allCheckpoints = new Dictionary<int, Checkpoint>();
+        }
 
+        public void LoadMap(string mapName)
+        {
+            if(mapName == null)
+            {
+                throw new NullReferenceException("Map name is null");
+            }
+            if(mapName.Equals(string.Empty))
+            {
+                throw new InvalidOperationException("No map name provided");
+            }
+
+            this.levelName = mapName;
             LoadMap();
         }
 
         protected void LoadMap()
         {
             string appPath = Application.dataPath;
-            string levelPath = string.Format("{0}/Levels/{1}.json", appPath, LevelName);
+            string levelPath = string.Format("{0}/Levels/{1}.json", appPath, levelName);
             Debug.Log(string.Format("Loading level {0}", levelPath));
 
             StrikeforceMap map;
@@ -120,7 +131,8 @@ namespace Strikeforce
                 int z = Height - (int)grid.Location.y;
                 Vector3 position = new Vector3(x, 0, z);
 
-                GameObject tile = Instantiate(TilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
+                GameObject tilePrefab = GameManager.Singleton.TilePrefab;
+                GameObject tile = Instantiate(tilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
                 tile.transform.parent = allGridObjects.transform;
 
                 SpriteRenderer renderer = tile.GetComponent<SpriteRenderer>();
@@ -166,9 +178,11 @@ namespace Strikeforce
             }
         }
 
-        protected void AddCheckpoints(List<Checkpoint> checkpointsToAdd)
+        protected void AddCheckpoints(List<CheckpointJson> checkpointsToAdd)
         {
             this.allCheckpoints = new Dictionary<int, Checkpoint>();
+
+            GameObject checkpointPrefab = GameManager.Singleton.CheckpointPrefab;
             
             //foreach (Vector2 location in checkpointsToAdd)
             //{

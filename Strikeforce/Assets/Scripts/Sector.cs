@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
-    [Serializable]
     public class Sector : Region
     {
         public int SectorId { get; protected set; }

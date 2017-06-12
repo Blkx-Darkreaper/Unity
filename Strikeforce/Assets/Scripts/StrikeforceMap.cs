@@ -5,7 +5,6 @@ using System.Drawing;
 
 namespace Strikeforce
 {
-    [Serializable]
     public class StrikeforceMap
     {
         // Meta data
@@ -18,11 +17,11 @@ namespace Strikeforce
         public Size MapSize { get; set; }
         public List<Grid> AllMapGrids { get; set; }
         public List<Zone> AllZones { get; set; }
-        public List<Checkpoint> AllCheckpoints { get; set; }
+        public List<CheckpointJson> AllCheckpoints { get; set; }
 
         [JsonConstructor]
         public StrikeforceMap(string author, DateTime dateCreated, string tilesetFilename, int tileLength, int nextSector, int nextZone,
-            Size mapSize, List<Grid> allMapGrids, List<Zone> allZones, List<Checkpoint> allCheckpoints)
+            Size mapSize, List<Grid> allMapGrids, List<Zone> allZones, List<CheckpointJson> allCheckpoints)
         {
             this.Author = author;
             this.DateCreated = dateCreated;

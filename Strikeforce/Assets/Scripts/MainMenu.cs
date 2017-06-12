@@ -9,6 +9,7 @@ namespace Strikeforce
         protected const string PROFILE = "Profile";
         public Menu ProfileMenu;
         protected const string MATCHMAKING = "Matchmaking";
+        protected string matchmakingButtonName { get; set; }
         public Menu MatchmakingMenu;
         protected const string OPTIONS = "Options";
         public Menu OptionsMenu;
@@ -18,6 +19,13 @@ namespace Strikeforce
             base.Awake();
 
             DisableMatchmaking();
+        }
+
+        protected override void Init()
+        {
+            this.matchmakingButtonName = AllButtonNames[1];
+
+            base.Init();
         }
 
         protected void EnableMatchmaking()
@@ -33,13 +41,13 @@ namespace Strikeforce
                 return;
             }
 
-            Button matchmakingButton = allButtons[MATCHMAKING];
+            Button matchmakingButton = allButtons[matchmakingButtonName];
             matchmakingButton.interactable = true;
         }
 
         protected void DisableMatchmaking()
         {
-            Button matchmakingButton = allButtons[MATCHMAKING];
+            Button matchmakingButton = allButtons[matchmakingButtonName];
             if (matchmakingButton == null)
             {
                 return;
@@ -55,25 +63,9 @@ namespace Strikeforce
             EnableMatchmaking();
         }
 
-        protected void OnLevelWasLoaded()
+        protected override void SetButtonTextValues()
         {
-            //Cursor.visible = true;
-            //Profile currentAccount = GameManager.ActiveInstance.CurrentPlayerAccount;
-            //if (currentAccount == null)
-            //{
-            //    GetComponent<MainMenu>().enabled = false;
-            //    GetComponent<ProfileMenu>().enabled = true;
-            //}
-            //else
-            //{
-            //    GetComponent<MainMenu>().enabled = true;
-            //    GetComponent<ProfileMenu>().enabled = false;
-            //}
-        }
-
-        protected override void SetButtonNames()
-        {
-            this.buttonNames = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
+            this.allButtonTextValues = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
         }
 
         protected override void HandleKeyboardActivity()

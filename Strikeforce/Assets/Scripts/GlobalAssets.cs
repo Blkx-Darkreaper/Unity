@@ -19,6 +19,7 @@ namespace Strikeforce
         public const string SUN = "Sun";
         public const string MAIN_CAMERA = "MainCamera";
         public const string GAME_MANAGER = "GameManager";
+        public const string MENU_OBJECT = "MenuObject";
         public const string NETWORK_MANAGER = "NetworkManager";
         public const string HEADER = "Header";
         public const string BUTTON = "Button";

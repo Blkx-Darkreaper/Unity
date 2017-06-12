@@ -33,15 +33,13 @@ namespace Strikeforce
             ShowMenu(CurrentMenu);
         }
 
-        protected virtual void OnLevelWasLoaded()
-        {
-            Invoke("HideLoadingScreen", LoadingTransitionTime);
-
-            Resume();
-        }
-
         public virtual void Pause()
         {
+            if(CurrentMenu == null)
+            {
+                return;
+            }
+
             this.IsMenuOpen = true;
             //Time.timeScale = 0f;
             //Cursor.visible = true;
@@ -53,6 +51,12 @@ namespace Strikeforce
             this.IsMenuOpen = false;
             //Time.timeScale = 1f;
             //Cursor.visible = false;
+
+            if(CurrentMenu == null)
+            {
+                return;
+            }
+
             CurrentMenu.IsOpening = false;
         }
 
@@ -70,10 +74,16 @@ namespace Strikeforce
             }
 
             CurrentMenu = menu;
+            CurrentMenu.ReadyMenu();
             CurrentMenu.ShowMenu();
 
             // Select the previously selected button
             CurrentMenu.SelectCurrentMenuButton();
+        }
+
+        public virtual void HideLoadingScreenDelayed()
+        {
+            Invoke("HideLoadingScreen", LoadingTransitionTime);
         }
 
         public virtual void HideLoadingScreen()
