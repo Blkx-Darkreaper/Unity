@@ -7,11 +7,10 @@ namespace Strikeforce
 {
     public class MatchmakingMenu : Menu
     {
-        protected string hostGameButtonName { get; set; }
-        public const string HOST_GAME = "Host Game";
-        protected string joinGameButtonName { get; set; }
-        public const string JOIN_GAME = "Join Game";
-        protected string backButtonName { get; set; }
+        protected const string HOST_GAME = "HostGame";
+        protected const string JOIN_GAME = "JoinGame";
+        public string hostGameText = "Host Game";
+        protected string joinGameText = "Join Game";
         protected NetworkManager networkManager;
         protected ServerManager serverManager;
 
@@ -19,7 +18,7 @@ namespace Strikeforce
         {
             base.Update();
 
-            Button joinGameButton = allButtons[joinGameButtonName];
+            Button joinGameButton = allButtons[JOIN_GAME];
             joinGameButton.enabled = false;
 
             if (serverManager == null)
@@ -36,10 +35,6 @@ namespace Strikeforce
 
         protected override void Init()
         {
-            this.hostGameButtonName = AllButtonNames[0];
-            this.joinGameButtonName = AllButtonNames[1];
-            this.backButtonName = AllButtonNames[2];
-
             base.Init();
 
             this.networkManager = NetworkManager.singleton;
@@ -55,14 +50,19 @@ namespace Strikeforce
             }
         }
 
+        protected override void SetButtonNames()
+        {
+            this.allButtonNames = new string[] { HOST_GAME, JOIN_GAME, BACK };
+        }
+
         protected override void SetButtonTextValues()
         {
-            this.allButtonTextValues = new string[] { HOST_GAME, JOIN_GAME, BACK };
+            this.allButtonTextValues = new string[] { hostGameText, joinGameText, BACK };
         }
 
         protected override string[] GetMenuButtonNamesToAdd()
         {
-            return new string[] { hostGameButtonName, joinGameButtonName };
+            return new string[] { HOST_GAME, JOIN_GAME };
         }
 
         protected override void HandleButtonPress(string buttonName)

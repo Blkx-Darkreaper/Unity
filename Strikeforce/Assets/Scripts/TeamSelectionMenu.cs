@@ -6,68 +6,73 @@ namespace Strikeforce
 {
     public class TeamSelectionMenu : Menu
     {
-        public const string AUTO_JOIN = "Auto-Assign to Team";
+        protected const string AUTO_JOIN = "AutoJoin";
+        protected const string JOIN_TEAM_A = "JoinTeamA";
+        protected const string JOIN_TEAM_B = "JoinTeamB";
+        protected const string QUIT_MATCH = "QuitMatch";
+        protected string autoJoinText = "Auto-Assign to Team";
+        protected string withDrawText = "Leave Match";
         public const string JOIN_TEAM = "Join";
         protected Team teamA;
-        protected string joinTeamAButtonName { get; set; }
         [HideInInspector]
-        public string JoinTeamA;
+        public string JoinTeamAText;
         protected Team teamB;
-        protected string joinTeamBButtonName { get; set; }
         [HideInInspector]
-        public string JoinTeamB;
-        public const string WITHDRAW = "Leave Match";
+        public string JoinTeamBText;
 
         protected override void Awake()
         {
             Init();
+        }
 
-            this.joinTeamAButtonName = AllButtonNames[1];
-            this.joinTeamBButtonName = AllButtonNames[2];
+        protected override void Init()
+        {
+            base.Init();
         }
 
         protected override void BuildMenu()
         {
             this.teamA = GameManager.Singleton.AllTeams[0];
-            this.JoinTeamA = string.Format("{0} {1}", JOIN_TEAM, teamA.Name);
+            this.JoinTeamAText = string.Format("{0} {1}", JOIN_TEAM, teamA.Name);
 
             this.teamB = GameManager.Singleton.AllTeams[1];
-            this.JoinTeamB = string.Format("{0} {1}", JOIN_TEAM, teamB.Name);
+            this.JoinTeamBText = string.Format("{0} {1}", JOIN_TEAM, teamB.Name);
 
             base.BuildMenu();
         }
 
+        protected override void SetButtonNames()
+        {
+            this.allButtonNames = new string[] { AUTO_JOIN, JOIN_TEAM_A, JOIN_TEAM_B, QUIT_MATCH };
+        }
+
         protected override void SetButtonTextValues()
         {
-            this.allButtonTextValues = new string[] { AUTO_JOIN, JoinTeamA, JoinTeamB, WITHDRAW };
+            this.allButtonTextValues = new string[] { autoJoinText, JoinTeamAText, JoinTeamBText, withDrawText };
         }
 
         protected override string[] GetMenuButtonNamesToAdd()
         {
-
-            return new string[] { joinTeamAButtonName, joinTeamBButtonName };
+            return new string[] { JOIN_TEAM_A, JOIN_TEAM_B };
         }
 
         protected override void HandleButtonPress(string buttonName)
         {
-            if(buttonName.Equals(AUTO_JOIN))
+            switch(buttonName)
             {
-                
-            }
+                case AUTO_JOIN:
+                    break;
 
-            if (buttonName.Equals(JoinTeamA)) {
-                SelectTeam(teamA);
-                return;
-            }
+                case JOIN_TEAM_A:
+                    SelectTeam(teamA);
+                    break;
 
-            if (buttonName.Equals(JoinTeamB)) {
-                SelectTeam(teamB);
-                return;
-            }
+                case JOIN_TEAM_B:
+                    SelectTeam(teamB);
+                    break;
 
-            if(buttonName.Equals(WITHDRAW))
-            {
-
+                case QUIT_MATCH:
+                    break;
             }
         }
 

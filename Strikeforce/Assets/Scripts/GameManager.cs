@@ -55,15 +55,8 @@ namespace Strikeforce
             this.AirMask = LayerMask.GetMask(Layers.AIR);
             this.EffectsMask = LayerMask.GetMask(Layers.EFFECTS);
 
-            GameObject menuObject = GameObject.FindGameObjectWithTag(Tags.MENU_OBJECT);
-            Canvas canvas = menuObject.GetComponentInChildren<Canvas>();
-            //this.teamMenu = menuObject.GetComponentInChildren<TeamSelectionMenu>();
-            //this.gameMenu = menuObject.GetComponentInChildren<GameMenu>();
             this.teamMenu = FindObjectOfType<TeamSelectionMenu>();
-            this.teamMenu.transform.SetParent(canvas.transform);
-
             this.gameMenu = FindObjectOfType<GameMenu>();
-            this.gameMenu.transform.SetParent(canvas.transform);
 
             this.AllLevels = new Level[2];
             this.allGameEntities = new Dictionary<int, Entity>();
@@ -123,7 +116,7 @@ namespace Strikeforce
 
                 Debug.Log(string.Format("Win condition {0} met"));
                 Profile winner = winCondition.GetWinningPlayer();
-                EndGameMenu resultsScreen = winner.Player.GetComponent<EndGameMenu>();
+                ResultsMenu resultsScreen = winner.Player.GetComponent<ResultsMenu>();
                 if (resultsScreen == null)
                 {
                     return;
@@ -174,7 +167,11 @@ namespace Strikeforce
 
         public bool CanJoinTeam(Profile playerAccount, Team teamToCheck)
         {
-            int rank = playerAccount.Ranking.Grade;
+            int rank = 0;
+            if(playerAccount.Ranking != null)
+            {
+                rank = playerAccount.Ranking.Grade;
+            }
 
             int teamMembers = teamToCheck.TotalMembers;
             int totalTeamRank = teamToCheck.TotalRank;

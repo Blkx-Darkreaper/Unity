@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Strikeforce
 {
-    public class Menu : MonoBehaviour
+    public abstract class Menu : MonoBehaviour
     {
         public bool IsReady { get; protected set; }
         public bool IsDrawingMenu;
@@ -25,11 +25,13 @@ namespace Strikeforce
         [HideInInspector]
         public int SelectedIndex = 0;
         public bool LoopSelection = false;
-        public string[] AllButtonNames;
+        protected string[] allButtonNames;
         protected string[] allButtonTextValues;
         protected Dictionary<string, Button> allButtons;
         protected const string BACK = "Back";
-        protected const string EXIT = "Quit Game";
+        protected const string OPTIONS = "Options";
+        protected const string EXIT = "Exit";
+        protected string exitText = "Quit Game";
         public struct Attributes
         {
             public static float Width { get { return HeaderWidth + 2 * ButtonHeight + 4 * Padding; } }
@@ -107,21 +109,21 @@ namespace Strikeforce
 
         protected virtual void BuildMenu()
         {
-            SetButtonTextValues();
             SetHeaderText();
+            SetButtonNames();
+            SetButtonTextValues();
             GetExistingButtons();
             AddMenuButtons();
             SetMenuButtonsTextAndHandlers();
         }
 
-        protected virtual void SetButtonTextValues()
-        {
-            this.allButtonTextValues = new string[] { BACK, EXIT };
-        }
+        protected abstract void SetButtonNames();
+
+        protected abstract void SetButtonTextValues();
 
         protected virtual string[] GetMenuButtonNamesToAdd()
         {
-            return AllButtonNames;
+            return allButtonNames;
         }
 
         protected void GetExistingButtons()
@@ -158,7 +160,7 @@ namespace Strikeforce
             }
 
             // Get the button group
-            LayoutGroup buttonGroup = GetComponentInChildren<LayoutGroup>();
+            LayoutGroup buttonGroup = GlobalAssets.GetChildComponentWithTag<LayoutGroup>(gameObject, Tags.LAYOUT_GROUP);
             if (buttonGroup == null)
             {
                 return;
@@ -181,9 +183,9 @@ namespace Strikeforce
 
         protected void SetMenuButtonsTextAndHandlers()
         {
-            for(int i = 0; i < AllButtonNames.Length; i++)
+            for(int i = 0; i < allButtonNames.Length; i++)
             {
-                string buttonName = AllButtonNames[i];
+                string buttonName = allButtonNames[i];
                 string buttonText = allButtonTextValues[i];
 
                 if(allButtons.ContainsKey(buttonName) == false)
@@ -303,7 +305,16 @@ namespace Strikeforce
 
         protected virtual Button GetButtonAtIndex(int index)
         {
-            string name = AllButtonNames[index];
+            if (allButtonNames == null)
+            {
+                return null;
+            }
+            if (allButtons == null)
+            {
+                return null;
+            }
+
+            string name = allButtonNames[index];
 
             if (allButtons.ContainsKey(name) == false)
             {
@@ -321,15 +332,6 @@ namespace Strikeforce
 
         protected virtual void SelectMenuButton(int index)
         {
-            if(allButtonTextValues == null)
-            {
-                return;
-            }
-            if(allButtons == null)
-            {
-                return;
-            }
-
             Button button = GetButtonAtIndex(index);
             if(button == null)
             {
@@ -347,23 +349,12 @@ namespace Strikeforce
 
         protected virtual void ClickMenuButton(int index)
         {
-            if (allButtonTextValues == null)
-            {
-                return;
-            }
-            if (allButtons == null)
-            {
-                return;
-            }
-
-            string name = allButtonTextValues[index];
-
-            if (allButtons.ContainsKey(name) == false)
+            Button button = GetButtonAtIndex(index);
+            if(button == null)
             {
                 return;
             }
 
-            Button button = allButtons[name];
             button.onClick.Invoke();
             Debug.Log(string.Format("{0} button clicked", name));
         }
@@ -465,8 +456,8 @@ namespace Strikeforce
                 return;
             }
 
-            string buttonText = button.GetComponentInChildren<Text>().text;
-            HandleButtonPress(buttonText);
+            string buttonName = button.name;
+            HandleButtonPress(buttonName);
         }
 
         protected virtual void HandleButtonPress(string buttonText)

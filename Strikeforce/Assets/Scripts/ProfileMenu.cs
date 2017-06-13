@@ -31,9 +31,14 @@ namespace Strikeforce
             base.OnGUI();
         }
 
+        protected override void SetButtonNames()
+        {
+            this.allButtonNames = new string[] { };
+        }
+
         protected override void SetButtonTextValues()
         {
-            this.allButtonTextValues = new string[] { BACK };
+            this.allButtonTextValues = new string[] { };
         }
 
         private static void LoadUsernames()

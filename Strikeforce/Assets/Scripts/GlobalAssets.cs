@@ -19,12 +19,13 @@ namespace Strikeforce
         public const string SUN = "Sun";
         public const string MAIN_CAMERA = "MainCamera";
         public const string GAME_MANAGER = "GameManager";
-        public const string MENU_OBJECT = "MenuObject";
+        public const string MENU_MANAGER = "MenuManager";
         public const string NETWORK_MANAGER = "NetworkManager";
         public const string HEADER = "Header";
         public const string BUTTON = "Button";
         public const string LEVEL = "Level";
         public const string SCENE = "Scene";
+        public const string LAYOUT_GROUP = "LayoutGroup";
     }
 
     public struct Layers

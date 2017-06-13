@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace Strikeforce
 {
@@ -8,9 +9,14 @@ namespace Strikeforce
         public GUISkin PauseMenuSkin;
         protected const string RESUME = "Resume";
 
+        protected override void SetButtonNames()
+        {
+            this.allButtonNames = new string[] { RESUME, EXIT };
+        }
+
         protected override void SetButtonTextValues()
         {
-            allButtonTextValues = new string[] { RESUME, EXIT };
+            this.allButtonTextValues = new string[] { RESUME, exitText };
         }
 
         protected override void OnGUI()
@@ -56,11 +62,11 @@ namespace Strikeforce
 
                 switch (buttonName)
                 {
-                    case "Resume":
+                    case RESUME:
                         menuManager.Resume();
                         break;
 
-                    case "Exit":
+                    case EXIT:
                         ExitGame();
                         break;
                 }

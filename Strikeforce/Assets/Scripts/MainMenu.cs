@@ -7,11 +7,9 @@ namespace Strikeforce
     public class MainMenu : Menu
     {
         protected const string PROFILE = "Profile";
-        public Menu ProfileMenu;
         protected const string MATCHMAKING = "Matchmaking";
-        protected string matchmakingButtonName { get; set; }
+        public Menu ProfileMenu;
         public Menu MatchmakingMenu;
-        protected const string OPTIONS = "Options";
         public Menu OptionsMenu;
 
         protected override void Awake()
@@ -21,11 +19,14 @@ namespace Strikeforce
             DisableMatchmaking();
         }
 
-        protected override void Init()
+        protected override void SetButtonNames()
         {
-            this.matchmakingButtonName = AllButtonNames[1];
+            this.allButtonNames = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
+        }
 
-            base.Init();
+        protected override void SetButtonTextValues()
+        {
+            this.allButtonTextValues = new string[] { PROFILE, MATCHMAKING, OPTIONS, exitText };
         }
 
         protected void EnableMatchmaking()
@@ -41,13 +42,13 @@ namespace Strikeforce
                 return;
             }
 
-            Button matchmakingButton = allButtons[matchmakingButtonName];
+            Button matchmakingButton = allButtons[MATCHMAKING];
             matchmakingButton.interactable = true;
         }
 
         protected void DisableMatchmaking()
         {
-            Button matchmakingButton = allButtons[matchmakingButtonName];
+            Button matchmakingButton = allButtons[MATCHMAKING];
             if (matchmakingButton == null)
             {
                 return;
@@ -61,11 +62,6 @@ namespace Strikeforce
             base.ShowMenu();
 
             EnableMatchmaking();
-        }
-
-        protected override void SetButtonTextValues()
-        {
-            this.allButtonTextValues = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
         }
 
         protected override void HandleKeyboardActivity()
