@@ -64,9 +64,9 @@ namespace Strikeforce
 
     public struct Scenes
     {
-        public static string Lobby = "lobby";
-        public static string MainMenu = "mainMenu";
-        public static string Game = "map";
+        public static string Lobby = "Lobby";
+        public static string MatchLobby = "MatchLobby";
+        public static string Match = "BaseLevel";
         public static string LoadTest = "blankTest";
     }
 

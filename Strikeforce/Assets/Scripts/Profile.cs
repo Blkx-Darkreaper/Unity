@@ -20,7 +20,7 @@ namespace Strikeforce
         public Player Player;
 
         [JsonConstructor]
-        public Profile(string username, int avatarId, bool isCurrentProfile)
+        public Profile(string username, int avatarId, bool isCurrentProfile, Rank ranking)
         {
             bool noUsername = username.Equals(string.Empty);
             if (noUsername == true)
@@ -35,6 +35,7 @@ namespace Strikeforce
             this.Username = username;
             this.AvatarId = avatarId;
 			this.IsCurrentProfile = isCurrentProfile;
+            this.Ranking = ranking;
         }
 
         public static void SetCurrentProfile(Profile previousProfile, Profile currentProfile)
@@ -47,6 +48,11 @@ namespace Strikeforce
             }
 
             previousProfile.IsCurrentProfile = false;
+        }
+
+        public void ResetRanking()
+        {
+            this.Ranking = new Rank();
         }
 
         private string GetDefaultUsername()

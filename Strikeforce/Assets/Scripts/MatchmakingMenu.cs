@@ -100,7 +100,7 @@ namespace Strikeforce
 
         protected virtual void LoadGame()
         {
-            MenuManager.Singleton.SetLoadingScreenActive(true);
+            MenuManager.Singleton.ShowLoadingScreen();
         }
     }
 }

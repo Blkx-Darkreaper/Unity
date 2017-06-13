@@ -61,7 +61,7 @@ namespace Strikeforce
             {
                 Time.timeScale = 1f;
                 IsOpening = false;
-                SceneManager.LoadScene(Scenes.Game);
+                SceneManager.LoadScene(Scenes.Match);
             }
 
             x += padding + buttonWidth;
@@ -70,7 +70,7 @@ namespace Strikeforce
             if (buttonPressed == true)
             {
                 GameManager.Singleton.LoadLevel(string.Empty);
-                SceneManager.LoadScene(Scenes.MainMenu);
+                SceneManager.LoadScene(Scenes.MatchLobby);
                 Cursor.visible = true;
             }
 

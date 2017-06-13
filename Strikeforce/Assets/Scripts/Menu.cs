@@ -283,6 +283,7 @@ namespace Strikeforce
                 if(LoopSelection == true)
                 {
                     // Loop through the list of buttons
+                    SelectedIndex += totalButtons;
                     SelectedIndex %= totalButtons;
                 } else
                 {

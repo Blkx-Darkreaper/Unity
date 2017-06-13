@@ -10,7 +10,8 @@ namespace Strikeforce
     {
         public int ZoneId { get; protected set; }
         public Zone NextZone { get; protected set; }
-        public Dictionary<int, Sector> AllSectors { get; protected set; }
+        public Sector FirstSector { get; protected set; }
+        public SortedList<int, Sector> AllSectors { get; protected set; }
         public bool HasHeadquartersSpawn { get { return HeadquartersSector != null; } }
         public Sector HeadquartersSector { get; protected set; }
         public bool IsLocked { get; protected set; }
@@ -27,7 +28,7 @@ namespace Strikeforce
 
         protected void AddSectors(List<Sector> sectorsToAdd)
         {
-            this.AllSectors = new Dictionary<int, Sector>();
+            this.AllSectors = new SortedList<int, Sector>();
 
             foreach (Sector sector in sectorsToAdd)
             {
@@ -40,6 +41,13 @@ namespace Strikeforce
                 }
 
                 AllSectors.Add(sectorId, sector);
+
+                sector.SetParent(this);
+
+                if(FirstSector == null)
+                {
+                    this.FirstSector = sector;
+                }
 
                 if(sector.Spawn.IsHeadquartersLocation == false)
                 {

@@ -60,9 +60,9 @@ namespace Strikeforce
             CurrentMenu.IsOpening = false;
         }
 
-        public virtual void ShowMenu(Menu menu)
+        public virtual void SetCurrentMenu(Menu menu)
         {
-            if(menu == null)
+            if (menu == null)
             {
                 Debug.Log("Cannot show menu, no menu loaded");
                 return;
@@ -75,10 +75,20 @@ namespace Strikeforce
 
             CurrentMenu = menu;
             CurrentMenu.ReadyMenu();
+        }
+
+        public virtual void ShowMenu(Menu menu)
+        {
+            SetCurrentMenu(menu);
             CurrentMenu.ShowMenu();
 
             // Select the previously selected button
             CurrentMenu.SelectCurrentMenuButton();
+        }
+
+        public virtual void ShowLoadingScreen()
+        {
+            SetLoadingScreenActive(true);
         }
 
         public virtual void HideLoadingScreenDelayed()

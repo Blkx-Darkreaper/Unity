@@ -21,6 +21,21 @@ namespace Strikeforce
             this.Spawn = spawn;
         }
 
+        public void SetParent(Zone parent)
+        {
+            if(parent == null)
+            {
+                return;
+            }
+            if(Parent != null)
+            {
+                Debug.Log(string.Format("Sector {0} already has parent Zone {1}. Zone {2} cannot be set as parent", SectorId, Parent.ZoneId, parent.ZoneId));
+                return;
+            }
+
+            this.Parent = parent;
+        }
+
         public bool CanConstructStructure(int cost)
         {
             return Parent.CanConstructStructure(cost);

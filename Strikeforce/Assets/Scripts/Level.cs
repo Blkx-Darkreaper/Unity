@@ -22,7 +22,7 @@ namespace Strikeforce
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
         protected GameObject allGridObjects;
-        protected Dictionary<int, Zone> allZones;
+        protected SortedList<int, Zone> allZones;
         protected Dictionary<int, Checkpoint> allCheckpoints;
         protected Zone lastUnlockedZone;
         protected Sector nextAvailableSector { get; set; }
@@ -31,7 +31,7 @@ namespace Strikeforce
         public void Awake()
         {
             this.allMapTiles = new List<GameObject>();
-            this.allZones = new Dictionary<int, Zone>();
+            this.allZones = new SortedList<int, Zone>();
             this.allCheckpoints = new Dictionary<int, Checkpoint>();
         }
 
@@ -150,7 +150,7 @@ namespace Strikeforce
 
         protected void AddZones(List<Zone> zonesToAdd)
         {
-            this.allZones = new Dictionary<int, Zone>();
+            this.allZones = new SortedList<int, Zone>();
 
             foreach (Zone zone in zonesToAdd)
             {
@@ -167,6 +167,12 @@ namespace Strikeforce
                 }
 
                 allZones.Add(zoneId, zone);
+
+                if(nextAvailableSector == null)
+                {
+                    Sector firstSector = zone.FirstSector;
+                    nextAvailableSector = firstSector;
+                }
 
                 bool hasHQ = zone.HasHeadquartersSpawn;
                 if(hasHQ == false)

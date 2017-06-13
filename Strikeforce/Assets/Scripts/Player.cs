@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -79,8 +80,12 @@ namespace Strikeforce
         {
             this.CurrentLevel = CurrentTeam.HomeBase;
 
+            MenuManager.Singleton.SetLoadingScreenActive(true);
+            SceneManager.LoadScene(Scenes.Match);
+            MenuManager.Singleton.HideLoadingScreen();
+
             SetCursors();
-            //SpawnRaider();  // Testing
+            SpawnRaider();  // Testing
         }
 
         protected void Update()
@@ -120,15 +125,8 @@ namespace Strikeforce
             spawnSector.SetOwnership(this);
             SetCameraOverhead(spawnpoint.Location);
 
-            // Get the cursors
-            GridCursor[] cursors = GetComponentsInChildren<GridCursor>() as GridCursor[];
-            if (cursors.Length != 2)
-            {
-                Debug.Log(String.Format("Failed to retrieve both cursors in player {0}", this.PlayerId));
-                return;
-            }
-
-            this.BuildCursor = cursors[0];
+            // Get the build cursor
+            this.BuildCursor = GetComponentInChildren<GridCursor>() as GridCursor;
             this.BuildCursor.Bounds = CurrentLevel.Bounds;
 
             //this.BuyCursor = cursors[1];

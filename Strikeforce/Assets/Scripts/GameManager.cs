@@ -167,11 +167,7 @@ namespace Strikeforce
 
         public bool CanJoinTeam(Profile playerAccount, Team teamToCheck)
         {
-            int rank = 0;
-            if(playerAccount.Ranking != null)
-            {
-                rank = playerAccount.Ranking.Grade;
-            }
+            int rank = playerAccount.Ranking.Grade;
 
             int teamMembers = teamToCheck.TotalMembers;
             int totalTeamRank = teamToCheck.TotalRank;
@@ -180,7 +176,7 @@ namespace Strikeforce
             int otherTeamMembers = otherTeam.TotalMembers;
             int otherTotalTeamRank = otherTeam.TotalRank;
 
-            float threshold = 3 * (otherTeamMembers - teamMembers) + 0.5f * (otherTotalTeamRank - totalTeamRank) / rank;
+            float threshold = 3 * (otherTeamMembers - teamMembers) + 0.5f * (otherTotalTeamRank - totalTeamRank) / rank + 1;
 
             int difference = rank + totalTeamRank - otherTotalTeamRank;
             if(difference > threshold)
@@ -218,6 +214,7 @@ namespace Strikeforce
             teamB.ResetRaidCountdown(teamBPlayers, teamAPlayers);
 
             this.IsGameInProgress = true;
+            MenuManager.Singleton.SetCurrentMenu(gameMenu);
 
             foreach(Profile playerAccount in AllProfiles.Values)
             {
@@ -246,7 +243,7 @@ namespace Strikeforce
         public void ExitGame()
         {
             GameName = string.Empty;
-            LevelName = Scenes.MainMenu;
+            LevelName = Scenes.MatchLobby;
         }
 
         public void CompleteRaid(Profile playerAccount, float damageInflictedDuringRaid)
