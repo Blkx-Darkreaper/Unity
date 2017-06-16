@@ -126,7 +126,6 @@ namespace Strikeforce
             SetCameraOverhead(spawnpoint.Location);
 
             // Get the build cursor
-            this.BuildCursor = GetComponentInChildren<GridCursor>() as GridCursor;
             this.BuildCursor.Bounds = CurrentLevel.Bounds;
 
             //this.BuyCursor = cursors[1];
@@ -218,7 +217,7 @@ namespace Strikeforce
 
         protected void SetCameraOverhead(Vector3 position)
         {
-            Vector3 overheadView = new Vector3(position.x, position.y + 10, position.z);
+            Vector3 overheadView = new Vector3(position.x, 10, position.z);
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
         }

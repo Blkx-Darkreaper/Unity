@@ -170,8 +170,7 @@ namespace Strikeforce
 
                 if(nextAvailableSector == null)
                 {
-                    Sector firstSector = zone.FirstSector;
-                    nextAvailableSector = firstSector;
+                    nextAvailableSector = zone.FirstSector;
                 }
 
                 bool hasHQ = zone.HasHeadquartersSpawn;

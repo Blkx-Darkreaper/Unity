@@ -108,8 +108,8 @@ namespace Strikeforce
                 firingOrder.Add(value, type);
             }
 
-            // Set the dominant weapon type
-            this.DominantWeaponType = firingOrder[firingOrder.Keys[0]];
+            // SortedList is ranked lowest to highest
+            this.DominantWeaponType = firingOrder[firingOrder.Keys[firingOrder.Count - 1]];
 
             LinkedList<Weapon> sortedWeapons = new LinkedList<Weapon>();
             foreach (int key in firingOrder.Keys)
@@ -124,7 +124,7 @@ namespace Strikeforce
                         continue;
                     }
 
-                    sortedWeapons.AddLast(weapon);
+                    sortedWeapons.AddFirst(weapon); // Reverse order, SortedList ranks from lowest to highest
                 }
             }
 
