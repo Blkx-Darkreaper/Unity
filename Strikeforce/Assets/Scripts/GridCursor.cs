@@ -71,8 +71,10 @@ namespace Strikeforce
 
             float selectionX = selectable.transform.position.x;
             float selectionY = selectable.transform.position.z;
-            float selectionWidth = selectionBounds.width;
-            float selectionHeight = selectionBounds.height;
+            //float selectionWidth = selectionBounds.width;
+            //float selectionHeight = selectionBounds.height;
+            float selectionWidth = selectable.transform.lossyScale.x;
+            float selectionHeight = selectable.transform.lossyScale.z;
 
             CenterOnLocation(selectionX, selectionY);
             Resize(selectionWidth, selectionHeight);

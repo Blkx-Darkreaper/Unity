@@ -614,12 +614,7 @@ namespace Strikeforce
             }
 
             SetSelected(selectable);
-
-            // Set build cursor size
-            float width = selectable.transform.lossyScale.x;
-            float length = selectable.transform.lossyScale.z;
-            Vector2 size = new Vector2(width, length);
-            BuildCursor.Resize(size);
+            BuildCursor.ExpandAndCenterAroundSelectable(selectable);
         }
 
         protected void Deselect()
