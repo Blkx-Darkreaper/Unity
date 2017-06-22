@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Strikeforce
 {
-    public class Team : MonoBehaviour
+    public class Team : ScriptableObject
     {
         public string Name { get; protected set; }
         public Level HomeBase { get; protected set; }

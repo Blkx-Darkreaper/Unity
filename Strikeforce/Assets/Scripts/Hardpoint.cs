@@ -6,7 +6,7 @@ namespace Strikeforce
 {
     public enum HardpointPosition { LeftOuterWing, LeftWing, Center, RightWing, RightOuterWing }
 
-    public class Hardpoint : MonoBehaviour
+    public class Hardpoint : ScriptableObject
     {
         public Vector2 Location;
         public HardpointPosition Position { get; protected set; }

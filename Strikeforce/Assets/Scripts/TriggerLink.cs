@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Strikeforce
 {
-    public class TriggerLink : MonoBehaviour
+    public class TriggerLink : ScriptableObject
     {
         public Type TriggerType { get; protected set; }
         protected LinkedList<Weapon> allLinkedWeapons { get; set; }
