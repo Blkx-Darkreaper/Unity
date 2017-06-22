@@ -76,6 +76,10 @@ namespace Strikeforce
             float selectionWidth = selectable.transform.lossyScale.x;
             float selectionHeight = selectable.transform.lossyScale.z;
 
+            // Keep from shrinking smaller than 1 tile
+            selectionWidth = Mathf.Clamp(selectionWidth, 1, selectionWidth);
+            selectionHeight = Mathf.Clamp(selectionHeight, 1, selectionHeight);
+
             CenterOnLocation(selectionX, selectionY);
             Resize(selectionWidth, selectionHeight);
         }
