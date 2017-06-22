@@ -619,7 +619,7 @@ namespace Strikeforce
             float width = selectable.transform.lossyScale.x;
             float length = selectable.transform.lossyScale.z;
             Vector2 size = new Vector2(width, length);
-            BuildCursor.SetSize(size);
+            BuildCursor.Resize(size);
         }
 
         protected void Deselect()
