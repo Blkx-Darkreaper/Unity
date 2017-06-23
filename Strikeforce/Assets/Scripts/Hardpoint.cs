@@ -6,7 +6,7 @@ namespace Strikeforce
 {
     public enum HardpointPosition { LeftOuterWing, LeftWing, Center, RightWing, RightOuterWing }
 
-    public class Hardpoint : ScriptableObject
+    public class Hardpoint : MonoBehaviour
     {
         public Vector2 Location;
         public HardpointPosition Position { get; protected set; }
@@ -42,13 +42,13 @@ namespace Strikeforce
             TriggerLink[] allTriggers = GetComponentsInChildren<TriggerLink>();
 
             this.primaryFire = allTriggers[0];
-            this.primaryFire.Init(parent, TriggerLink.Type.Primary);
+            this.primaryFire.Init(TriggerLink.Type.Primary);
 
             this.secondaryFire = allTriggers[1];
-            this.secondaryFire.Init(parent, TriggerLink.Type.Secondary);
+            this.secondaryFire.Init(TriggerLink.Type.Secondary);
 
             this.specialFire = allTriggers[2];
-            this.specialFire.Init(parent, TriggerLink.Type.Special);
+            this.specialFire.Init(TriggerLink.Type.Special);
         }
 
         public bool Contains(Equipment item)

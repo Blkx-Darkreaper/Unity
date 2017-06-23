@@ -27,9 +27,8 @@ namespace Strikeforce
             this.IsFiring = false;
         }
 
-        public void Init(Transform parent, Type type)
+        public void Init(Type type)
         {
-            transform.parent = parent;
             this.TriggerType = type;
         }
 
