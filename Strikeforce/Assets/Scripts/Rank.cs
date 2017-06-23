@@ -122,10 +122,27 @@ namespace Strikeforce
         [JsonConstructor]
         public Rank(int ranking, int score, GameStats gameStats, RaidModeStats raidStats, BuildModeStats buildStats)
         {
+            if(ranking <= 0)
+            {
+                ranking = 1;
+            }
+
             this.Grade = ranking;
             this.Score = score;
+            if(gameStats == null)
+            {
+                gameStats = new GameStats();
+            }
             this.currentGameStats = gameStats;
+            if(raidStats == null)
+            {
+                raidStats = new RaidModeStats();
+            }
             this.currentRaidStats = raidStats;
+            if(buildStats == null)
+            {
+                buildStats = new BuildModeStats();
+            }
             this.currentBuildStats = buildStats;
 
             this.latestMatchGameStats = new GameStats();

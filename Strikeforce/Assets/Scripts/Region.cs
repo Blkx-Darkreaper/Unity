@@ -17,44 +17,11 @@ namespace Strikeforce
             this.isEmpty = true;
         }
 
-        public Region(int x, int y, int width, int height)
+        public Region(float x, float y, int width, int height)
         {
             this.Location = new Vector2(x, y);
             this.Size = new Size(width, height);
             this.isEmpty = false;
-        }
-
-        public virtual void AddGrid(Grid gridToAdd)
-        {
-            int gridX = (int)gridToAdd.Location.x;
-            int gridY = (int)gridToAdd.Location.y;
-
-            float x = Math.Min(Location.x, gridX);
-            float y = Math.Min(Location.y, gridY);
-
-            if (isEmpty == true)
-            {
-                x = gridX;
-                y = gridY;
-
-                isEmpty = false;
-            }
-
-            this.Location = new Vector2(x, y);
-
-            int outerGridX = gridX + 1;
-            int outerGridY = gridY + 1;
-
-            float outerX = Location.x + Size.Width;
-            float outerY = Location.y + Size.Height;
-
-            outerX = Math.Max(outerX, outerGridX);
-            outerY = Math.Max(outerY, outerGridY);
-
-            int width = (int)(outerX - x);
-            int height = (int)(outerY - y);
-
-            this.Size = new Size(width, height);
         }
     }
 }

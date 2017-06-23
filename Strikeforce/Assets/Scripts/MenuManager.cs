@@ -33,15 +33,13 @@ namespace Strikeforce
             ShowMenu(CurrentMenu);
         }
 
-        protected virtual void OnLevelWasLoaded()
-        {
-            Invoke("HideLoadingScreen", LoadingTransitionTime);
-
-            Resume();
-        }
-
         public virtual void Pause()
         {
+            if(CurrentMenu == null)
+            {
+                return;
+            }
+
             this.IsMenuOpen = true;
             //Time.timeScale = 0f;
             //Cursor.visible = true;
@@ -53,12 +51,18 @@ namespace Strikeforce
             this.IsMenuOpen = false;
             //Time.timeScale = 1f;
             //Cursor.visible = false;
+
+            if(CurrentMenu == null)
+            {
+                return;
+            }
+
             CurrentMenu.IsOpening = false;
         }
 
-        public virtual void ShowMenu(Menu menu)
+        public virtual void SetCurrentMenu(Menu menu)
         {
-            if(menu == null)
+            if (menu == null)
             {
                 Debug.Log("Cannot show menu, no menu loaded");
                 return;
@@ -70,15 +74,38 @@ namespace Strikeforce
             }
 
             CurrentMenu = menu;
+            CurrentMenu.ReadyMenu();
+        }
+
+        public virtual void ShowMenu(Menu menu)
+        {
+            SetCurrentMenu(menu);
             CurrentMenu.ShowMenu();
 
             // Select the previously selected button
             CurrentMenu.SelectCurrentMenuButton();
         }
 
+        public virtual void ShowLoadingScreen()
+        {
+            SetLoadingScreenActive(true);
+            this.IsMenuOpen = false;
+        }
+
+        public virtual void HideLoadingScreenDelayed()
+        {
+            Invoke("HideLoadingScreen", LoadingTransitionTime);
+        }
+
         public virtual void HideLoadingScreen()
         {
             SetLoadingScreenActive(false);
+            if(CurrentMenu.IsOpen == false)
+            {
+                return;
+            }
+
+            this.IsMenuOpen = true;
         }
 
         public virtual void SetLoadingScreenActive(bool isLoading)

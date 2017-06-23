@@ -6,19 +6,26 @@ namespace Strikeforce
 {
     public class Team : ScriptableObject
     {
-        public string Name { get; protected set; }
+        public string Name;
         public Level HomeBase { get; protected set; }
         public Color Colour;
         public int TotalRank { get; protected set; }
-        public Dictionary<string, Profile> Members;
+        protected Dictionary<string, Profile> members;
+        public int TotalMembers { get { return members.Count; } }
+        [HideInInspector]
+        public Inventory SharedInventory;
         public bool IsRaidInProgress { get; protected set; }
         public float RaidCountdown { get; protected set; }
         public float RaidWindowRemaining { get; protected set; }
+        protected LinkedList<Profile> raidingMembers { get; set; }
+        public bool AreMembersCurrentlyRaiding { get { return raidingMembers.Count > 0; } }
+        public float TotalDamageInflictedDuringRaid { get; protected set; }
 
         protected void Awake()
         {
             this.TotalRank = 0;
-            this.Members = new Dictionary<string, Profile>();
+            this.members = new Dictionary<string, Profile>();
+            this.raidingMembers = new LinkedList<Profile>();
         }
 
         public void SetName(string name)
@@ -46,7 +53,7 @@ namespace Strikeforce
 
         public void AddPlayer(Profile playerToAdd)
         {
-            Members.Add(playerToAdd.Username, playerToAdd);
+            members.Add(playerToAdd.Username, playerToAdd);
             playerToAdd.Player.CurrentTeam = this;
 
             int rank = playerToAdd.Ranking.Grade;
@@ -58,20 +65,39 @@ namespace Strikeforce
             int rank = playerToRemove.Ranking.Grade;
             TotalRank -= rank;
 
-            Members.Remove(playerToRemove.Username);
+            members.Remove(playerToRemove.Username);
             playerToRemove.Player.CurrentTeam = null;
         }
 
-        public void LaunchRaid()
+        public void LaunchRaid(Profile playerAccount)
         {
+            if(RaidCountdown > 0)
+            {
+                return;
+            }
+
             this.IsRaidInProgress = true;
+            raidingMembers.AddLast(playerAccount);
+        }
+
+        public void CompleteRaid(Profile playerAccount, float damageInflictedDuringRaid)
+        {
+            this.TotalDamageInflictedDuringRaid += damageInflictedDuringRaid;
+            this.raidingMembers.Remove(playerAccount);
         }
 
         public void ResetRaidCountdown(int teamPlayers, int enemyPlayers, float totalDamageValueFromPreviousRaid = 0f, float elapsedGameTime = 0f)
         {
             this.RaidCountdown = (12 - 2) * (1 - (float)Math.Exp(-totalDamageValueFromPreviousRaid / 5000f)) + 2 + (teamPlayers - enemyPlayers) / 2f;
             this.RaidWindowRemaining = 0.5f + 0.1f * (float)Math.Floor((elapsedGameTime + RaidCountdown) / 5) - 0.02f * teamPlayers;
+            this.TotalDamageInflictedDuringRaid = 0f;
             this.IsRaidInProgress = false;
+
+            // Clear all checkpoints
+            foreach(Profile account in members.Values)
+            {
+                account.Player.PreviousCheckpoint = null;
+            }
         }
     }
 }

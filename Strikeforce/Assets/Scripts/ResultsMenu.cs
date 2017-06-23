@@ -1,18 +1,28 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using System;
 
 namespace Strikeforce
 {
-    public class ResultsMenuController : Menu
+    public class ResultsMenu : Menu
     {
+        protected const string NEW_GAME = "NewGame";
+        protected const string MAIN_MENU = "MainMenu";
+        protected string newGameText = "New Game";
+        protected string mainMenuText = "Main Menu";
+        protected string gameOverText = "Game Over";
         protected Profile winner;
         protected VictoryCondition metWinCondition { get; set; }
-        protected struct Message
+
+        protected override void SetButtonNames()
         {
-            public const string NEW_GAME = "New Game";
-            public const string MAIN_MENU = "Main Menu";
-            public const string GAME_OVER = "Game Over";
+            this.allButtonNames = new string[] { NEW_GAME, MAIN_MENU };
+        }
+
+        protected override void SetButtonTextValues()
+        {
+            this.allButtonTextValues = new string[] { newGameText, mainMenuText };
         }
 
         protected override void DrawMenu()
@@ -28,7 +38,7 @@ namespace Strikeforce
             // Display
             GUI.Box(new Rect(x, y, width, height), string.Empty);
 
-            string message = Message.GAME_OVER;
+            string message = gameOverText;
             if (winner != null)
             {
                 message = string.Format("Congratulations {0}! You have won by {1}.", winner.Username, metWinCondition.GetDescription());
@@ -46,21 +56,21 @@ namespace Strikeforce
             x = Screen.width / 2 - padding / 2 - buttonWidth;
             y += buttonHeight + padding;
 
-            bool buttonPressed = GUI.Button(new Rect(x, y, buttonWidth, buttonHeight), Message.NEW_GAME);
+            bool buttonPressed = GUI.Button(new Rect(x, y, buttonWidth, buttonHeight), newGameText);
             if (buttonPressed == true)
             {
                 Time.timeScale = 1f;
                 IsOpening = false;
-                SceneManager.LoadScene(Scenes.Game);
+                SceneManager.LoadScene(Scenes.Match);
             }
 
             x += padding + buttonWidth;
 
-            buttonPressed = GUI.Button(new Rect(x, y, buttonWidth, buttonHeight), Message.MAIN_MENU);
+            buttonPressed = GUI.Button(new Rect(x, y, buttonWidth, buttonHeight), mainMenuText);
             if (buttonPressed == true)
             {
                 GameManager.Singleton.LoadLevel(string.Empty);
-                SceneManager.LoadScene(Scenes.MainMenu);
+                SceneManager.LoadScene(Scenes.MatchLobby);
                 Cursor.visible = true;
             }
 

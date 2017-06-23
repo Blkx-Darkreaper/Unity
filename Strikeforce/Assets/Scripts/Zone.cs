@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Newtonsoft.Json;
 
 namespace Strikeforce
 {
@@ -9,27 +10,52 @@ namespace Strikeforce
     {
         public int ZoneId { get; protected set; }
         public Zone NextZone { get; protected set; }
-        public Dictionary<int, Sector> AllSectors { get; protected set; }
+        public Sector FirstSector { get; protected set; }
+        public SortedList<int, Sector> AllSectors { get; protected set; }
+        public bool HasHeadquartersSpawn { get { return HeadquartersSector != null; } }
+        public Sector HeadquartersSector { get; protected set; }
         public bool IsLocked { get; protected set; }
         public int CurrentDevelopment { get; protected set; }
         protected int unlockThreshold { get; set; }
 
-        public Zone(int zoneId) : base() {
-            this.ZoneId = zoneId;
-            this.NextZone = null;
-            this.AllSectors = new Dictionary<int, Sector>();
-            this.IsLocked = true;
-            this.unlockThreshold = 0;
+        [JsonConstructor]
+        public Zone(int id, Point location, Size size, List<Sector> allSectors) : base(location.X, location.Y, size.Width, size.Height)
+        {
+            this.ZoneId = id;
+
+            AddSectors(allSectors);
         }
 
-        public Zone(int zoneId, int x, int y, int width, int height)
-            : base(x, y, width, height)
+        protected void AddSectors(List<Sector> sectorsToAdd)
         {
-            this.ZoneId = zoneId;
-            this.NextZone = null;
-            this.AllSectors = new Dictionary<int, Sector>();
-            this.IsLocked = true;
-            this.unlockThreshold = 0;
+            this.AllSectors = new SortedList<int, Sector>();
+
+            foreach (Sector sector in sectorsToAdd)
+            {
+                int sectorId = sector.SectorId;
+
+                bool sectorExists = AllSectors.ContainsKey(sectorId);
+                if (sectorExists == true)
+                {
+                    throw new InvalidOperationException(string.Format("Sector {0} has already been loaded", sectorId));
+                }
+
+                AllSectors.Add(sectorId, sector);
+
+                sector.SetParent(this);
+
+                if(FirstSector == null)
+                {
+                    this.FirstSector = sector;
+                }
+
+                if(sector.Spawn.IsHeadquartersLocation == false)
+                {
+                    continue;
+                }
+
+                this.HeadquartersSector = sector;
+            }
         }
 
         public void UpdateUnlockThreshold()
@@ -54,30 +80,6 @@ namespace Strikeforce
             }
 
             this.NextZone = zone;
-        }
-
-        public override void AddGrid(Grid gridToAdd)
-        {
-            base.AddGrid(gridToAdd);
-
-            AddGridToSectors(gridToAdd);
-        }
-
-        public void AddGridToSectors(Grid grid)
-        {
-            int sectorId = grid.SectorId;
-
-            Sector sector;
-            bool sectorExists = AllSectors.ContainsKey(sectorId);
-            if (sectorExists == false)
-            {
-                sector = new Sector(sectorId, this);
-                AllSectors.Add(sectorId, sector);
-            }
-
-            sector = AllSectors[sectorId];
-
-            sector.AddGrid(grid);
         }
 
         public int GetMaxDevelopment()

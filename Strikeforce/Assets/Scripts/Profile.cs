@@ -20,7 +20,7 @@ namespace Strikeforce
         public Player Player;
 
         [JsonConstructor]
-        public Profile(string username, int avatarId, bool isCurrentProfile)
+        public Profile(string username, int avatarId, bool isCurrentProfile, Rank ranking)
         {
             bool noUsername = username.Equals(string.Empty);
             if (noUsername == true)
@@ -35,6 +35,7 @@ namespace Strikeforce
             this.Username = username;
             this.AvatarId = avatarId;
 			this.IsCurrentProfile = isCurrentProfile;
+            this.Ranking = ranking;
         }
 
         public static void SetCurrentProfile(Profile previousProfile, Profile currentProfile)
@@ -49,10 +50,44 @@ namespace Strikeforce
             previousProfile.IsCurrentProfile = false;
         }
 
+        public void ResetRanking()
+        {
+            this.Ranking = new Rank();
+        }
+
         private string GetDefaultUsername()
         {
             string defaultUsername = GlobalAssets.DefaultUsername;
             return defaultUsername;
+        }
+
+        public virtual void DropPlayer()
+        {
+            // Transfer player inventory to team
+            Player.CurrentInventory.TransferAllTo(Player.CurrentTeam.SharedInventory);
+
+            //Network.RemoveRPCs(Player);
+            //Network.DestroyPlayerObjects(Player);
+            this.Player = null;
+        }
+
+        public virtual void DrawPlayerAvatar()
+        {
+            float height = Menu.Attributes.TextHeight;
+            float x = Menu.Attributes.TextHeight;
+            float y = Screen.height - x - Menu.Attributes.Padding;
+            DrawPlayerAvatar(x, y, height);
+        }
+
+        public virtual void DrawPlayerAvatar(float x, float y, float height)
+        {
+            Texture2D avatar = GlobalAssets.GetAvatar(AvatarId);
+            if (avatar == null)
+            {
+                return;
+            }
+
+            GUI.DrawTexture(new Rect(x, y, height, height), avatar);
         }
     }
 }

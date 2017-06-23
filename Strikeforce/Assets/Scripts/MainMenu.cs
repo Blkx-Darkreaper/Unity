@@ -7,10 +7,9 @@ namespace Strikeforce
     public class MainMenu : Menu
     {
         protected const string PROFILE = "Profile";
-        public Menu ProfileMenu;
         protected const string MATCHMAKING = "Matchmaking";
+        public Menu ProfileMenu;
         public Menu MatchmakingMenu;
-        protected const string OPTIONS = "Options";
         public Menu OptionsMenu;
 
         protected override void Awake()
@@ -18,6 +17,16 @@ namespace Strikeforce
             base.Awake();
 
             DisableMatchmaking();
+        }
+
+        protected override void SetButtonNames()
+        {
+            this.allButtonNames = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
+        }
+
+        protected override void SetButtonTextValues()
+        {
+            this.allButtonTextValues = new string[] { PROFILE, MATCHMAKING, OPTIONS, exitText };
         }
 
         protected void EnableMatchmaking()
@@ -53,32 +62,6 @@ namespace Strikeforce
             base.ShowMenu();
 
             EnableMatchmaking();
-        }
-
-        protected void OnLevelWasLoaded()
-        {
-            //Cursor.visible = true;
-            //Profile currentAccount = GameManager.ActiveInstance.CurrentPlayerAccount;
-            //if (currentAccount == null)
-            //{
-            //    GetComponent<MainMenu>().enabled = false;
-            //    GetComponent<ProfileMenu>().enabled = true;
-            //}
-            //else
-            //{
-            //    GetComponent<MainMenu>().enabled = true;
-            //    GetComponent<ProfileMenu>().enabled = false;
-            //}
-        }
-
-        protected override void SetButtonNames()
-        {
-            this.buttonNames = new string[] { PROFILE, MATCHMAKING, OPTIONS, EXIT };
-        }
-
-        protected override void HandleKeyboardActivity()
-        {
-            return;
         }
 
         protected override void HandleButtonPress(string buttonName)

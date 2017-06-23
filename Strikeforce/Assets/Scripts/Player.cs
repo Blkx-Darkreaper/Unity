@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
+using System.Drawing;
+using Color = UnityEngine.Color;
 
 namespace Strikeforce
 {
@@ -12,18 +15,18 @@ namespace Strikeforce
         public bool IsNPC;
         public Team CurrentTeam { get; set; }
         protected Camera mainCamera;
-        [HideInInspector]
-        public Hud PlayerHud;
+        public Hud BuildHud;
+        public Hud RaidHud;
         [HideInInspector]
         public Raider CurrentRaider;
         public string RaiderPrefabName = "Raider";
         [HideInInspector]
+        public Checkpoint PreviousCheckpoint = null;
+        [HideInInspector]
         public Inventory CurrentInventory;
         protected bool isInBuildMode = true;
-        [HideInInspector]
         public GridCursor BuildCursor;
-        [HideInInspector]
-        public GridCursor BuyCursor;
+        //public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
         public Selectable SelectedEntity { get; set; }
         public Color SelectionColour = Color.red;
@@ -52,9 +55,20 @@ namespace Strikeforce
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
             this.CurrentInventory = GetComponent<Inventory>();
             this.Sectors = new LinkedList<Sector>();
-            this.CurrentLevel = GameManager.Singleton.CurrentLevels[0];
             this.allUnits = new LinkedList<Vehicle>();
             this.allStructures = new LinkedList<Structure>();
+            this.IsSettingConstructionPoint = false;
+        }
+
+        protected void Start()
+        {
+            Profile profile = ProfileManager.Singleton.CurrentProfile;
+            if (profile == null)
+            {
+                return;
+            }
+
+            GameManager.Singleton.AddProfile(profile);
         }
 
         public override void OnStartLocalPlayer()
@@ -62,14 +76,19 @@ namespace Strikeforce
             //CurrentRaider.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
         }
 
-        protected void Start()
+        public void StartGame()
         {
-            this.PlayerHud = GetComponentInChildren<Hud>();
-            this.IsSettingConstructionPoint = false;
-            this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
+            this.CurrentLevel = CurrentTeam.HomeBase;
 
-            //SpawnCursors();
-            SpawnRaider();  // Testing
+            SetCursors();
+            //SpawnRaider();  // Testing
+
+            BuildHud.gameObject.SetActive(true);
+
+            // Set viewport
+            mainCamera.rect = new Rect(0.2f, 0f, 0.6f, 1f);
+
+            MenuManager.Singleton.HideLoadingScreenDelayed();
         }
 
         protected void Update()
@@ -109,16 +128,11 @@ namespace Strikeforce
             spawnSector.SetOwnership(this);
             SetCameraOverhead(spawnpoint.Location);
 
-            // Get the cursors
-            GridCursor[] cursors = GetComponentsInChildren<GridCursor>() as GridCursor[];
-            if (cursors.Length != 2)
-            {
-                Debug.Log(String.Format("Failed to retrieve both cursors in player {0}", this.PlayerId));
-                return;
-            }
+            // Get the build cursor
+            this.BuildCursor.Bounds = CurrentLevel.Bounds;
 
-            this.BuildCursor = cursors[0];
-            this.BuyCursor = cursors[1];
+            //this.BuyCursor = cursors[1];
+            //this.BuyCursor.Bounds = BuildHud.Bounds;
 
             BuildCursor.transform.position = new Vector3(spawnpoint.Location.x, spawnpoint.Location.y, spawnpoint.Location.z);
         }
@@ -126,6 +140,8 @@ namespace Strikeforce
         protected void SpawnRaider()	// Testing
         {
             this.isInBuildMode = false;
+            this.BuildHud.enabled = isInBuildMode;
+            this.RaidHud.enabled = !isInBuildMode;
 
             // Get spawn point from level
             Vector3 spawnLocation = CurrentLevel.GetRaiderSpawnLocation();
@@ -181,8 +197,8 @@ namespace Strikeforce
             allHardpoints[5].Init(CurrentRaider.transform, relativeToCenterX, relativeToCenterY, width, height, position);
 
             CurrentRaider.SetLayout(new Vector3[] {
-                new Vector3(-0.25f, 0, 0),
-                new Vector3(-0.125f, 0, 0),
+                new Vector3(-0.25f, -0.25f, 0),
+                new Vector3(-0.125f, -0.125f, 0),
                 new Vector3(0, 0, 0),
                 new Vector3(0.125f, 0, 0),
                 new Vector3(0.25f, 0, 0)},
@@ -207,8 +223,8 @@ namespace Strikeforce
             bolt.transform.parent = CurrentRaider.transform;
             GameManager.Singleton.RegisterEntity(bolt);
 
-            bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.LeftOuterWing, 0, 0, 0);
-            equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.RightOuterWing, 0, 0, 0);
+            bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.Center, 0, 1, 0);
+            equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.Center, 0, 2, 0);
             equipped &= CurrentRaider.EquipWeapon(bolt, HardpointPosition.Center, 0, 0, 0);
             if (equipped == true)
             {
@@ -224,11 +240,11 @@ namespace Strikeforce
             SetCameraOverhead(raiderPosition);
 
             // Set raider and camera initial velocity
-            float initialVelocity = CurrentRaider.StallSpeed;
+            float initialVelocity = CurrentRaider.StartingSpeed;
             CurrentRaider.SetForwardVelocity(initialVelocity);
 
             Vector3 raiderVelocity = CurrentRaider.GetVelocity();
-            SetCameraVelocity(raiderVelocity.x, raiderVelocity.y, raiderVelocity.z);
+            SetMainCameraVelocity(raiderVelocity.x, raiderVelocity.y, raiderVelocity.z);
 
             // Make raider airbourne
             CurrentRaider.TakeOff();
@@ -240,7 +256,12 @@ namespace Strikeforce
 
         protected void SetCameraOverhead(Vector3 position)
         {
-            Vector3 overheadView = new Vector3(position.x, position.y + 10, position.z);
+            float x = position.x;
+            float z = position.z;
+            KeepLevelInMainView(ref x, ref z);
+
+            Vector3 overheadView = new Vector3(x, 10, z);
+
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
         }
@@ -257,7 +278,7 @@ namespace Strikeforce
                 return;
             }
 
-            BuyCursor.Move(x, z);
+            //BuyCursor.Move(x, z);
         }
 
         public void DPad(float x, int y, float z)
@@ -280,7 +301,6 @@ namespace Strikeforce
 
         protected void MovePlayer(float x, float y, float z)
         {
-            Vector3 cameraPosition = Vector3.zero;
             if (isInBuildMode == true)
             {
                 BuildCursor.Move(x, z);
@@ -291,29 +311,33 @@ namespace Strikeforce
                 z *= 0.3f;
 
                 CurrentRaider.Move(x, z);
-                cameraPosition = CurrentRaider.transform.position;
             }
 
-            //MoveCamera(x, y, z);
-            SetCameraPosition(cameraPosition);
+            MoveMainCamera(x, y, z);
+            //SetMainCameraPosition(cameraPosition);
         }
 
-        protected void MoveCamera(float x, float y, float z)
+        protected void MoveMainCamera(float deltaX, float deltaY, float deltaZ)
         {
             Vector3 currentPosition = transform.position;
 
-            CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
+            KeepLevelInMainView(currentPosition.x, currentPosition.z, ref deltaX, ref deltaZ);
 
-            mainCamera.transform.Translate(x, z, y);
+            mainCamera.transform.Translate(deltaX, deltaZ, deltaY);
         }
 
-        protected void SetCameraPosition(Vector3 position)
+        protected void SetMainCameraPosition(float x, float z)
         {
             float y = mainCamera.transform.position.y;
-            mainCamera.transform.position = new Vector3(position.x, y, position.z);
+            SetMainCameraPosition(new Vector3(x, y, z));
         }
 
-        protected void SetCameraVelocity(float velocityX, float velocityY, float velocityZ)
+        protected void SetMainCameraPosition(Vector3 position)
+        {
+            mainCamera.transform.position = new Vector3(position.x, position.y, position.z);
+        }
+
+        protected void SetMainCameraVelocity(float velocityX, float velocityY, float velocityZ)
         {
             Rigidbody cameraVelocity = mainCamera.GetComponent<Rigidbody>();
             if (cameraVelocity == null)
@@ -323,6 +347,62 @@ namespace Strikeforce
             }
 
             cameraVelocity.velocity = new Vector3(velocityX, velocityY, velocityZ);
+        }
+
+        protected RectangleF GetMainCameraViewBounds()
+        {
+            float x = mainCamera.transform.position.x;
+            float y = mainCamera.transform.position.z;
+            float height = 2 * mainCamera.orthographicSize;
+            float width = height * Screen.width / Screen.height;
+
+            RectangleF cameraBounds = new RectangleF(x, y, width, height);
+            return cameraBounds;
+        }
+
+        protected void KeepLevelInMainView(ref float x, ref float y)
+        {
+            RectangleF mainCameraBounds = GetMainCameraViewBounds();
+            float viewWidth = mainCameraBounds.Width;
+            float viewHeight = mainCameraBounds.Height;
+
+            float levelX = CurrentLevel.transform.position.x;
+            float levelY = CurrentLevel.transform.position.z;
+            int levelWidth = CurrentLevel.Width;
+            int levelHeight = CurrentLevel.Height;
+
+            float minX = (viewWidth - levelWidth) / 2f + levelX;
+            float maxX = (levelWidth - viewWidth) / 2f + levelX;
+
+            float minY = (viewHeight - levelHeight) / 2f + levelY;
+            float maxY = (levelHeight - viewHeight) / 2f + levelY;
+
+            x = Mathf.Clamp(x, minX, maxX);
+            y = Mathf.Clamp(y, minY, maxY);
+        }
+
+        protected void KeepLevelInMainView(float x, float y, ref float deltaX, ref float deltaY)
+        {
+            float finalX = x + deltaX;
+            float finalY = y + deltaY;
+
+            RectangleF mainCameraBounds = GetMainCameraViewBounds();
+            float viewWidth = mainCameraBounds.Width;
+            float viewHeight = mainCameraBounds.Height;
+
+            float levelX = CurrentLevel.transform.position.x;
+            float levelY = CurrentLevel.transform.position.z;
+            int levelWidth = CurrentLevel.Width;
+            int levelHeight = CurrentLevel.Height;
+
+            float minX = (viewWidth - levelWidth) / 2f + levelX;
+            float maxX = (levelWidth - viewWidth) / 2f + levelX;
+
+            float minY = (viewHeight - levelHeight) / 2f + levelY;
+            float maxY = (levelHeight - viewHeight) / 2f + levelY;
+
+            deltaX = Mathf.Clamp(finalX, minX, maxX) - x;
+            deltaY = Mathf.Clamp(finalY, minY, maxY) - y;
         }
 
         public void RespondToKeyEvent(KeyEvent keyEvent)
@@ -363,12 +443,20 @@ namespace Strikeforce
                     {
                         Special1(keyEvent);
                     }
+                    else
+                    {
+                        SetSpecialFiring(!keyEvent.IsComplete);
+                    }
                     break;
 
                 case ActionKey.Special2:
                     if (isInBuildMode == true)
                     {
                         Special2();
+                    }
+                    else
+                    {
+                        SetEquipmentActive(!keyEvent.IsComplete);
                     }
                     break;
 
@@ -395,11 +483,27 @@ namespace Strikeforce
                         SetPrimaryFiring(!keyEvent.IsComplete);
                     }
                     break;
+
+                case ActionKey.LeftTrigger:
+                    if (isInBuildMode == true)
+                    {
+                    }
+                    else
+                    {
+                        SetSecondaryFiring(!keyEvent.IsComplete);
+                    }
+                    break;
             }
         }
 
         protected void Action1()
         {
+            if (MenuManager.Singleton.IsMenuOpen == true)
+            {
+                HandleMenuButtonClick();
+                return;
+            }
+
             if (IsSellingStructure == true)
             {
                 ConfirmSale();
@@ -413,6 +517,12 @@ namespace Strikeforce
             }
 
             Select();
+        }
+
+        protected void HandleMenuButtonClick()
+        {
+            Menu currentMenu = MenuManager.Singleton.CurrentMenu;
+            currentMenu.MenuButtonClick();
         }
 
         protected void Action2()
@@ -453,7 +563,7 @@ namespace Strikeforce
         {
             if (SelectedEntity == null)
             {
-                BuyStructure();
+                //BuyStructure();
                 return;
             }
 
@@ -493,10 +603,10 @@ namespace Strikeforce
             return GetHighlightedStructure(BuildCursor);
         }
 
-        protected Structure GetStructureHighlightedByBuyCursor()
-        {
-            return GetHighlightedStructure(BuyCursor);
-        }
+        //protected Structure GetStructureHighlightedByBuyCursor()
+        //{
+        //    return GetHighlightedStructure(BuyCursor);
+        //}
 
         protected Structure GetHighlightedStructure(GridCursor cursor)
         {
@@ -583,12 +693,7 @@ namespace Strikeforce
             }
 
             SetSelected(selectable);
-
-            // Set build cursor size
-            float width = selectable.transform.lossyScale.x;
-            float length = selectable.transform.lossyScale.z;
-            Vector2 size = new Vector2(width, length);
-            BuildCursor.SetSize(size);
+            BuildCursor.ExpandAndCenterAroundSelectable(selectable);
         }
 
         protected void Deselect()
@@ -741,45 +846,45 @@ namespace Strikeforce
             structure.transform.Rotate(0, 90, 0);
         }
 
-        protected void BuyStructure()
-        {
-            Structure structure = GetStructureHighlightedByBuyCursor();
-            if (structure == null)
-            {
-                ActionFailed();
-                return;
-            }
+        //protected void BuyStructure()
+        //{
+        //    Structure structure = GetStructureHighlightedByBuyCursor();
+        //    if (structure == null)
+        //    {
+        //        ActionFailed();
+        //        return;
+        //    }
 
-            int cost = structure.Cost;
+        //    int cost = structure.Cost;
 
-            bool hasSufficientFunds = CurrentInventory.HasSufficientResources(ResourceType.Money, cost);
-            if (hasSufficientFunds == false)
-            {
-                // Insufficient funds
-                ActionFailed();
-                return;
-            }
+        //    bool hasSufficientFunds = CurrentInventory.HasSufficientResources(ResourceType.Money, cost);
+        //    if (hasSufficientFunds == false)
+        //    {
+        //        // Insufficient funds
+        //        ActionFailed();
+        //        return;
+        //    }
 
-            Vector3 spawnPoint = BuildCursor.transform.position;
-            GameObject gameObjectToBuild = Instantiate(structure.gameObject, spawnPoint, Quaternion.identity) as GameObject;
-            if (gameObjectToBuild == null)
-            {
-                ActionFailed();
-                return;
-            }
+        //    Vector3 spawnPoint = BuildCursor.transform.position;
+        //    GameObject gameObjectToBuild = Instantiate(structure.gameObject, spawnPoint, Quaternion.identity) as GameObject;
+        //    if (gameObjectToBuild == null)
+        //    {
+        //        ActionFailed();
+        //        return;
+        //    }
 
-            Selectable selectable = gameObjectToBuild.GetComponent<Selectable>();
-            if (selectable == null)
-            {
-                ActionFailed();
-                return;
-            }
+        //    Selectable selectable = gameObjectToBuild.GetComponent<Selectable>();
+        //    if (selectable == null)
+        //    {
+        //        ActionFailed();
+        //        return;
+        //    }
 
-            SetSelected(selectable);
-            IsSettingConstructionPoint = true;
+        //    SetSelected(selectable);
+        //    IsSettingConstructionPoint = true;
 
-            CurrentInventory.UpdateResource(ResourceType.Money, -cost);
-        }
+        //    CurrentInventory.UpdateResource(ResourceType.Money, -cost);
+        //}
 
         protected void ToggleContextOption()
         {
@@ -857,6 +962,54 @@ namespace Strikeforce
             }
 
             raider.SetPrimaryFire(isFiring);
+        }
+
+        protected void SetSecondaryFiring(bool isFiring)
+        {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
+            Raider raider = CurrentRaider;
+            if (raider == null)
+            {
+                return;
+            }
+
+            raider.SetSecondaryFire(isFiring);
+        }
+
+        protected void SetSpecialFiring(bool isFiring)
+        {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
+            Raider raider = CurrentRaider;
+            if (raider == null)
+            {
+                return;
+            }
+
+            raider.SetSpecialFire(isFiring);
+        }
+
+        protected void SetEquipmentActive(bool isActive)
+        {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
+            Raider raider = CurrentRaider;
+            if (raider == null)
+            {
+                return;
+            }
+
+            raider.SetEquipmentActive(isActive);
         }
 
         public bool IsConstructionSiteValid(Structure constructionSite)
@@ -940,7 +1093,7 @@ namespace Strikeforce
             vehicleToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId));
 
-            if (rallyPoint == GlobalAssets.InvalidPoint)
+            if (rallyPoint == GlobalAssets.InvalidLocation)
             {
                 return;
             }
@@ -970,7 +1123,7 @@ namespace Strikeforce
             vehicleToSpawn.transform.parent = allUnits.transform;
             Debug.Log(string.Format("Spawned {0} for player {1}", vehicleName, PlayerId.ToString()));
 
-            if (rallyPoint == GlobalAssets.InvalidPoint)
+            if (rallyPoint == GlobalAssets.InvalidLocation)
             {
                 return;
             }

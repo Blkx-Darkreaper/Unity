@@ -9,35 +9,51 @@ namespace Strikeforce
 {
     public class Level : MonoBehaviour
     {
-        public int Columns;
-        public int Rows;
+        [HideInInspector]
+        public int Width;
+        [HideInInspector]
+        public int Height;
         public static int TileLength = 32;
-        public string LevelName;
+        protected string levelName;
         [HideInInspector]
         public GameObject BoundingBox;
-        public Rectangle Bounds { get { return new Rectangle(0, 0, Columns, Rows); } }
+        public Rectangle Bounds { get { return new Rectangle((int)transform.position.x, (int)transform.position.z, Width, Height); } }
         public Spawnpoint HeadquartersSpawn;
-        public GameObject TilePrefab;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
         protected GameObject allGridObjects;
-        protected Dictionary<int, Zone> allZones;
+        protected SortedList<int, Zone> allZones;
+        protected Dictionary<int, Checkpoint> allCheckpoints;
         protected Zone lastUnlockedZone;
         protected Sector nextAvailableSector { get; set; }
         public const string BOUNDING_BOX = "BoundingBox";
 
-        public void Start()
+        public void Awake()
         {
             this.allMapTiles = new List<GameObject>();
-            this.allZones = new Dictionary<int, Zone>();
+            this.allZones = new SortedList<int, Zone>();
+            this.allCheckpoints = new Dictionary<int, Checkpoint>();
+        }
 
+        public void LoadMap(string mapName)
+        {
+            if(mapName == null)
+            {
+                throw new NullReferenceException("Map name is null");
+            }
+            if(mapName.Equals(string.Empty))
+            {
+                throw new InvalidOperationException("No map name provided");
+            }
+
+            this.levelName = mapName;
             LoadMap();
         }
 
         protected void LoadMap()
         {
             string appPath = Application.dataPath;
-            string levelPath = string.Format("{0}/Levels/{1}.json", appPath, LevelName);
+            string levelPath = string.Format("{0}/Levels/{1}.json", appPath, levelName);
             Debug.Log(string.Format("Loading level {0}", levelPath));
 
             StrikeforceMap map;
@@ -51,9 +67,39 @@ namespace Strikeforce
                 Debug.Log(string.Format("Failed to load level. {0}", ex.Message));
                 return;
             }
+
+            // Testing
+            //Tile testTile = new Tile(new Point(0, 0), 0);
+
+            //List<Grid> mapGrids = new List<Grid>();
+            //mapGrids.Add(new Grid(1, new Point(0, 0), true, true, true, testTile));
+            //mapGrids.Add(new Grid(2, new Point(1, 0), true, true, true, testTile));
+
+            //List<Zone> allZones = new List<Zone>();
+
+            //List<Sector> allSectors = new List<Sector>();
+            //allSectors.Add(new Sector(1, new Point(-13, 3), new Size(13,7), new Spawnpoint(false, new Point(6, 6), new Size(1, 1))));
+            //allZones.Add(new Zone(1, new Point(0, 3), new Size(26, 7), allSectors));
+
+            //List<Checkpoint> allCheckpoints = new List<Checkpoint>();
+            //allCheckpoints.Add(new Checkpoint(new Point(0, 9), new Size(26, 1)));
+
+            //map = new StrikeforceMap("Nic Bunting", new DateTime(2017, 05, 26), "\\tilea2.png", 32, 13, 7, new Size(26, 50), mapGrids, allZones, allCheckpoints);
+            //string unityJson = JsonUtility.ToJson(map);
+            //try
+            //{
+            //    levelPath = string.Format("{0}/Levels/{1}-unity.json", appPath, LevelName);
+            //    GlobalAssets.WriteTextFile(levelPath, unityJson);
+            //} catch(Exception ex)
+            //{
+            //    Debug.Log(ex.Message);
+            //}
+            // End testing
+
             try
             {
                 map = JsonConvert.DeserializeObject<StrikeforceMap>(json);
+                //map = JsonUtility.FromJson<StrikeforceMap>(json);
             }
             catch (Exception ex)
             {
@@ -63,12 +109,12 @@ namespace Strikeforce
 
             Level.TileLength = map.TileLength;
 
-            this.Columns = (int)map.MapSize.Width;
-            int halfWidth = Columns / 2;
-            this.Rows = (int)map.MapSize.Height;
+            this.Width = (int)map.MapSize.Width;
+            int halfWidth = Width / 2;
+            this.Height = (int)map.MapSize.Height;
 
             // Set build Bounding box
-            LoadBoundingBox(Columns, Rows);
+            LoadBoundingBox(Width, Height);
 
             allGridObjects = new GameObject("GridsObject");
             allGridObjects.transform.parent = gameObject.transform;
@@ -82,45 +128,75 @@ namespace Strikeforce
                 int x = (int)grid.Location.x;
                 x -= halfWidth;
 
-                int z = Rows - (int)grid.Location.y;
+                int z = Height - (int)grid.Location.y;
                 Vector3 position = new Vector3(x, 0, z);
 
-                GameObject tile = Instantiate(TilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
+                GameObject tilePrefab = GameManager.Singleton.TilePrefab;
+                GameObject tile = Instantiate(tilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
                 tile.transform.parent = allGridObjects.transform;
 
                 SpriteRenderer renderer = tile.GetComponent<SpriteRenderer>();
                 renderer.sprite = sprite;
 
                 allMapTiles.Add(tile);
-
-                AddGridToZones(grid);
             }
+
+            AddZones(map.AllZones);
 
             this.lastUnlockedZone = allZones[1];
             LinkZones();
+            AddCheckpoints(map.AllCheckpoints);
         }
 
-        protected void AddGridToZones(Grid grid)
+        protected void AddZones(List<Zone> zonesToAdd)
         {
-            int zoneId = grid.ZoneId;
-            if (zoneId == 0)
-            {
-                return;
-            }
+            this.allZones = new SortedList<int, Zone>();
 
-            Zone zone;
-            bool zoneExists = allZones.ContainsKey(zoneId);
-            if (zoneExists == false)
+            foreach (Zone zone in zonesToAdd)
             {
-                zone = new Zone(zoneId);
+                int zoneId = zone.ZoneId;
+                if (zoneId == 0)
+                {
+                    return;
+                }
+
+                bool zoneExists = allZones.ContainsKey(zoneId);
+                if (zoneExists == true)
+                {
+                    throw new InvalidOperationException(string.Format("Zone {0} has already been loaded", zoneId));
+                }
+
                 allZones.Add(zoneId, zone);
+
+                if(nextAvailableSector == null)
+                {
+                    nextAvailableSector = zone.FirstSector;
+                }
+
+                bool hasHQ = zone.HasHeadquartersSpawn;
+                if(hasHQ == false)
+                {
+                    continue;
+                }
+
+                SetHeadquartersSpawn(zone.HeadquartersSector);
             }
+        }
 
-            zone = allZones[zoneId];
+        protected void AddCheckpoints(List<CheckpointJson> checkpointsToAdd)
+        {
+            this.allCheckpoints = new Dictionary<int, Checkpoint>();
 
-            zone.AddGrid(grid);
+            GameObject checkpointPrefab = GameManager.Singleton.CheckpointPrefab;
+            
+            //foreach (Vector2 location in checkpointsToAdd)
+            //{
+            //    int y = (int)location.y;
+            //    GameObject gameObject = Instantiate(CheckpointPrefab, new Vector3(0, y, 0), Quaternion.identity) as GameObject;
+            //    Checkpoint checkpoint = gameObject.GetComponent<Checkpoint>();
 
-            AddHeadquartersSpawn(grid);
+            //    allCheckpoints.Add(y, checkpoint);
+            //}
         }
 
         protected void LinkZones()
@@ -153,19 +229,8 @@ namespace Strikeforce
             throw new InvalidOperationException(string.Format("Only {0} Zones linked out of {1}", nextZoneId - 2, allZones.Count));
         }
 
-        protected void AddHeadquartersSpawn(Grid grid)
+        public void SetHeadquartersSpawn(Sector sector)
         {
-            if (grid.IsHeadquartersSpawn == false)
-            {
-                return;
-            }
-
-            int zoneId = grid.ZoneId;
-            int sectorId = grid.SectorId;
-
-            Zone zone = allZones[zoneId];
-            Sector sector = zone.AllSectors[sectorId];
-
             this.HeadquartersSpawn = sector.Spawn;
             this.nextAvailableSector = sector;
         }
@@ -185,14 +250,13 @@ namespace Strikeforce
             }
 
             this.nextAvailableSector = zoneToCheck.AllSectors[nextSectorId];
-
             return availableSector;
         }
 
-        protected void LoadBoundingBox(int columns, int rows)
+        protected void LoadBoundingBox(int width, int height)
         {
-            int midRow = rows / 2;
-            Vector3 position = new Vector3(0, 10, midRow);
+            int halfHeight = height / 2;
+            Vector3 position = new Vector3(0, 10, halfHeight);
             GameObject boundingBoxPrefab = GlobalAssets.GetMiscPrefab(BOUNDING_BOX);
             if (boundingBoxPrefab == null)
             {
@@ -200,7 +264,7 @@ namespace Strikeforce
             }
 
             this.BoundingBox = Instantiate(boundingBoxPrefab, position, Quaternion.identity) as GameObject;
-            this.BoundingBox.transform.localScale = new Vector3(columns, 20, rows);
+            this.BoundingBox.transform.localScale = new Vector3(width, 20, height);
             this.BoundingBox.transform.parent = gameObject.transform;
         }
 
@@ -232,13 +296,7 @@ namespace Strikeforce
         public void KeepInBounds(float x, float z, ref float deltaX, ref float deltaZ)
         {
             // Keep in level bounds
-            float finalX = x + deltaX;
-            float finalZ = z + deltaZ;
-
-            float halfWidth = Bounds.Width / 2;
-
-            deltaX = Mathf.Clamp(finalX, -halfWidth, halfWidth) - x;
-            deltaZ = Mathf.Clamp(finalZ, 0, Bounds.Height) - z;
+            GlobalAssets.KeepInBounds(Bounds, x, z, ref deltaX, ref deltaZ);
         }
     }
 }

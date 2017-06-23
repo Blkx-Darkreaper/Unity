@@ -12,11 +12,12 @@ namespace Strikeforce
         public float CyclePeriod = 0.5f;
         protected float cycleRemaining { get; set; }
         protected LinkedListNode<Weapon> currentWeaponToFire { get; set; }
-        protected string DominantWeaponType { get;  set; }
-        protected int AngledSpread { get;  set; }
-        protected int HorizontalSpread { get;  set; }
-        protected int GroupingBonus { get;  set; }
         public bool IsFiring { get; set; }
+        protected Dictionary<string, int> allWeaponTypes { get; set; }
+        public string DominantWeaponType { get; protected set; }
+        public int AngledSpread { get; protected set; }
+        public int HorizontalSpread { get; protected set; }
+        public int GroupingBonus { get; protected set; }
         public enum Type { Primary, Secondary, Special };
 
         protected void Awake()
@@ -63,16 +64,104 @@ namespace Strikeforce
                 return;
             }
 
+            SetFiringOrder();
+
+            SetAngledSpread();
+            SetHorizontalSpread();
+            SetGroupingBonus();
+        }
+
+        protected void SetFiringOrder()
+        {
+            SortedList<int, string> firingOrder = new SortedList<int, string>();
+
+            foreach (string type in allWeaponTypes.Keys)
+            {
+                GameObject prefab = GlobalAssets.GetWeaponPrefab(type);
+                Weapon weapon = prefab.GetComponent<Weapon>();
+                int priority = weapon.Priority;
+                int quantity = this.allWeaponTypes[type];
+
+                int triples = quantity / 3;
+                int pairs = (quantity - 3 * triples) / 2;
+                int value = 100 * triples + 10 * pairs + priority;
+
+                firingOrder.Add(value, type);
+            }
+
+            // SortedList is ranked lowest to highest
+            this.DominantWeaponType = firingOrder[firingOrder.Keys[firingOrder.Count - 1]];
+
+            LinkedList<Weapon> sortedWeapons = new LinkedList<Weapon>();
+            foreach (int key in firingOrder.Keys)
+            {
+                string type = firingOrder[key];
+
+                foreach (Weapon weapon in allLinkedWeapons)
+                {
+                    string typeToCheck = weapon.Type;
+                    if (typeToCheck.Equals(type) == false)
+                    {
+                        continue;
+                    }
+
+                    sortedWeapons.AddFirst(weapon); // Reverse order, SortedList ranks from lowest to highest
+                }
+            }
+
             // Weapons are now sorted into firing order based on priority values
             this.allLinkedWeapons = sortedWeapons;
 
             // Set first weapon to fire
             this.currentWeaponToFire = allLinkedWeapons.First;
+        }
 
-            this.DominantWeaponType = dominantWeaponType;
-            this.AngledSpread = angledSpread;
-            this.HorizontalSpread = horizontalSpread;
-            this.GroupingBonus = groupingBonus;
+        protected void SetAngledSpread()
+        {
+            if (DominantWeaponType.Equals(Weapon.Types.BOLT) == true)
+            {
+                return;
+            }
+
+            if (allWeaponTypes.ContainsKey(Weapon.Types.BOLT) == false)
+            {
+                return;
+            }
+
+            int quantity = allWeaponTypes[Weapon.Types.BOLT];
+            this.AngledSpread = quantity * 5;
+        }
+
+        protected void SetHorizontalSpread()
+        {
+            if (DominantWeaponType.Equals(Weapon.Types.FLAMEBURST) == true)
+            {
+                return;
+            }
+
+            if (allWeaponTypes.ContainsKey(Weapon.Types.FLAMEBURST) == false)
+            {
+                return;
+            }
+
+            int quantity = allWeaponTypes[Weapon.Types.FLAMEBURST];
+            this.HorizontalSpread = quantity * 10;
+        }
+
+        protected void SetGroupingBonus()
+        {
+            if (DominantWeaponType.Equals(Weapon.Types.WAVE) == true)
+            {
+                return;
+            }
+
+            if (allWeaponTypes.ContainsKey(Weapon.Types.WAVE) == false)
+            {
+                return;
+            }
+
+            int quantity = allWeaponTypes[Weapon.Types.WAVE];
+            this.GroupingBonus = quantity;
         }
 
         public void Update()

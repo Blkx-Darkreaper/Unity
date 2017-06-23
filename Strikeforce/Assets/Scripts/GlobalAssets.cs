@@ -3,6 +3,8 @@ using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Drawing;
+using Color = UnityEngine.Color;
 
 namespace Strikeforce
 {
@@ -17,11 +19,14 @@ namespace Strikeforce
         public const string SUN = "Sun";
         public const string MAIN_CAMERA = "MainCamera";
         public const string GAME_MANAGER = "GameManager";
+        public const string MENU_MANAGER = "MenuManager";
         public const string NETWORK_MANAGER = "NetworkManager";
         public const string HEADER = "Header";
         public const string BUTTON = "Button";
         public const string LEVEL = "Level";
         public const string SCENE = "Scene";
+        public const string LAYOUT_GROUP = "LayoutGroup";
+        public const string PANEL = "Panel";
     }
 
     public struct Layers
@@ -60,9 +65,9 @@ namespace Strikeforce
 
     public struct Scenes
     {
-        public static string Lobby = "lobby";
-        public static string MainMenu = "mainMenu";
-        public static string Game = "map";
+        public static string Lobby = "Lobby";
+        public static string MatchLobby = "MatchLobby";
+        public static string Match = "BaseLevel";
         public static string LoadTest = "blankTest";
     }
 
@@ -93,11 +98,9 @@ namespace Strikeforce
     public static class GlobalAssets
     {
         public static string DefaultUsername = "NewPlayer";
-        private static Vector3 invalidPositionValue = new Vector3(-99999f, -99999f, -99999f);
-        public static Vector3 InvalidPoint { get { return invalidPositionValue; } }
+        public static Vector3 InvalidLocation { get { return new Vector3(-99999f, -99999f, -99999f); } }
         public static GUISkin SelectionBoxSkin { get; set; }
-        private static Bounds invalidBoundsValue = new Bounds(new Vector3(-99999f, -99999f, -99999f), Vector3.zero);
-        public static Bounds InvalidBounds { get { return invalidBoundsValue; } }
+        public static Bounds InvalidBounds { get { return new Bounds(new Vector3(-99999f, -99999f, -99999f), Vector3.zero); } }
         private static Dictionary<ResourceType, Texture2D> resourceHealthBarTextures;
         private static Dictionary<int, Texture2D> playerAvatars;
         public static KeyValuePair<string, string>[] PlayerResourceProperties = new KeyValuePair<string, string>[] 
@@ -356,9 +359,24 @@ namespace Strikeforce
             return getPrefabFromCollection(name, vehiclePrefabs);
         }
 
-        public static GameObject GetProjectilePrefab(string name)
+        public static GameObject[] GetProjectilePrefabs(string name)
         {
-            return getPrefabFromCollection(name, projectilePrefabs);
+            List<GameObject> prefabs = new List<GameObject>();
+
+            GameObject nextPrefab = getPrefabFromCollection(name, projectilePrefabs);
+            int index = 2;
+
+            while (nextPrefab != null)
+            {
+                prefabs.Add(nextPrefab);
+
+                string fullName = string.Format("{0}{1}", name, index);
+                nextPrefab = getPrefabFromCollection(fullName, projectilePrefabs);
+
+                index++;
+            }
+
+            return prefabs.ToArray();
         }
 
         public static GameObject GetMiscPrefab(string name)
@@ -487,6 +505,17 @@ namespace Strikeforce
             result.SetPixels(pix);
             result.Apply();
             return result;
+        }
+
+        public static void KeepInBounds(Rectangle bounds, float x, float z, ref float deltaX, ref float deltaZ)
+        {
+            float finalX = x + deltaX;
+            float finalZ = z + deltaZ;
+
+            float halfWidth = bounds.Width / 2;
+
+            deltaX = Mathf.Clamp(finalX, -halfWidth, halfWidth) - x;
+            deltaZ = Mathf.Clamp(finalZ, 0, bounds.Height) - z;
         }
     }
 }

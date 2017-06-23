@@ -130,11 +130,19 @@ namespace Strikeforce
             }
 
             userInput.profile = profile;
+
+            if(profile.Ranking != null)
+            {
+                return;
+            }
+
+            profile.ResetRanking();
         }
 
         public Profile CreateProfile(string username, int avatarId)
         {
-            Profile profile = new Profile(username, avatarId, false);
+            Rank ranking = new Rank();
+            Profile profile = new Profile(username, avatarId, false, ranking);
             AllProfiles.Add(username, profile);
 
             SaveProfiles();

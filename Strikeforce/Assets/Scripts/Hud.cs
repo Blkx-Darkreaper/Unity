@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using Color = UnityEngine.Color;
+using Image = UnityEngine.UI.Image;
 
 namespace Strikeforce
 {
@@ -24,6 +28,8 @@ namespace Strikeforce
         private CursorState activeCursorState;
         private int currentFrame = 0;
         public CursorState PreviousCursorState { get; private set; }
+        public Rectangle Bounds = new Rectangle();
+
         public Texture2D[] ResourceIcons;
         private Dictionary<ResourceType, Texture2D> allResources;
         private Selectable previousSelection = null;
@@ -31,13 +37,35 @@ namespace Strikeforce
         public Texture2D ButtonHover, ButtonClick;
         public Texture2D BuildFrame, BuildMask;
         public Texture2D SmallButtonHover, SmallButtonClick;
+        protected struct Styles
+        {
+            public const string label = "label";
+        }
 
         protected void Start()
         {
+            FitToScreen();
+
             profile = ProfileManager.Singleton.CurrentProfile;
 
             SetCursorState(CursorState.select);
             InitResources();
+        }
+
+        protected void FitToScreen()
+        {
+            float resWidth = Screen.width;
+            float resHeight = Screen.height;
+
+            RectTransform panel = GlobalAssets.GetChildComponentWithTag<RectTransform>(gameObject, Tags.PANEL);
+
+            float width = panel.rect.width;
+            float height = panel.rect.height;
+
+            float scaleX = resWidth / width;
+            float scaleY = resHeight / height;
+
+            panel.localScale = new Vector3(scaleX, scaleY, 1f);
         }
 
         protected void InitStyles()
@@ -47,13 +75,13 @@ namespace Strikeforce
                 return;
             }
 
-            HealthStyle = new GUIStyle(GUI.skin.box);
-            HealthStyle.normal.background = GlobalAssets.MakeTexture(2, 2, new Color(0f, 1f, 0f, 1.0f));
+            this.HealthStyle = new GUIStyle(GUI.skin.box);
+            this.HealthStyle.normal.background = GlobalAssets.MakeTexture(2, 2, new Color(0f, 1f, 0f, 1.0f));
 
-            BackStyle = new GUIStyle(GUI.skin.box);
-            BackStyle.normal.background = GlobalAssets.MakeTexture(2, 2, new Color(0f, 0f, 0f, 1.0f));
+            this.BackStyle = new GUIStyle(GUI.skin.box);
+            this.BackStyle.normal.background = GlobalAssets.MakeTexture(2, 2, new Color(0f, 0f, 0f, 1.0f));
 
-            areStylesSet = true;
+            this.areStylesSet = true;
         }
 
         protected void InitResources()
@@ -117,9 +145,19 @@ namespace Strikeforce
             }
 
             InitStyles();
-            DrawPlayerDetails();
-            DrawHealthBar();
+            //DrawPlayerDetails();
+            //DrawHealthBar();
             //DrawMouseCursor();
+        }
+
+        protected void DrawBuildHud()
+        {
+
+        }
+
+        protected void DrawRaidHud()
+        {
+
         }
 
         protected void DrawPlayerDetails()
@@ -147,7 +185,7 @@ namespace Strikeforce
             //    Debug.Log(string.Format("Usernames do not match"));
             //}
 
-            PlayerDetailsSkin.GetStyle("label").CalcMinMaxWidth(new GUIContent(username), out minWidth, out maxWidth);
+            PlayerDetailsSkin.GetStyle(Styles.label).CalcMinMaxWidth(new GUIContent(username), out minWidth, out maxWidth);
             GUI.Label(new Rect(x, y, maxWidth, height), username);
 
             GUI.EndGroup();

@@ -300,5 +300,15 @@ namespace Strikeforce
         {
             primaryFire.IsFiring = isFiring;
         }
+
+        public void SetSecondaryFire(bool isFiring)
+        {
+            secondaryFire.IsFiring = isFiring;
+        }
+
+        public void SetSpecialFire(bool isFiring)
+        {
+            specialFire.IsFiring = isFiring;
+        }
     }
 }

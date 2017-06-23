@@ -7,34 +7,12 @@ namespace Strikeforce
 {
     public class MatchmakingMenu : Menu
     {
-        public const string HOST_GAME = "Host Game";
-        public const string JOIN_GAME = "Join Game";
+        protected const string HOST_GAME = "HostGame";
+        protected const string JOIN_GAME = "JoinGame";
+        public string hostGameText = "Host Game";
+        protected string joinGameText = "Join Game";
         protected NetworkManager networkManager;
         protected ServerManager serverManager;
-        public GameMenu gameMenu;
-
-        protected override void Awake()
-        {
-            // Get back button first
-            Button backButton = GlobalAssets.GetChildComponentWithTag<Button>(gameObject, Tags.BUTTON);
-
-            base.Awake();
-
-            // Add back button handler
-            AddButtonHandler(backButton, BACK);
-
-            this.networkManager = NetworkManager.singleton;
-            if (networkManager == null)
-            {
-                Debug.Log(string.Format("NetworkManager failed to load."));
-            }
-
-            this.serverManager = networkManager.gameObject.GetComponent<ServerManager>() as ServerManager;
-            if (serverManager == null)
-            {
-                Debug.Log(string.Format("ServerManager failed to load."));
-            }
-        }
 
         protected override void Update()
         {
@@ -55,9 +33,31 @@ namespace Strikeforce
             joinGameButton.enabled = true;
         }
 
+        protected override void Init()
+        {
+            base.Init();
+
+            this.networkManager = NetworkManager.singleton;
+            if (networkManager == null)
+            {
+                Debug.Log(string.Format("NetworkManager failed to load."));
+            }
+
+            this.serverManager = networkManager.gameObject.GetComponent<ServerManager>() as ServerManager;
+            if (serverManager == null)
+            {
+                Debug.Log(string.Format("ServerManager failed to load."));
+            }
+        }
+
         protected override void SetButtonNames()
         {
-            this.buttonNames = new string[] { HOST_GAME, JOIN_GAME, BACK };
+            this.allButtonNames = new string[] { HOST_GAME, JOIN_GAME, BACK };
+        }
+
+        protected override void SetButtonTextValues()
+        {
+            this.allButtonTextValues = new string[] { hostGameText, joinGameText, BACK };
         }
 
         protected override string[] GetMenuButtonNamesToAdd()
@@ -100,8 +100,7 @@ namespace Strikeforce
 
         protected virtual void LoadGame()
         {
-            MenuManager.Singleton.SetLoadingScreenActive(true);
-            MenuManager.Singleton.ShowMenu(gameMenu);
+            MenuManager.Singleton.ShowLoadingScreen();
         }
     }
 }

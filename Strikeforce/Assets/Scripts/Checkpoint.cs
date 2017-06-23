@@ -4,16 +4,20 @@ using Newtonsoft.Json;
 
 namespace Strikeforce
 {
-    public class Checkpoint
+    public class Checkpoint : MonoBehaviour
     {
         public Vector2 Location;
         public Size Size;
 
-        [JsonConstructor]
-        public Checkpoint(Point location, Size size)
+        protected void OnTriggerEnter(Collider other)
         {
-            this.Location = new Vector2(location.X, location.Y);
-            this.Size = size;
+            Raider raider = other.gameObject.GetComponent<Raider>();
+            if(raider == null)
+            {
+                return;
+            }
+
+            raider.Owner.PreviousCheckpoint = this;
         }
     }
 }

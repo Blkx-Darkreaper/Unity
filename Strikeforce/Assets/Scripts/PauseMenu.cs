@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace Strikeforce
 {
@@ -10,7 +11,12 @@ namespace Strikeforce
 
         protected override void SetButtonNames()
         {
-            buttonNames = new string[] { RESUME, EXIT };
+            this.allButtonNames = new string[] { RESUME, EXIT };
+        }
+
+        protected override void SetButtonTextValues()
+        {
+            this.allButtonTextValues = new string[] { RESUME, exitText };
         }
 
         protected override void OnGUI()
@@ -42,9 +48,9 @@ namespace Strikeforce
             width = Attributes.ButtonWidth;
             height = Attributes.ButtonHeight;
 
-            for (int i = 0; i < buttonNames.Length; i++)
+            for (int i = 0; i < allButtonTextValues.Length; i++)
             {
-                string buttonName = buttonNames[i];
+                string buttonName = allButtonTextValues[i];
                 bool buttonPressed = GUI.Button(new Rect(x, y, width, height), buttonName);
 
                 y += Attributes.ButtonHeight + Attributes.Padding;
@@ -56,11 +62,11 @@ namespace Strikeforce
 
                 switch (buttonName)
                 {
-                    case "Resume":
+                    case RESUME:
                         menuManager.Resume();
                         break;
 
-                    case "Exit":
+                    case EXIT:
                         ExitGame();
                         break;
                 }
