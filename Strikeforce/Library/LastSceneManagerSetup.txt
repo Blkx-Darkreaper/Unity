@@ -1,1 +1,8 @@
+<<<<<<< HEAD
 sceneSetups: []
+=======
+sceneSetups:
+- path: Assets/Scenes/Lobby.unity
+  isLoaded: 1
+  isActive: 1
+>>>>>>> 8a66fa6221a96dc0b4420bc9c6d40c85cde54da3
