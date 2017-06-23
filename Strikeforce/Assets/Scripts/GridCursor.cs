@@ -5,11 +5,15 @@ namespace Strikeforce
 {
     public class GridCursor : Entity
     {
+        protected Vector2 location { get; set; }
+        protected Image sprite { get; set; }
         public Rectangle Bounds = new Rectangle();
 
         protected override void Awake()
         {
             base.Awake();
+
+            this.sprite = GetComponent<Image>();
         }
 
         public virtual void Move(float x, float z)
@@ -22,17 +26,16 @@ namespace Strikeforce
                 }
             }
 
-            Vector3 currentPosition = transform.position;
-
             int signX = (int)Mathf.Sign(x);
             x = signX;
 
             int signZ = (int)Mathf.Sign(z);
             z = signZ;
 
-            GlobalAssets.KeepInBounds(Bounds, currentPosition.x, currentPosition.z, ref x, ref z);
+            GlobalAssets.KeepInBounds(Bounds, location.x, location.z, ref x, ref z);
 
             transform.Translate(x, 0, z);
+            this.location = new Vector2(transform.position.x, transform.position.z);
         }
 
         public virtual void DefaultSize()
@@ -40,10 +43,45 @@ namespace Strikeforce
             transform.localScale = new Vector3(1, 1, 1);
         }
 
-        public virtual void SetSize(Vector2 size)
+        public void Resize(Vector2 size)
         {
-            float height = transform.localScale.y;
-            transform.localScale = new Vector3(size.x, height, size.y);
+            Resize(size.x, size.y);
+        }
+
+        public virtual void Resize(float width, float height)
+        {
+            float depth = transform.localScale.y;
+            transform.localScale = new Vector3(width, depth, height);
+        }
+
+        public void CenterOnLocation(Vector2 location)
+        {
+            CenterOnLocation(location.x, location.y);
+        }
+
+        public virtual void CenterOnLocation(float x, float z)
+        {
+            float y = transform.position.y;
+            transform.position = new Vector3(x, y, z);
+        }
+
+        public virtual void ExpandAndCenterAroundSelectable(Selectable selectable)
+        {
+            Bounds selectionBounds = selectable.SelectionBounds;
+
+            float selectionX = selectable.transform.position.x;
+            float selectionY = selectable.transform.position.z;
+            //float selectionWidth = selectionBounds.width;
+            //float selectionHeight = selectionBounds.height;
+            float selectionWidth = selectable.transform.lossyScale.x;
+            float selectionHeight = selectable.transform.lossyScale.z;
+
+            // Keep from shrinking smaller than 1 tile
+            selectionWidth = Mathf.Clamp(selectionWidth, 1, selectionWidth);
+            selectionHeight = Mathf.Clamp(selectionHeight, 1, selectionHeight);
+
+            CenterOnLocation(selectionX, selectionY);
+            Resize(selectionWidth, selectionHeight);
         }
     }
 }
