@@ -59,8 +59,6 @@ namespace Strikeforce
             }
 
             canvasGroup.blocksRaycasts = canvasGroup.interactable = true;
-
-            HandleKeyboardActivity();
         }
 
         protected virtual void OnGUI()
@@ -234,14 +232,6 @@ namespace Strikeforce
             displayText.text = MenuName;
         }
 
-        protected virtual void HandleKeyboardActivity()
-        {
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                menuManager.Resume();
-            }
-        }
-
         public virtual void HandleMenuSelection(string direction)
         {
             int totalButtons = allButtons.Count;
@@ -299,8 +289,13 @@ namespace Strikeforce
             SelectMenuButton(SelectedIndex);
         }
 
-        public virtual void MenuClick()
+        public virtual void MenuButtonClick()
         {
+            if(IsOpen == false)
+            {
+                return;
+            }
+
             ClickMenuButton(SelectedIndex);
         }
 

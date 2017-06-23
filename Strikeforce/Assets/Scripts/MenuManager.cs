@@ -89,6 +89,7 @@ namespace Strikeforce
         public virtual void ShowLoadingScreen()
         {
             SetLoadingScreenActive(true);
+            this.IsMenuOpen = false;
         }
 
         public virtual void HideLoadingScreenDelayed()
@@ -99,6 +100,12 @@ namespace Strikeforce
         public virtual void HideLoadingScreen()
         {
             SetLoadingScreenActive(false);
+            if(CurrentMenu.IsOpen == false)
+            {
+                return;
+            }
+
+            this.IsMenuOpen = true;
         }
 
         public virtual void SetLoadingScreenActive(bool isLoading)

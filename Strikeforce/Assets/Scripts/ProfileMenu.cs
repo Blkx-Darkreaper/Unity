@@ -57,11 +57,6 @@ namespace Strikeforce
             GlobalAssets.SetAvatars(Avatars);
         }
 
-        protected override void HandleKeyboardActivity()
-        {
-            return;
-        }
-
         protected override void DrawMenu()
         {
             GUI.skin = MenuSkin;

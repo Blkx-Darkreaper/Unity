@@ -7,6 +7,7 @@ namespace Strikeforce
 {
     public class Raider : Aircraft
     {
+        public float StartingSpeed;
         public float MaxEnergy;
         public float CurrentEnergy { get; protected set; }
         public Vector3[] AllFiringPoints { get; protected set; }

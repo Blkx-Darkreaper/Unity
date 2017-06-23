@@ -17,7 +17,7 @@ namespace Strikeforce
         protected string levelName;
         [HideInInspector]
         public GameObject BoundingBox;
-        public Rectangle Bounds { get { return new Rectangle(0, 0, Width, Height); } }
+        public Rectangle Bounds { get { return new Rectangle((int)transform.position.x, (int)transform.position.z, Width, Height); } }
         public Spawnpoint HeadquartersSpawn;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;

@@ -26,6 +26,7 @@ namespace Strikeforce
         public const string LEVEL = "Level";
         public const string SCENE = "Scene";
         public const string LAYOUT_GROUP = "LayoutGroup";
+        public const string PANEL = "Panel";
     }
 
     public struct Layers

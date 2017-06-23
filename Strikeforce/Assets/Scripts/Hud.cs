@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using Color = UnityEngine.Color;
+using Image = UnityEngine.UI.Image;
 
 namespace Strikeforce
 {
@@ -40,17 +42,30 @@ namespace Strikeforce
             public const string label = "label";
         }
 
-        protected void Awake()
-        {
-            enabled = false;
-        }
-
         protected void Start()
         {
+            FitToScreen();
+
             profile = ProfileManager.Singleton.CurrentProfile;
 
             SetCursorState(CursorState.select);
             InitResources();
+        }
+
+        protected void FitToScreen()
+        {
+            float resWidth = Screen.width;
+            float resHeight = Screen.height;
+
+            RectTransform panel = GlobalAssets.GetChildComponentWithTag<RectTransform>(gameObject, Tags.PANEL);
+
+            float width = panel.rect.width;
+            float height = panel.rect.height;
+
+            float scaleX = resWidth / width;
+            float scaleY = resHeight / height;
+
+            panel.localScale = new Vector3(scaleX, scaleY, 1f);
         }
 
         protected void InitStyles()

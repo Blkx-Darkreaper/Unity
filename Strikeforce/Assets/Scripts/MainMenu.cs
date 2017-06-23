@@ -64,11 +64,6 @@ namespace Strikeforce
             EnableMatchmaking();
         }
 
-        protected override void HandleKeyboardActivity()
-        {
-            return;
-        }
-
         protected override void HandleButtonPress(string buttonName)
         {
             switch (buttonName)

@@ -311,12 +311,6 @@ namespace Strikeforce
             currentMenu.HandleMenuSelection(direction);
         }
 
-        protected void HandleMenuClick()
-        {
-            Menu currentMenu = MenuManager.Singleton.CurrentMenu;
-            currentMenu.MenuClick();
-        }
-
         protected void RightStick()
         {
             string rightStickHor = string.Format("{0} {1}", Direction.RIGHT, Axis.HORIZONTAL);
@@ -421,33 +415,50 @@ namespace Strikeforce
                 return;
             }
 
-            KeyEvent keyEvent;
+            CheckAction1KeyPressed();
+            CheckRightTriggerKeyPressed();
+            CheckMenuKeyPressed();
+        }
 
-            if (Input.GetKeyDown(gamepadBinds.Action1) || Input.GetKeyDown(keyboardBinds.Action1))
+        protected void CheckMenuKeyPressed()
+        {
+            if (Input.GetKeyDown(gamepadBinds.Menu) == false)
             {
-                if(MenuManager.Singleton.IsMenuOpen == true)
+                if(Input.GetKeyDown(keyboardBinds.Menu) == false)
                 {
-                    HandleMenuClick();
-                } else
-                {
-                    keyEvent = KeyDownEvent(ActionKey.Action1);
-                    allKeyEvents.Enqueue(keyEvent);
+                    return;
                 }
             }
 
-            if (Input.GetKeyDown(keyboardBinds.RightTrigger))
-            {
-                keyEvent = KeyDownEvent(ActionKey.RightTrigger);
-                allKeyEvents.Enqueue(keyEvent);
-            }
-
-            if (Input.GetKeyDown(gamepadBinds.Menu) || Input.GetKeyDown(keyboardBinds.Menu))
-            {
-                TogglePauseMenu();
-            }
+            HandleMenuButtonToggled();
         }
 
-        protected void TogglePauseMenu()
+        protected void CheckRightTriggerKeyPressed()
+        {
+            if (Input.GetKeyDown(keyboardBinds.RightTrigger) == false)
+            {
+                return;
+            }
+
+            KeyEvent keyEvent = KeyDownEvent(ActionKey.RightTrigger);
+            allKeyEvents.Enqueue(keyEvent);
+        }
+
+        protected void CheckAction1KeyPressed()
+        {
+            if (Input.GetKeyDown(gamepadBinds.Action1) == false)
+            {
+                if(Input.GetKeyDown(keyboardBinds.Action1) == false)
+                {
+                    return;
+                }
+            }
+
+            KeyEvent keyEvent = KeyDownEvent(ActionKey.Action1);
+                allKeyEvents.Enqueue(keyEvent);
+        }
+
+        protected void HandleMenuButtonToggled()
         {
             // If not in match go back
             if(profile.Player == null)
@@ -470,24 +481,47 @@ namespace Strikeforce
 
         protected void CheckForReleasedKeys()
         {
-            KeyEvent keyEvent;
+            CheckForAction1KeyReleased();
+            CheckForRightTriggerReleased();
+            CheckForMenuKeyReleased();
+        }
 
-            if (Input.GetKeyUp(gamepadBinds.Action1) || Input.GetKeyUp(keyboardBinds.Action1))
+        protected void CheckForMenuKeyReleased()
+        {
+            if (Input.GetKeyUp(gamepadBinds.Menu) == false)
             {
-                keyEvent = KeyUpEvent(ActionKey.Action1);
-                allKeyEvents.Enqueue(keyEvent);
+                if (Input.GetKeyUp(keyboardBinds.Menu) == false)
+                {
+                    return;
+                }
             }
 
-            if (Input.GetKeyUp(keyboardBinds.RightTrigger))
+            HandleMenuButtonToggled();
+        }
+
+        protected void CheckForRightTriggerReleased()
+        {
+            if (Input.GetKeyUp(keyboardBinds.RightTrigger) == false)
             {
-                keyEvent = KeyUpEvent(ActionKey.RightTrigger);
-                allKeyEvents.Enqueue(keyEvent);
+                return;
             }
 
-            if (Input.GetKeyUp(gamepadBinds.Menu) || Input.GetKeyUp(keyboardBinds.Menu))
+            KeyEvent keyEvent = KeyUpEvent(ActionKey.RightTrigger);
+            allKeyEvents.Enqueue(keyEvent);
+        }
+
+        protected void CheckForAction1KeyReleased()
+        {
+            if (Input.GetKeyUp(gamepadBinds.Action1) == false)
             {
-                TogglePauseMenu();
+                if (Input.GetKeyUp(keyboardBinds.Action1) == false)
+                {
+                    return;
+                }
             }
+
+            KeyEvent keyEvent = KeyUpEvent(ActionKey.Action1);
+            allKeyEvents.Enqueue(keyEvent);
         }
 
         protected KeyEvent KeyDownEvent(ActionKey key)

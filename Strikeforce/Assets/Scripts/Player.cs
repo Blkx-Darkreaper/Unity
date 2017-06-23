@@ -80,12 +80,15 @@ namespace Strikeforce
         {
             this.CurrentLevel = CurrentTeam.HomeBase;
 
-            MenuManager.Singleton.SetLoadingScreenActive(true);
-            SceneManager.LoadScene(Scenes.Match);
-            MenuManager.Singleton.HideLoadingScreen();
-
             SetCursors();
-            SpawnRaider();  // Testing
+            //SpawnRaider();  // Testing
+
+            BuildHud.gameObject.SetActive(true);
+
+            // Set viewport
+            mainCamera.rect = new Rect(0.2f, 0f, 0.6f, 1f);
+
+            MenuManager.Singleton.HideLoadingScreenDelayed();
         }
 
         protected void Update()
@@ -201,7 +204,7 @@ namespace Strikeforce
             SetCameraOverhead(raiderPosition);
 
             // Set raider and camera initial velocity
-            float initialVelocity = CurrentRaider.StallSpeed;
+            float initialVelocity = CurrentRaider.StartingSpeed;
             CurrentRaider.SetForwardVelocity(initialVelocity);
 
             Vector3 raiderVelocity = CurrentRaider.GetVelocity();
@@ -217,7 +220,12 @@ namespace Strikeforce
 
         protected void SetCameraOverhead(Vector3 position)
         {
-            Vector3 overheadView = new Vector3(position.x, 10, position.z);
+            float x = position.x;
+            float z = position.z;
+            KeepLevelInMainView(ref x, ref z);
+
+            Vector3 overheadView = new Vector3(x, 10, z);
+
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
         }
@@ -308,12 +316,33 @@ namespace Strikeforce
         protected RectangleF GetMainCameraViewBounds()
         {
             float x = mainCamera.transform.position.x;
-            float y = mainCamera.transform.position.y;
+            float y = mainCamera.transform.position.z;
             float height = 2 * mainCamera.orthographicSize;
             float width = height * Screen.width / Screen.height;
 
             RectangleF cameraBounds = new RectangleF(x, y, width, height);
             return cameraBounds;
+        }
+
+        protected void KeepLevelInMainView(ref float x, ref float y)
+        {
+            RectangleF mainCameraBounds = GetMainCameraViewBounds();
+            float viewWidth = mainCameraBounds.Width;
+            float viewHeight = mainCameraBounds.Height;
+
+            float levelX = CurrentLevel.transform.position.x;
+            float levelY = CurrentLevel.transform.position.z;
+            int levelWidth = CurrentLevel.Width;
+            int levelHeight = CurrentLevel.Height;
+
+            float minX = (viewWidth - levelWidth) / 2f + levelX;
+            float maxX = (levelWidth - viewWidth) / 2f + levelX;
+
+            float minY = (viewHeight - levelHeight) / 2f + levelY;
+            float maxY = (levelHeight - viewHeight) / 2f + levelY;
+
+            x = Mathf.Clamp(x, minX, maxX);
+            y = Mathf.Clamp(y, minY, maxY);
         }
 
         protected void KeepLevelInMainView(float x, float y, ref float deltaX, ref float deltaY)
@@ -325,14 +354,16 @@ namespace Strikeforce
             float viewWidth = mainCameraBounds.Width;
             float viewHeight = mainCameraBounds.Height;
 
+            float levelX = CurrentLevel.transform.position.x;
+            float levelY = CurrentLevel.transform.position.z;
             int levelWidth = CurrentLevel.Width;
             int levelHeight = CurrentLevel.Height;
 
-            float minX = (viewWidth - levelWidth) / 2f;
-            float maxX = (levelWidth - viewWidth) / 2f;
+            float minX = (viewWidth - levelWidth) / 2f + levelX;
+            float maxX = (levelWidth - viewWidth) / 2f + levelX;
 
-            float minY = (viewHeight - levelHeight) / 2f;
-            float maxY = (levelHeight - viewHeight) / 2f;
+            float minY = (viewHeight - levelHeight) / 2f + levelY;
+            float maxY = (levelHeight - viewHeight) / 2f + levelY;
 
             deltaX = Mathf.Clamp(finalX, minX, maxX) - x;
             deltaY = Mathf.Clamp(finalY, minY, maxY) - y;
@@ -431,6 +462,12 @@ namespace Strikeforce
 
         protected void Action1()
         {
+            if (MenuManager.Singleton.IsMenuOpen == true)
+            {
+                HandleMenuButtonClick();
+                return;
+            }
+
             if (IsSellingStructure == true)
             {
                 ConfirmSale();
@@ -444,6 +481,12 @@ namespace Strikeforce
             }
 
             Select();
+        }
+
+        protected void HandleMenuButtonClick()
+        {
+            Menu currentMenu = MenuManager.Singleton.CurrentMenu;
+            currentMenu.MenuButtonClick();
         }
 
         protected void Action2()

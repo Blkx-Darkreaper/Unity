@@ -195,6 +195,8 @@ namespace Strikeforce
             }
 
             teamToJoin.AddPlayer(playerAccount);
+
+            MenuManager.Singleton.SetLoadingScreenActive(true);
         }
 
         public void StartGame()
@@ -215,6 +217,7 @@ namespace Strikeforce
 
             this.IsGameInProgress = true;
             MenuManager.Singleton.SetCurrentMenu(gameMenu);
+            MenuManager.Singleton.CurrentMenu.HideMenu();
 
             foreach(Profile playerAccount in AllProfiles.Values)
             {
