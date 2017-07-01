@@ -9,7 +9,6 @@ namespace Strikeforce
         public GUISkin HudSkin;
         public Texture2D Healthy, Damaged, Critical;
         public GameObject[] Weapons, Structures, Vehicles, Projectiles, Misc;
-        public GameObject BoundingBox;
 
         public void Awake()
         {
@@ -21,7 +20,6 @@ namespace Strikeforce
             LoadVehiclePrefabs();
             LoadProjectilePrefabs();
             LoadMiscPrefabs();
-            LoadBoundingBoxPrefab();
         }
 
         protected void LoadGuiSkins()
@@ -58,17 +56,11 @@ namespace Strikeforce
 
         protected void LoadMiscPrefabs()
         {
-            LoadPrefabs<Entity>(Misc, GlobalAssets.Prefabs.MISC);
-        }
-
-        protected void LoadBoundingBoxPrefab()
-        {
-            string name = BoundingBox.name;
-            GlobalAssets.RegisterMiscPrefab(name, BoundingBox);
+            LoadPrefabs<MonoBehaviour>(Misc, GlobalAssets.Prefabs.MISC);
         }
 
         protected void LoadPrefabs<T>(GameObject[] items, string collectionName)
-        where T : Entity
+        where T : MonoBehaviour
         {
             foreach (GameObject gameObject in items)
             {
@@ -91,7 +83,7 @@ namespace Strikeforce
             }
         }
 
-        public void SetEntityName(GameObject gameObject, Entity entity)
+        public void SetEntityName(GameObject gameObject, MonoBehaviour entity)
         {
             if (entity.name == null)
             {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Strikeforce
 {
-    public class TriggerLink
+    public class TriggerLink : ScriptableObject
     {
         public Type TriggerType { get; protected set; }
         protected LinkedList<Weapon> allLinkedWeapons { get; set; }
@@ -20,18 +20,17 @@ namespace Strikeforce
         public int GroupingBonus { get; protected set; }
         public enum Type { Primary, Secondary, Special };
 
-        public TriggerLink(Type type)
+        protected void Awake()
         {
-            this.TriggerType = type;
             this.allLinkedWeapons = new LinkedList<Weapon>();
             this.cycleRemaining = this.CyclePeriod;
             this.currentWeaponToFire = null;
             this.IsFiring = false;
-            this.allWeaponTypes = new Dictionary<string, int>();
-            this.DominantWeaponType = string.Empty;
-            this.AngledSpread = 0;
-            this.HorizontalSpread = 0;
-            this.GroupingBonus = 0;
+        }
+
+        public void Init(Type type)
+        {
+            this.TriggerType = type;
         }
 
         public void LinkWeapon(Weapon weapon, Vector3 firingPoint)
@@ -48,16 +47,6 @@ namespace Strikeforce
             this.allLinkedWeapons.AddFirst(weapon);
 
             weapon.SetFiringPointOffset(firingPoint);
-
-            bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
-            if (hasType == false)
-            {
-                this.allWeaponTypes.Add(weapon.Type, 1);
-            }
-            else
-            {
-                this.allWeaponTypes[weapon.Type]++;
-            }
         }
 
         public void UnlinkWeapon(Weapon weapon)
@@ -66,17 +55,9 @@ namespace Strikeforce
 
             this.allLinkedWeapons.Remove(weapon);
             this.currentWeaponToFire = allLinkedWeapons.First;
-
-            bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
-            if (hasType == false)
-            {
-                return;
-            }
-
-            this.allWeaponTypes[weapon.Type]--;
         }
 
-        public void ReadyWeapons()
+        public void ReadyWeapons(LinkedList<Weapon> sortedWeapons, string dominantWeaponType, int angledSpread, int horizontalSpread, int groupingBonus)
         {
             if (allLinkedWeapons.Count == 0)
             {
@@ -229,7 +210,7 @@ namespace Strikeforce
         {
             Weapon weapon = currentWeaponToFire.Value;
             string weaponType = weapon.Type;
-            if (weaponType.Equals(this.DominantWeaponType) == true)
+            if (weaponType.Equals(DominantWeaponType) == true)
             {
                 weapon.Fire();
                 return;

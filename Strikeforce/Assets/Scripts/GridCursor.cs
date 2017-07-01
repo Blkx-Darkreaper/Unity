@@ -3,17 +3,15 @@ using System.Drawing;
 
 namespace Strikeforce
 {
-    public class GridCursor : Entity
+    public class GridCursor : MonoBehaviour
     {
         protected Vector2 location { get; set; }
-        protected Image sprite { get; set; }
+        protected Sprite sprite { get; set; }
         public Rectangle Bounds = new Rectangle();
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
-
-            this.sprite = GetComponent<Image>();
+            this.sprite = GetComponent<Sprite>();
         }
 
         public virtual void Move(float x, float z)
@@ -32,7 +30,7 @@ namespace Strikeforce
             int signZ = (int)Mathf.Sign(z);
             z = signZ;
 
-            GlobalAssets.KeepInBounds(Bounds, location.x, location.z, ref x, ref z);
+            GlobalAssets.KeepInBounds(Bounds, location.x, location.y, ref x, ref z);
 
             transform.Translate(x, 0, z);
             this.location = new Vector2(transform.position.x, transform.position.z);

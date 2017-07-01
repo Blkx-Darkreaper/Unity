@@ -161,18 +161,43 @@ namespace Strikeforce
             NetworkServer.SpawnWithClientAuthority(CurrentRaider.gameObject, gameObject);
             GameManager.Singleton.RegisterEntity(CurrentRaider);
 
+            Hardpoint hardpointPrefab = GlobalAssets.GetMiscPrefab("Hardpoint").GetComponent<Hardpoint>();
+
+            Hardpoint[] leftOuterWing = new Hardpoint[1];
+            leftOuterWing[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            leftOuterWing[0].Init(-138, -69, 1, 1, HardpointPosition.LeftOuterWing);
+
+            Hardpoint[] leftWing = new Hardpoint[1];
+            leftWing[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            leftWing[0].Init(-94, -16, 1, 1, HardpointPosition.LeftWing);
+
+            Hardpoint[] center = new Hardpoint[2];
+            center[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            center[0].Init(-22, 116, 1, 1, HardpointPosition.Center);
+            center[1] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            center[1].Init(-22, 26, 1, 3, HardpointPosition.Center);
+
+            Hardpoint[] rightWing = new Hardpoint[1];
+            rightWing[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            rightWing[0].Init(50, -16, 1, 1, HardpointPosition.RightWing);
+
+            Hardpoint[] rightOuterWing = new Hardpoint[1];
+            rightOuterWing[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            rightOuterWing[0].Init(94, -69, 1, 1, HardpointPosition.RightOuterWing);
+
             CurrentRaider.SetLayout(new Vector3[] {
                 new Vector3(-0.25f, -0.25f, 0),
                 new Vector3(-0.125f, -0.125f, 0),
                 new Vector3(0, 0, 0),
                 new Vector3(0.125f, 0, 0),
                 new Vector3(0.25f, 0, 0)},
-                new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
-                new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
-                new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center),
-                    new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) },
-                new Hardpoint[] { new Hardpoint(50, -16, 1, 1, HardpointPosition.RightWing) },
-                new Hardpoint[] { new Hardpoint(94, -69, 1, 1, HardpointPosition.RightOuterWing) });
+            //new Hardpoint[] { new Hardpoint(-138, -69, 1, 1, HardpointPosition.LeftOuterWing) },
+            //new Hardpoint[] { new Hardpoint(-94, -16, 1, 1, HardpointPosition.LeftWing) },
+            //new Hardpoint[] { new Hardpoint(-22, 116, 1, 1, HardpointPosition.Center),
+            //    new Hardpoint(-22, 26, 1, 3, HardpointPosition.Center) },
+            //new Hardpoint[] { new Hardpoint(50, -16, 1, 1, HardpointPosition.RightWing) },
+            //new Hardpoint[] { new Hardpoint(94, -69, 1, 1, HardpointPosition.RightOuterWing) });
+            leftOuterWing, leftWing, center, rightWing, rightOuterWing);
 
             GameObject basicShotPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BASIC_SHOT);
             Weapon basicShot1 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;

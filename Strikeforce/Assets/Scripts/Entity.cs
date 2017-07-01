@@ -7,7 +7,6 @@ namespace Strikeforce
     {
         public int EntityId { get; set; }
         public Level CurrentLevel { get; protected set; }
-        //public static string nameProperty { get { return ItemProperties.NAME; } }
         public struct EntityProperties
         {
             public const string ID = "Id";

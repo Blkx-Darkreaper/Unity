@@ -10,7 +10,7 @@ using Image = UnityEngine.UI.Image;
 
 namespace Strikeforce
 {
-    public class Hud : NetworkBehaviour
+    public class Hud : MonoBehaviour
     {
         protected bool areStylesSet = false;
         public GUIStyle HealthStyle;
@@ -127,10 +127,10 @@ namespace Strikeforce
 
         protected void OnGUI()
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
+            //if (isLocalPlayer == false)
+            //{
+            //    return;
+            //}
 
             if (profile.Player == null)
             {
