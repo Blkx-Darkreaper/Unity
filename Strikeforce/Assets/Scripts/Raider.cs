@@ -53,6 +53,12 @@ namespace Strikeforce
         {
             base.DestroyEntity();
 
+            RpcDestroyEntity();
+        }
+
+        [ClientRpc]
+        public void RpcDestroyEntity()
+        {
             Debug.Log(string.Format("You have been destroyed."));
         }
 
