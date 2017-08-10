@@ -212,12 +212,12 @@ namespace Strikeforce
             string weaponType = weapon.Type;
             if (weaponType.Equals(DominantWeaponType) == true)
             {
-                weapon.Fire();
+                weapon.CmdFire();
                 return;
             }
 
             // Apply Synergy effects
-            weapon.Fire(AngledSpread, HorizontalSpread, GroupingBonus);
+            weapon.CmdFire(AngledSpread, HorizontalSpread, GroupingBonus);
         }
     }
 }
