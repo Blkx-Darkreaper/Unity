@@ -396,6 +396,11 @@ namespace Strikeforce
 
         public void RespondToKeyEvent(KeyEvent keyEvent)
         {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
             ActionKey key = keyEvent.Key;
 
             if (keyEvent.IsComplete == false)
@@ -923,11 +928,6 @@ namespace Strikeforce
 
         protected void SetIsBoosting(bool isBoosting)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -939,11 +939,6 @@ namespace Strikeforce
 
         protected void SetPrimaryFiring(bool isFiring)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -955,11 +950,6 @@ namespace Strikeforce
 
         protected void SetSecondaryFiring(bool isFiring)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -971,11 +961,6 @@ namespace Strikeforce
 
         protected void SetSpecialFiring(bool isFiring)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -987,11 +972,6 @@ namespace Strikeforce
 
         protected void SetEquipmentActive(bool isActive)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
