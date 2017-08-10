@@ -135,6 +135,7 @@ namespace Strikeforce
             //this.BuyCursor.Bounds = BuildHud.Bounds;
 
             BuildCursor.transform.position = new Vector3(spawnpoint.Location.x, spawnpoint.Location.y, spawnpoint.Location.z);
+            BuildCursor.transform.parent = CurrentLevel.gameObject.transform;   // Make position relative to base
         }
 
         protected void SpawnRaider()	// Testing
@@ -143,8 +144,10 @@ namespace Strikeforce
             this.BuildHud.enabled = isInBuildMode;
             this.RaidHud.enabled = !isInBuildMode;
 
-            // Get spawn point from level
-            Vector3 spawnLocation = CurrentLevel.GetRaiderSpawnLocation();
+            // Get spawn point from enemy level
+            Team enemyTeam = GameManager.Singleton.GetOtherTeam(CurrentTeam);
+            Level enemyLevel = enemyTeam.HomeBase;
+            Vector3 spawnLocation = enemyLevel.GetRaiderSpawnLocation();
 
             // Spawn the raider at the spawnpoint
             GameObject raiderObject = Instantiate(
@@ -153,7 +156,7 @@ namespace Strikeforce
                 Quaternion.identity) as GameObject;
 
             // Make the raider a child of the player
-            raiderObject.transform.parent = gameObject.transform;
+            raiderObject.transform.parent = enemyLevel.gameObject.transform;  // Make position relative to enemy base
 
             this.CurrentRaider = raiderObject.GetComponent<Raider>();
 
