@@ -126,7 +126,7 @@ namespace Strikeforce
             Spawnpoint spawnpoint = spawnSector.Spawn;
 
             spawnSector.SetOwnership(this);
-            SetCameraOverhead(spawnpoint.Location);
+            SetOverheadCameraPosition(spawnpoint.Location);
 
             // Get the build cursor
             this.BuildCursor.Bounds = CurrentLevel.Bounds;
@@ -229,7 +229,7 @@ namespace Strikeforce
             }
 
             Vector3 raiderPosition = raiderObject.transform.position;
-            SetCameraOverhead(raiderPosition);
+            SetOverheadCameraPosition(raiderPosition);
 
             // Set raider and camera initial velocity
             float initialVelocity = CurrentRaider.StartingSpeed;
@@ -246,13 +246,20 @@ namespace Strikeforce
             }
         }
 
-        protected void SetCameraOverhead(Vector3 position)
+        protected void SetOverheadCameraPosition(Vector3 position)
         {
             float x = position.x;
             float z = position.z;
-            KeepLevelInMainView(ref x, ref z);
+            SetOverheadCameraPosition(new Vector2(x, z));
+        }
 
-            Vector3 overheadView = new Vector3(x, 10, z);
+        protected void SetOverheadCameraPosition(Vector2 position)
+        {
+            float x = position.x;
+            float y = position.y;
+            KeepLevelInMainView(ref x, ref y);
+
+            Vector3 overheadView = new Vector3(x, 10, y);
 
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
