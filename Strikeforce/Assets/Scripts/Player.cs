@@ -1168,5 +1168,21 @@ namespace Strikeforce
                     break;
             }
         }
+
+        public void EndOfLevel()
+        {
+            // Remove last checkpoint
+            this.PreviousCheckpoint = null;
+
+            // Lock camera position
+
+            // Disable Raider control
+
+            // Fade out
+
+            // Unspawn raider from map
+
+            // Return control to Build cursor
+        }
     }
 }

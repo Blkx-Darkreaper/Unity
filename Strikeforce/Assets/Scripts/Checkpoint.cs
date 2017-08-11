@@ -8,6 +8,7 @@ namespace Strikeforce
     {
         public Vector2 Location;
         public Size Size;
+        public bool IsFinalCheckpoint { get; protected set; }
 
         protected void OnTriggerEnter(Collider other)
         {
@@ -15,6 +16,11 @@ namespace Strikeforce
             if(raider == null)
             {
                 return;
+            }
+
+            if(IsFinalCheckpoint == true)
+            {
+                raider.Owner.EndOfLevel();
             }
 
             raider.Owner.PreviousCheckpoint = this;
