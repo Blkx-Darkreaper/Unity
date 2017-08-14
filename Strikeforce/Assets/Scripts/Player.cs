@@ -25,6 +25,7 @@ namespace Strikeforce
         [HideInInspector]
         public Inventory CurrentInventory;
         protected bool isInBuildMode = true;
+        protected bool HasControl = false;
         public GridCursor BuildCursor;
         //public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
@@ -89,6 +90,8 @@ namespace Strikeforce
             mainCamera.rect = new Rect(0.2f, 0f, 0.6f, 1f);
 
             MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            this.HasControl = true;
         }
 
         protected void Update()
@@ -244,6 +247,8 @@ namespace Strikeforce
             {
                 Debug.Log(String.Format("Raider {0} of player {1} failed to take off", CurrentRaider.EntityId, PlayerId));
             }
+
+            this.HasControl = true;
         }
 
         protected void SetOverheadCameraPosition(Vector3 position)
@@ -267,11 +272,21 @@ namespace Strikeforce
 
         public void LeftStick(float x, float y, float z)
         {
+            if (HasControl == false)
+            {
+                return;
+            }
+
             MovePlayer(x, y, z);
         }
 
         public void RightStick(float x, float y, float z)
         {
+            if(HasControl == false)
+            {
+                return;
+            }
+
             if (isInBuildMode == false)
             {
                 return;
@@ -282,6 +297,11 @@ namespace Strikeforce
 
         public void DPad(float x, int y, float z)
         {
+            if(HasControl)
+            {
+                return;
+            }
+
             if (isInBuildMode == false)
             {
                 return;
@@ -420,6 +440,14 @@ namespace Strikeforce
             else
             {
                 Debug.Log(string.Format("{0} key released at {1}", key.ToString(), Time.time.ToString()));
+            }
+
+            if(HasControl == false)
+            {
+                if(key != ActionKey.Menu)
+                {
+                    return;
+                }
             }
 
             switch (key)
@@ -1175,14 +1203,27 @@ namespace Strikeforce
             this.PreviousCheckpoint = null;
 
             // Lock camera position
+            SetMainCameraVelocity(0f, 0f, 0f);
 
             // Disable Raider control
+            this.HasControl = false;
 
             // Fade out
+            MenuManager.Singleton.ShowLoadingScreen();
 
             // Unspawn raider from map
+            Raider raider = this.CurrentRaider;
+            this.CurrentRaider = null;
+
+            GameManager.Singleton.RemoveEntity(raider);
 
             // Return control to Build cursor
+            isInBuildMode = true;
+
+            // Fade in
+            MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            this.HasControl = true;
         }
     }
 }
