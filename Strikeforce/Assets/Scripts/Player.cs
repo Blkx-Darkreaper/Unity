@@ -1224,6 +1224,13 @@ namespace Strikeforce
             }
         }
 
+        protected void SetBuildRaidModes(bool buildMode)
+        {
+            this.isInBuildMode = buildMode;
+            this.BuildHud.enabled = buildMode;
+            this.RaidHud.enabled = !buildMode;
+        }
+
         protected void ToggleBuildRaidModes()
         {
             this.isInBuildMode = !isInBuildMode;
