@@ -297,7 +297,7 @@ namespace Strikeforce
                 SetSelection(false);
             }
 
-            GameManager.Singleton.RemoveEntity(this);
+            GameManager.Singleton.CmdRemoveEntity(this);
         }
 
         public virtual void ToggleContextOption()
@@ -324,7 +324,7 @@ namespace Strikeforce
                 SetSelection(false);
             }
 
-            GameManager.Singleton.RemoveEntity(this);
+            GameManager.Singleton.CmdRemoveEntity(this);
         }
 
         public void Construct(int amount)

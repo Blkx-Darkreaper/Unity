@@ -92,8 +92,8 @@ namespace Strikeforce
                 return;
             }
 
-            GameManager.Singleton.JoinTeam(playerAccount, selectedTeam);
-            GameManager.Singleton.StartGame();  //Testing
+            GameManager.Singleton.CmdJoinTeam(playerAccount, selectedTeam);
+            GameManager.Singleton.CmdStartGame();  //Testing
         }
 
         protected void SelectionError(string errorMessage)

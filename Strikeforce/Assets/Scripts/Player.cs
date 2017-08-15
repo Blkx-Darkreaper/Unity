@@ -165,7 +165,7 @@ namespace Strikeforce
 
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
             NetworkServer.SpawnWithClientAuthority(CurrentRaider.gameObject, gameObject);
-            GameManager.Singleton.RegisterEntity(CurrentRaider);
+            GameManager.Singleton.CmdRegisterEntity(CurrentRaider);
 
             Hardpoint hardpointPrefab = GlobalAssets.GetMiscPrefab("Hardpoint").GetComponent<Hardpoint>();
 
@@ -208,16 +208,16 @@ namespace Strikeforce
             GameObject basicShotPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BASIC_SHOT);
             Weapon basicShot1 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
             basicShot1.transform.parent = CurrentRaider.transform;
-            GameManager.Singleton.RegisterEntity(basicShot1);
+            GameManager.Singleton.CmdRegisterEntity(basicShot1);
 
             Weapon basicShot2 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
             basicShot2.transform.parent = CurrentRaider.transform;
-            GameManager.Singleton.RegisterEntity(basicShot2);
+            GameManager.Singleton.CmdRegisterEntity(basicShot2);
 
             GameObject boltPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BOLT);
             Weapon bolt = GameObject.Instantiate(boltPrefab).GetComponent<Weapon>() as Weapon;
             bolt.transform.parent = CurrentRaider.transform;
-            GameManager.Singleton.RegisterEntity(bolt);
+            GameManager.Singleton.CmdRegisterEntity(bolt);
 
             bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.Center, 0, 1, 0);
             equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.Center, 0, 2, 0);
@@ -790,7 +790,7 @@ namespace Strikeforce
 
             IsSettingConstructionPoint = false;
 
-            GameManager.Singleton.RegisterEntity(structure);
+            GameManager.Singleton.CmdRegisterEntity(structure);
             structure.Owner = this;
             structure.StartConstruction();
         }
@@ -1285,9 +1285,6 @@ namespace Strikeforce
             // Disable Raider control
             this.HasControl = false;
 
-            // Remove last checkpoint
-            this.PreviousCheckpoint = null;
-
             // Lock camera position
             SetMainCameraVelocity(0f, 0f, 0f);
 
@@ -1298,13 +1295,16 @@ namespace Strikeforce
             Raider raider = this.CurrentRaider;
             this.CurrentRaider = null;
 
-            GameManager.Singleton.RemoveEntity(raider);
+            GameManager.Singleton.CmdRemoveEntity(raider);
 
             // Return control to Build cursor
             ToggleBuildRaidModes();
 
             // Fade in
             MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            // Remove last checkpoint
+            this.PreviousCheckpoint = null;
 
             this.HasControl = true;
         }

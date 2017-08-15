@@ -15,14 +15,14 @@ namespace Strikeforce
 
         protected virtual void Awake()
         {
-            GameManager.Singleton.RegisterEntity(this);
+            GameManager.Singleton.CmdRegisterEntity(this);
 
             this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
         }
 
         protected virtual void DestroyEntity()
         {
-            GameManager.Singleton.RemoveEntity(this);
+            GameManager.Singleton.CmdRemoveEntity(this);
 
             Debug.Log(string.Format("{0} has been destroyed", name));
         }
