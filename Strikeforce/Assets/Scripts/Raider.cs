@@ -171,7 +171,7 @@ namespace Strikeforce
             base.TakeDamage(amount, hit);
         }
 
-        private int SoakDamage(int damage)
+        protected int SoakDamage(int damage)
         {
             int distribution = loadout.allArmour.Count;
             if (distribution == 0)
@@ -187,6 +187,17 @@ namespace Strikeforce
                 }
 
                 LinkedListNode<Armour> currentNode = loadout.nextArmourNode;
+                Armour currentArmour = currentNode.Value;
+                currentArmour.TakeDamage(1);
+
+                // If armour is destroyed
+                if (currentArmour.CurrentHitPoints == 0)
+                {
+                    loadout.allArmour.Remove(currentNode);
+                    currentArmour.DestroyArmour();
+                }
+
+                damage--;
 
                 // Get next node
                 loadout.nextArmourNode = loadout.nextArmourNode.Next;
@@ -195,18 +206,6 @@ namespace Strikeforce
                     // Loop round to the beginning of the list
                     loadout.nextArmourNode = loadout.allArmour.First;
                 }
-
-                Armour currentArmour = currentNode.Value;
-                currentArmour.TakeDamage(1);
-
-                // If armour is destroyed
-                if (currentArmour.CurrentHitPoints == 0)
-                {
-                    DestroyEntity();
-                    loadout.allArmour.Remove(currentNode);
-                }
-
-                damage--;
             }
 
             return damage;
