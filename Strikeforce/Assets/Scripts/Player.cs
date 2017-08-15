@@ -251,6 +251,33 @@ namespace Strikeforce
             this.HasControl = true;
         }
 
+        protected Raider SpawnRaider(Vector3 spawnLocation)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected void LaunchRaider(Raider raider)
+        {
+            this.CurrentRaider = raider;
+
+            Vector3 raiderPosition = raider.gameObject.transform.position;
+            SetOverheadCameraPosition(raiderPosition);
+
+            // Set raider and camera initial velocity
+            float initialVelocity = raider.StartingSpeed;
+            raider.SetForwardVelocity(initialVelocity);
+
+            Vector3 raiderVelocity = raider.GetVelocity();
+            SetMainCameraVelocity(raiderVelocity.x, raiderVelocity.y, raiderVelocity.z);
+
+            // Make raider airbourne
+            raider.TakeOff();
+            if (raider.IsAirborne == false)
+            {
+                Debug.Log(String.Format("Raider {0} of player {1} failed to take off", raider.EntityId, PlayerId));
+            }
+        }
+
         protected void SetOverheadCameraPosition(Vector3 position)
         {
             float x = position.x;
@@ -387,8 +414,8 @@ namespace Strikeforce
 
             float levelX = CurrentLevel.transform.position.x;
             float levelY = CurrentLevel.transform.position.z;
-            int levelWidth = CurrentLevel.Width;
-            int levelHeight = CurrentLevel.Height;
+            int levelWidth = CurrentLevel.Length;
+            int levelHeight = CurrentLevel.Width;
 
             float minX = (viewWidth - levelWidth) / 2f + levelX;
             float maxX = (levelWidth - viewWidth) / 2f + levelX;
@@ -411,8 +438,8 @@ namespace Strikeforce
 
             float levelX = CurrentLevel.transform.position.x;
             float levelY = CurrentLevel.transform.position.z;
-            int levelWidth = CurrentLevel.Width;
-            int levelHeight = CurrentLevel.Height;
+            int levelWidth = CurrentLevel.Length;
+            int levelHeight = CurrentLevel.Width;
 
             float minX = (viewWidth - levelWidth) / 2f + levelX;
             float maxX = (levelWidth - viewWidth) / 2f + levelX;
@@ -1197,16 +1224,72 @@ namespace Strikeforce
             }
         }
 
+        protected void ToggleBuildRaidModes()
+        {
+            this.isInBuildMode = !isInBuildMode;
+            this.BuildHud.enabled = isInBuildMode;
+            this.RaidHud.enabled = !isInBuildMode;
+        }
+
+        public void StartOfLevel()
+        {
+            this.HasControl = false;
+
+            ToggleBuildRaidModes();
+
+            // Get spawn point from enemy level
+            Team enemyTeam = GameManager.Singleton.GetOtherTeam(CurrentTeam);
+            Level enemyLevel = enemyTeam.HomeBase;
+            Vector3 spawnLocation = enemyLevel.GetRaiderSpawnLocation();
+
+            // Fade out
+            MenuManager.Singleton.ShowLoadingScreen();
+
+            // Spawn raider
+            Raider raider = SpawnRaider(spawnLocation);
+            LaunchRaider(raider);
+
+            // Fade in
+            MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            this.HasControl = true;
+        }
+
+        public void RestartFromCheckpoint()
+        {
+            this.HasControl = false;
+
+            ToggleBuildRaidModes();
+
+            //Fade out
+            MenuManager.Singleton.ShowLoadingScreen();
+
+            // Get checkpoint starting point
+            Vector2 checkpointLocation = PreviousCheckpoint.Location;
+            int altitude = CurrentLevel.RaiderAltitude;
+
+            Vector3 spawnLocation = new Vector3(checkpointLocation.x, altitude, checkpointLocation.z - 5);
+
+            // Spawn raider
+            Raider raider = SpawnRaider(spawnLocation);
+            LaunchRaider(raider);
+
+            // Fade in
+            MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            this.HasControl = true;
+        }
+
         public void EndOfLevel()
         {
+            // Disable Raider control
+            this.HasControl = false;
+
             // Remove last checkpoint
             this.PreviousCheckpoint = null;
 
             // Lock camera position
             SetMainCameraVelocity(0f, 0f, 0f);
-
-            // Disable Raider control
-            this.HasControl = false;
 
             // Fade out
             MenuManager.Singleton.ShowLoadingScreen();
@@ -1218,7 +1301,7 @@ namespace Strikeforce
             GameManager.Singleton.RemoveEntity(raider);
 
             // Return control to Build cursor
-            isInBuildMode = true;
+            ToggleBuildRaidModes();
 
             // Fade in
             MenuManager.Singleton.HideLoadingScreenDelayed();
