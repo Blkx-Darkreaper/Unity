@@ -1231,7 +1231,7 @@ namespace Strikeforce
             this.RaidHud.enabled = !isInBuildMode;
         }
 
-        public void StartOfLevel()
+        public void StartLevelRaid()
         {
             this.HasControl = false;
 
@@ -1255,7 +1255,7 @@ namespace Strikeforce
             this.HasControl = true;
         }
 
-        public void RestartFromCheckpoint()
+        public void RestartRaidFromCheckpoint()
         {
             this.HasControl = false;
 
@@ -1280,7 +1280,7 @@ namespace Strikeforce
             this.HasControl = true;
         }
 
-        public void EndOfLevel()
+        public void EndLevelRaid()
         {
             // Disable Raider control
             this.HasControl = false;

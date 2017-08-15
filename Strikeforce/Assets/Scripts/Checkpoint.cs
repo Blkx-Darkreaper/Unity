@@ -20,7 +20,7 @@ namespace Strikeforce
 
             if(IsFinalCheckpoint == true)
             {
-                raider.Owner.EndOfLevel();
+                raider.Owner.EndLevelRaid();
             }
 
             raider.Owner.PreviousCheckpoint = this;
