@@ -69,15 +69,17 @@ namespace Strikeforce
             playerToRemove.Player.CurrentTeam = null;
         }
 
-        public void LaunchRaid(Profile playerAccount)
+        public bool LaunchRaid(Profile playerAccount)
         {
             if(RaidCountdown > 0)
             {
-                return;
+                return false;
             }
 
             this.IsRaidInProgress = true;
             raidingMembers.AddLast(playerAccount);
+
+            return true;
         }
 
         public void CompleteRaid(Profile playerAccount, float damageInflictedDuringRaid)
