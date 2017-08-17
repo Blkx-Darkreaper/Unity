@@ -8,7 +8,7 @@ namespace Strikeforce
     public class Raider : Aircraft
     {
         public float StartingSpeed;
-        public float MaxEnergy;
+        //public float MaxEnergy;
         public float CurrentEnergy { get; protected set; }
         //public Vector3[] AllFiringPoints { get; protected set; }
         protected RaiderLoadout loadout { get; set; }
@@ -32,7 +32,7 @@ namespace Strikeforce
         {
             base.Awake();
 
-            this.CurrentEnergy = MaxEnergy;
+            //this.CurrentEnergy = Loadout.MaxEnergy;
 
             //this.AllFiringPoints = new Vector3[5];
             //this.AllHardpoints = new Dictionary<HardpointPosition, Hardpoint[]>();
@@ -61,6 +61,12 @@ namespace Strikeforce
         public void RpcDestroyEntity()
         {
             Debug.Log(string.Format("You have been destroyed."));
+        }
+
+        public void ReadyRaider(RaiderLoadout loadout)
+        {
+            this.loadout = loadout;
+            this.CurrentEnergy = this.loadout.MaxEnergy;
         }
 
         //public void SetLayout(Vector3[] firingPoints, Hardpoint[] leftOuterWing, Hardpoint[] leftWing, Hardpoint[] center, Hardpoint[] rightWing, Hardpoint[] rightOuterWing)
@@ -138,21 +144,21 @@ namespace Strikeforce
             loadout.SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
         }
 
-        //protected void SetFiring(bool primaryFiring, bool secondaryFiring, bool specialFiring)
-        //{
-        //    foreach (HardpointPosition position in positionOrder)
-        //    {
-        //        Hardpoint[] hardpoints = AllHardpoints[position];
-        //        foreach (Hardpoint hardpoint in hardpoints)
-        //        {
-        //            hardpoint.SetPrimaryFire(primaryFiring);
+        public void SetFiring(bool primaryFiring, bool secondaryFiring, bool specialFiring)
+        {
+            foreach (HardpointPosition position in RaiderLoadout.PositionOrder)
+            {
+                Hardpoint[] hardpoints = loadout.AllHardpoints[position];
+                foreach (Hardpoint hardpoint in hardpoints)
+                {
+                    hardpoint.SetPrimaryFire(primaryFiring);
 
-        //            hardpoint.SetSecondaryFire(secondaryFiring);
+                    hardpoint.SetSecondaryFire(secondaryFiring);
 
-        //            hardpoint.SetSpecialFire(specialFiring);
-        //        }
-        //    }
-        //}
+                    hardpoint.SetSpecialFire(specialFiring);
+                }
+            }
+        }
 
         public void SetEquipmentActive(bool isActive)
         {

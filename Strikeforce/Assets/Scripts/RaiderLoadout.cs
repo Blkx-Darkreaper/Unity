@@ -6,6 +6,7 @@ namespace Strikeforce
 {
     public class RaiderLoadout : MonoBehaviour
     {
+        public string RaiderType;
         public float StartingSpeed;
         public float MaxEnergy;
         public Vector3[] AllFiringPoints { get; protected set; }
@@ -44,7 +45,7 @@ namespace Strikeforce
             }
         }
 
-        public bool EquipItem(Equipment item, HardpointPosition hardpointPosition, int index, int row, int column)
+        public bool EquipItem(Equipment item, HardpointPosition hardpointPosition, int index, int row, int column, Raider parent)
         {
             Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
 
@@ -54,13 +55,13 @@ namespace Strikeforce
                 return false;
             }
 
-            hardpoint.Equip(item, row, column, this);
+            hardpoint.Equip(item, row, column, parent);
             this.EquippedItem = item;
 
             return true;
         }
 
-        public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int index, int row, int column)
+        public bool EquipWeapon(Weapon weapon, HardpointPosition hardpointPosition, int index, int row, int column, Raider parent)
         {
             Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
 
@@ -70,7 +71,7 @@ namespace Strikeforce
                 return false;
             }
 
-            hardpoint.Equip(weapon, row, column, this);
+            hardpoint.Equip(weapon, row, column, parent);
 
             // Link to Primary by default
             return LinkWeapon(weapon, hardpointPosition, index, TriggerLink.Type.Primary);
@@ -90,7 +91,7 @@ namespace Strikeforce
             trigger.UnlinkWeapon(weapon);
         }
 
-        public bool EquipArmour(Armour armour, HardpointPosition hardpointPosition, int index, int row, int column)
+        public bool EquipArmour(Armour armour, HardpointPosition hardpointPosition, int index, int row, int column, Raider parent)
         {
             Hardpoint hardpoint = AllHardpoints[hardpointPosition][index];
 
@@ -100,26 +101,10 @@ namespace Strikeforce
                 return false;
             }
 
-            hardpoint.Equip(armour, row, column, this);
+            hardpoint.Equip(armour, row, column, parent);
             allArmour.AddLast(armour);
 
             return true;
-        }
-
-        public void SetFiring(bool primaryFiring, bool secondaryFiring, bool specialFiring)
-        {
-            foreach (HardpointPosition position in PositionOrder)
-            {
-                Hardpoint[] hardpoints = AllHardpoints[position];
-                foreach (Hardpoint hardpoint in hardpoints)
-                {
-                    hardpoint.SetPrimaryFire(primaryFiring);
-
-                    hardpoint.SetSecondaryFire(secondaryFiring);
-
-                    hardpoint.SetSpecialFire(specialFiring);
-                }
-            }
         }
     }
 }
