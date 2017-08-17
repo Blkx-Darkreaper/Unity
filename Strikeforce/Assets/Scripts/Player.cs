@@ -19,7 +19,7 @@ namespace Strikeforce
         public Hud RaidHud;
         [HideInInspector]
         public Raider CurrentRaider;
-        public string RaiderPrefabName = "Raider";
+        public string RaiderPrefabName = "Raider";  //testing
         [HideInInspector]
         public Checkpoint PreviousCheckpoint = null;
         [HideInInspector]
@@ -158,7 +158,7 @@ namespace Strikeforce
                 spawnLocation,
                 Quaternion.identity) as GameObject;
 
-            // Make the raider a child of the player
+            // Make the raider a child of the enemy base
             raiderObject.transform.parent = enemyLevel.gameObject.transform;  // Make position relative to enemy base
 
             this.CurrentRaider = raiderObject.GetComponent<Raider>();
@@ -251,13 +251,35 @@ namespace Strikeforce
             this.HasControl = true;
         }
 
-        protected Raider SpawnRaider(Vector3 spawnLocation)
+        protected Raider SpawnRaider(string raiderPrefabName, Level spawnLevel, Vector3 spawnLocation)
         {
-            throw new NotImplementedException();
+            GameObject raiderPrefab = GlobalAssets.GetVehiclePrefab(raiderPrefabName);
+
+            // Spawn the raider at the spawnpoint
+            GameObject raiderObject = Instantiate(
+                raiderPrefab,
+                spawnLocation,
+                Quaternion.identity) as GameObject;
+
+            // Make the raider a child of the enemy base
+            raiderObject.transform.parent = spawnLevel.gameObject.transform;
+
+            Raider raider = raiderObject.GetComponent<Raider>();
+
+            //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
+            NetworkServer.SpawnWithClientAuthority(raider.gameObject, gameObject);
+            GameManager.Singleton.CmdRegisterEntity(raider);
+
+            return raider;
         }
 
-        protected void LaunchRaider(Raider raider)
+        protected void LaunchRaider(RaiderLoadout loadout, Level spawnLevel, Vector3 spawnLocation)
         {
+            string raiderPrefabName = loadout.RaiderType;
+
+            Raider raider = SpawnRaider(raiderPrefabName, spawnLevel, spawnLocation);
+            raider.Loadout = loadout;
+
             this.CurrentRaider = raider;
 
             Vector3 raiderPosition = raider.gameObject.transform.position;
@@ -309,7 +331,7 @@ namespace Strikeforce
 
         public void RightStick(float x, float y, float z)
         {
-            if(HasControl == false)
+            if (HasControl == false)
             {
                 return;
             }
@@ -324,7 +346,7 @@ namespace Strikeforce
 
         public void DPad(float x, int y, float z)
         {
-            if(HasControl)
+            if (HasControl)
             {
                 return;
             }
@@ -469,9 +491,9 @@ namespace Strikeforce
                 Debug.Log(string.Format("{0} key released at {1}", key.ToString(), Time.time.ToString()));
             }
 
-            if(HasControl == false)
+            if (HasControl == false)
             {
-                if(key != ActionKey.Menu)
+                if (key != ActionKey.Menu)
                 {
                     return;
                 }
@@ -1238,7 +1260,7 @@ namespace Strikeforce
             this.RaidHud.enabled = !isInBuildMode;
         }
 
-        public void StartLevelRaid()
+        public void StartLevelRaid(RaiderLoadout loadout)
         {
             this.HasControl = false;
 
@@ -1253,8 +1275,7 @@ namespace Strikeforce
             MenuManager.Singleton.ShowLoadingScreen();
 
             // Spawn raider
-            Raider raider = SpawnRaider(spawnLocation);
-            LaunchRaider(raider);
+            LaunchRaider(loadout, enemyLevel, spawnLocation);
 
             // Fade in
             MenuManager.Singleton.HideLoadingScreenDelayed();
@@ -1262,7 +1283,7 @@ namespace Strikeforce
             this.HasControl = true;
         }
 
-        public void RestartRaidFromCheckpoint()
+        public void RestartRaidFromCheckpoint(RaiderLoadout loadout)
         {
             this.HasControl = false;
 
@@ -1271,6 +1292,10 @@ namespace Strikeforce
             //Fade out
             MenuManager.Singleton.ShowLoadingScreen();
 
+            // Get enemy base
+            Team enemyTeam = GameManager.Singleton.GetOtherTeam(CurrentTeam);
+            Level enemyLevel = enemyTeam.HomeBase;
+
             // Get checkpoint starting point
             Vector2 checkpointLocation = PreviousCheckpoint.Location;
             int altitude = CurrentLevel.RaiderAltitude;
@@ -1278,8 +1303,7 @@ namespace Strikeforce
             Vector3 spawnLocation = new Vector3(checkpointLocation.x, altitude, checkpointLocation.z - 5);
 
             // Spawn raider
-            Raider raider = SpawnRaider(spawnLocation);
-            LaunchRaider(raider);
+            LaunchRaider(loadout, enemyLevel, spawnLocation);
 
             // Fade in
             MenuManager.Singleton.HideLoadingScreenDelayed();
