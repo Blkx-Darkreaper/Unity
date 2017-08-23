@@ -23,7 +23,25 @@ namespace Strikeforce
                 raider.Owner.EndLevelRaid();
             }
 
+            bool isBuggingOut = CheckIsBuggingOut(raider.Owner);
+            if(isBuggingOut == true)
+            {
+                raider.Owner.BugOut();
+                return;
+            }
+
             raider.Owner.PreviousCheckpoint = this;
+        }
+
+        protected bool CheckIsBuggingOut(Player player)
+        {
+            Checkpoint previousCheckpoint = player.PreviousCheckpoint;
+            if(previousCheckpoint == this)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

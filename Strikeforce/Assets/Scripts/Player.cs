@@ -1311,7 +1311,7 @@ namespace Strikeforce
             this.HasControl = true;
         }
 
-        public void EndLevelRaid()
+        public void BugOut()
         {
             // Disable Raider control
             this.HasControl = false;
@@ -1334,10 +1334,15 @@ namespace Strikeforce
             // Fade in
             MenuManager.Singleton.HideLoadingScreenDelayed();
 
+            this.HasControl = true;
+        }
+
+        public void EndLevelRaid()
+        {
+            BugOut();
+
             // Remove last checkpoint
             this.PreviousCheckpoint = null;
-
-            this.HasControl = true;
         }
     }
 }
