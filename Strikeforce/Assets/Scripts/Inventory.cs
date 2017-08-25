@@ -27,9 +27,9 @@ namespace Strikeforce
         public const string UNKNOWN = "Unknown";
     }
 
-    public class Inventory : MonoBehaviour
+    public class Inventory : ScriptableObject
     {
-        public LinkedList<Raider> AllRaiders;
+        public LinkedList<RaiderType> AllRaiders;
         public LinkedList<Weapon> AllGuns;
         public LinkedList<Weapon> AllOrdnance;
         public LinkedList<Ordnance> AllMunitions;
@@ -38,9 +38,9 @@ namespace Strikeforce
             StartingRockets = 0, RocketLimit = 9999, StartingMissiles = 0, MissileLimit = 9999, StartingBombs = 0, BombLimit = 9999;
         protected Dictionary<ResourceType, int> resources, resourceLimits;
 
-        protected void Awake()
+        protected void OnEnable()
         {
-            AllRaiders = new LinkedList<Raider>();
+            AllRaiders = new LinkedList<RaiderType>();
             AllGuns = new LinkedList<Weapon>();
             AllOrdnance = new LinkedList<Weapon>();
             AllMunitions = new LinkedList<Ordnance>();
@@ -126,7 +126,7 @@ namespace Strikeforce
         public void TransferAllTo(Inventory other)
         {
             other.AllRaiders.AddLast(AllRaiders.First);
-            AllRaiders = new LinkedList<Raider>();
+            AllRaiders = new LinkedList<RaiderType>();
 
             other.AllGuns.AddLast(AllGuns.First);
             AllGuns = new LinkedList<Weapon>();
@@ -141,7 +141,7 @@ namespace Strikeforce
             AllEquipment = new LinkedList<Equipment>();
         }
 
-        protected Raider RemoveRaider(Raider raiderToRemove)
+        protected RaiderType RemoveRaider(RaiderType raiderToRemove)
         {
             AllRaiders.Remove(raiderToRemove);
             return raiderToRemove;

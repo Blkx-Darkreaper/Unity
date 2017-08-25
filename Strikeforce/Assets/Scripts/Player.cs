@@ -54,7 +54,7 @@ namespace Strikeforce
 
             // Get the main camera
             this.mainCamera = GameObject.FindGameObjectWithTag(Tags.MAIN_CAMERA).GetComponent<Camera>();
-            this.CurrentInventory = GetComponent<Inventory>();
+            this.CurrentInventory = ScriptableObject.CreateInstance(typeof(Inventory)) as Inventory;
             this.Sectors = new LinkedList<Sector>();
             this.allUnits = new LinkedList<Vehicle>();
             this.allStructures = new LinkedList<Structure>();
