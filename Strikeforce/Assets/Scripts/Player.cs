@@ -171,31 +171,35 @@ namespace Strikeforce
             NetworkServer.SpawnWithClientAuthority(CurrentRaider.gameObject, gameObject);
             GameManager.Singleton.CmdRegisterEntity(CurrentRaider);
 
+            RaiderLoadout loadoutPrefab = GlobalAssets.GetMiscPrefab("Loadout").GetComponent<RaiderLoadout>();
+            RaiderLoadout loadout = Instantiate<RaiderLoadout>(loadoutPrefab);
+            CurrentRaider.ReadyRaider(loadout);
+
             Hardpoint hardpointPrefab = GlobalAssets.GetMiscPrefab("Hardpoint").GetComponent<Hardpoint>();
 
             Hardpoint[] leftOuterWing = new Hardpoint[1];
-            leftOuterWing[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            leftOuterWing[0] = Instantiate<Hardpoint>(hardpointPrefab, loadout.transform);
             leftOuterWing[0].Init(-138, -69, 1, 1, HardpointPosition.LeftOuterWing);
 
             Hardpoint[] leftWing = new Hardpoint[1];
-            leftWing[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            leftWing[0] = Instantiate<Hardpoint>(hardpointPrefab, loadout.transform);
             leftWing[0].Init(-94, -16, 1, 1, HardpointPosition.LeftWing);
 
             Hardpoint[] center = new Hardpoint[2];
-            center[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            center[0] = Instantiate<Hardpoint>(hardpointPrefab, loadout.transform);
             center[0].Init(-22, 116, 1, 1, HardpointPosition.Center);
-            center[1] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            center[1] = Instantiate<Hardpoint>(hardpointPrefab, loadout.transform);
             center[1].Init(-22, 26, 1, 3, HardpointPosition.Center);
 
             Hardpoint[] rightWing = new Hardpoint[1];
-            rightWing[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            rightWing[0] = Instantiate<Hardpoint>(hardpointPrefab, loadout.transform);
             rightWing[0].Init(50, -16, 1, 1, HardpointPosition.RightWing);
 
             Hardpoint[] rightOuterWing = new Hardpoint[1];
-            rightOuterWing[0] = Instantiate<Hardpoint>(hardpointPrefab, CurrentRaider.transform);
+            rightOuterWing[0] = Instantiate<Hardpoint>(hardpointPrefab, loadout.transform);
             rightOuterWing[0].Init(94, -69, 1, 1, HardpointPosition.RightOuterWing);
 
-            CurrentRaider.SetLayout(new Vector3[] {
+            CurrentRaider.Loadout.SetLayout(new Vector3[] {
                 new Vector3(-0.25f, -0.25f, 0),
                 new Vector3(-0.125f, -0.125f, 0),
                 new Vector3(0, 0, 0),
@@ -223,12 +227,12 @@ namespace Strikeforce
             bolt.transform.parent = CurrentRaider.transform;
             GameManager.Singleton.CmdRegisterEntity(bolt);
 
-            bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.Center, 0, 1, 0);
-            equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.Center, 0, 2, 0);
-            equipped &= CurrentRaider.EquipWeapon(bolt, HardpointPosition.Center, 0, 0, 0);
+            bool equipped = CurrentRaider.Loadout.EquipWeapon(basicShot1, HardpointPosition.Center, 0, 1, 0, CurrentRaider);
+            equipped &= CurrentRaider.Loadout.EquipWeapon(basicShot2, HardpointPosition.Center, 0, 2, 0, CurrentRaider);
+            equipped &= CurrentRaider.Loadout.EquipWeapon(bolt, HardpointPosition.Center, 0, 0, 0, CurrentRaider);
             if (equipped == true)
             {
-                CurrentRaider.ReadyWeapons();
+                CurrentRaider.Loadout.ReadyWeapons();
             }
             else
             {
@@ -282,7 +286,7 @@ namespace Strikeforce
             string raiderPrefabName = loadout.RaiderType;
 
             Raider raider = SpawnRaider(raiderPrefabName, spawnLevel, spawnLocation);
-            raider.Loadout = loadout;
+            raider.ReadyRaider(loadout);
 
             this.CurrentRaider = raider;
 
@@ -1304,7 +1308,7 @@ namespace Strikeforce
             Vector2 checkpointLocation = PreviousCheckpoint.Location;
             int altitude = CurrentLevel.RaiderAltitude;
 
-            Vector3 spawnLocation = new Vector3(checkpointLocation.x, altitude, checkpointLocation.z - 5);
+            Vector3 spawnLocation = new Vector3(checkpointLocation.x, altitude, checkpointLocation.y - 5);
 
             // Spawn raider
             LaunchRaider(loadout, enemyLevel, spawnLocation);

@@ -11,7 +11,7 @@ namespace Strikeforce
         //public float MaxEnergy;
         public float CurrentEnergy { get; protected set; }
         //public Vector3[] AllFiringPoints { get; protected set; }
-        protected RaiderLoadout loadout { get; set; }
+        public RaiderLoadout Loadout { get; protected set; }
         //public Dictionary<HardpointPosition, Hardpoint[]> AllHardpoints { get; protected set; }
         //protected LinkedList<Armour> allArmour { get; set; }
         //protected LinkedListNode<Armour> nextArmourNode { get; set; }
@@ -65,8 +65,8 @@ namespace Strikeforce
 
         public void ReadyRaider(RaiderLoadout loadout)
         {
-            this.loadout = loadout;
-            this.CurrentEnergy = this.loadout.MaxEnergy;
+            this.Loadout = loadout;
+            this.CurrentEnergy = this.Loadout.MaxEnergy;
         }
 
         //public void SetLayout(Vector3[] firingPoints, Hardpoint[] leftOuterWing, Hardpoint[] leftWing, Hardpoint[] center, Hardpoint[] rightWing, Hardpoint[] rightOuterWing)
@@ -129,26 +129,26 @@ namespace Strikeforce
         public void SetPrimaryFire(bool isFiring)
         {
             this.isPrimaryFiring = isFiring;
-            loadout.SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
+            SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
         }
 
         public void SetSecondaryFire(bool isFiring)
         {
             this.isSecondaryFiring = isFiring;
-            loadout.SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
+            SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
         }
 
         public void SetSpecialFire(bool isFiring)
         {
             this.isSpecialFiring = isFiring;
-            loadout.SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
+            SetFiring(isPrimaryFiring, isSecondaryFiring, isSpecialFiring);
         }
 
         public void SetFiring(bool primaryFiring, bool secondaryFiring, bool specialFiring)
         {
             foreach (HardpointPosition position in RaiderLoadout.PositionOrder)
             {
-                Hardpoint[] hardpoints = loadout.AllHardpoints[position];
+                Hardpoint[] hardpoints = Loadout.AllHardpoints[position];
                 foreach (Hardpoint hardpoint in hardpoints)
                 {
                     hardpoint.SetPrimaryFire(primaryFiring);
@@ -162,7 +162,7 @@ namespace Strikeforce
 
         public void SetEquipmentActive(bool isActive)
         {
-            loadout.EquippedItem.Use(isActive);
+            Loadout.EquippedItem.Use(isActive);
         }
 
         public void UpdateEnergy(float amount)
@@ -179,7 +179,7 @@ namespace Strikeforce
 
         protected int SoakDamage(int damage)
         {
-            int distribution = loadout.allArmour.Count;
+            int distribution = Loadout.allArmour.Count;
             if (distribution == 0)
             {
                 return damage;
@@ -187,30 +187,30 @@ namespace Strikeforce
 
             for (int i = 0; i < damage; i++)
             {
-                if (loadout.allArmour.Count == 0)
+                if (Loadout.allArmour.Count == 0)
                 {
                     break;
                 }
 
-                LinkedListNode<Armour> currentNode = loadout.nextArmourNode;
+                LinkedListNode<Armour> currentNode = Loadout.nextArmourNode;
                 Armour currentArmour = currentNode.Value;
                 currentArmour.TakeDamage(1);
 
                 // If armour is destroyed
                 if (currentArmour.CurrentHitPoints == 0)
                 {
-                    loadout.allArmour.Remove(currentNode);
+                    Loadout.allArmour.Remove(currentNode);
                     currentArmour.DestroyArmour();
                 }
 
                 damage--;
 
                 // Get next node
-                loadout.nextArmourNode = loadout.nextArmourNode.Next;
-                if (loadout.nextArmourNode == null)
+                Loadout.nextArmourNode = Loadout.nextArmourNode.Next;
+                if (Loadout.nextArmourNode == null)
                 {
                     // Loop round to the beginning of the list
-                    loadout.nextArmourNode = loadout.allArmour.First;
+                    Loadout.nextArmourNode = Loadout.allArmour.First;
                 }
             }
 
