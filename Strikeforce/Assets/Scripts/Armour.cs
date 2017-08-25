@@ -19,5 +19,12 @@ namespace Strikeforce
 
             Debug.Log(string.Format("{0} has taken {1} damage", name, damage));
         }
+
+        public virtual void DestroyArmour()
+        {
+            GameManager.Singleton.CmdRemoveEntity(this);
+
+            Debug.Log(string.Format("{0} has been destroyed", name));
+        }
     }
 }

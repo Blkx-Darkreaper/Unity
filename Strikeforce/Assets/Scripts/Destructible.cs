@@ -136,7 +136,7 @@ namespace Strikeforce
 
         protected override void DestroyEntity()
         {
-            GameManager.Singleton.RemoveEntity(this);
+            GameManager.Singleton.CmdRemoveEntity(this);
 
             string ownersName = "Neutral";
             if (Owner != null)

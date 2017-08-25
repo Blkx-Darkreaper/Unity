@@ -187,7 +187,8 @@ namespace Strikeforce
             return true;
         }
 
-        public void JoinTeam(Profile playerAccount, Team teamToJoin)
+        [Command]
+        public void CmdJoinTeam(Profile playerAccount, Team teamToJoin)
         {
             if(IsGameInProgress == true)
             {
@@ -199,7 +200,8 @@ namespace Strikeforce
             MenuManager.Singleton.SetLoadingScreenActive(true);
         }
 
-        public void StartGame()
+        [Command]
+        public void CmdStartGame()
         {
             if(IsGameInProgress == true)
             {
@@ -231,13 +233,15 @@ namespace Strikeforce
             }
         }
 
-        public void LoadGame(string gameToLoad, string levelToLoad)
+        [Command]
+        public void CmdLoadGame(string gameToLoad, string levelToLoad)
         {
             GameName = gameToLoad;
-            LoadLevel(levelToLoad);
+            CmdLoadLevel(levelToLoad);
         }
 
-        public void LoadLevel(string levelToLoad)
+        [Command]
+        public void CmdLoadLevel(string levelToLoad)
         {
             LevelName = levelToLoad;
             //isLoading = true;
@@ -249,7 +253,8 @@ namespace Strikeforce
             LevelName = Scenes.MatchLobby;
         }
 
-        public void CompleteRaid(Profile playerAccount, float damageInflictedDuringRaid)
+        [Command]
+        public void CmdCompleteRaid(Profile playerAccount, float damageInflictedDuringRaid)
         {
             // Clear checkpoint
             playerAccount.Player.PreviousCheckpoint = null;
@@ -291,7 +296,8 @@ namespace Strikeforce
             return properName;
         }
 
-        public void RegisterEntity(Entity spawnedItem)
+        [Command]
+        public void CmdRegisterEntity(Entity spawnedItem)
         {
             int id;
             bool idInUse = true;
@@ -303,7 +309,7 @@ namespace Strikeforce
                 int count = allGameEntities.Count;
                 if (count > MaxEntities)
                 {
-                    RemoveEntity(spawnedItem);
+                    CmdRemoveEntity(spawnedItem);
                     Debug.Log(string.Format("Entity limit reached"));
                     return;
                 }
@@ -326,7 +332,8 @@ namespace Strikeforce
             return entity;
         }
 
-        public void RemoveEntity(GameObject gameObjectToRemove)
+        [Command]
+        public void CmdRemoveEntity(GameObject gameObjectToRemove)
         {
             Entity entityToRemove = gameObjectToRemove.GetComponent<Entity>();
             if (entityToRemove == null)
@@ -334,10 +341,11 @@ namespace Strikeforce
                 return;
             }
 
-            RemoveEntity(entityToRemove);
+            CmdRemoveEntity(entityToRemove);
         }
 
-        public void RemoveEntity(Entity entityToRemove)
+        [Command]
+        public void CmdRemoveEntity(Entity entityToRemove)
         {
             int id = entityToRemove.EntityId;
 

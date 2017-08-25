@@ -8,6 +8,7 @@ namespace Strikeforce
     {
         public Vector2 Location;
         public Size Size;
+        public bool IsFinalCheckpoint { get; protected set; }
 
         protected void OnTriggerEnter(Collider other)
         {
@@ -17,7 +18,30 @@ namespace Strikeforce
                 return;
             }
 
+            if(IsFinalCheckpoint == true)
+            {
+                raider.Owner.EndLevelRaid();
+            }
+
+            bool isBuggingOut = CheckIsBuggingOut(raider.Owner);
+            if(isBuggingOut == true)
+            {
+                raider.Owner.BugOut();
+                return;
+            }
+
             raider.Owner.PreviousCheckpoint = this;
+        }
+
+        protected bool CheckIsBuggingOut(Player player)
+        {
+            Checkpoint previousCheckpoint = player.PreviousCheckpoint;
+            if(previousCheckpoint == this)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

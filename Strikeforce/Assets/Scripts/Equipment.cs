@@ -33,7 +33,7 @@ namespace Strikeforce
 
         protected virtual void Start()
         {
-            GameManager.Singleton.RegisterEntity(this);
+            GameManager.Singleton.CmdRegisterEntity(this);
         }
 
         protected virtual void Update()

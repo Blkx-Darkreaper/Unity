@@ -10,14 +10,15 @@ namespace Strikeforce
     public class Level : MonoBehaviour
     {
         [HideInInspector]
-        public int Width;
+        public int Length;
         [HideInInspector]
-        public int Height;
+        public int Width;
+        public int RaiderAltitude = 5;
         public static int TileLength = 32;
         protected string levelName;
         [HideInInspector]
         public GameObject BoundingBox;
-        public Rectangle Bounds { get { return new Rectangle((int)transform.position.x, (int)transform.position.z, Width, Height); } }
+        public Rectangle Bounds { get { return new Rectangle((int)transform.position.x, (int)transform.position.z, Length, Width); } }
         public Spawnpoint HeadquartersSpawn;
         public Sprite[] Tileset;
         protected List<GameObject> allMapTiles;
@@ -109,12 +110,12 @@ namespace Strikeforce
 
             Level.TileLength = map.TileLength;
 
-            this.Width = (int)map.MapSize.Width;
-            int halfWidth = Width / 2;
-            this.Height = (int)map.MapSize.Height;
+            this.Length = (int)map.MapSize.Width;
+            int halfLength = Length / 2;
+            this.Width = (int)map.MapSize.Height;
 
             // Set build Bounding box
-            LoadBoundingBox(Width, Height);
+            LoadBoundingBox(Length, Width);
 
             allGridObjects = new GameObject("GridsObject");
             allGridObjects.transform.parent = gameObject.transform;
@@ -126,9 +127,9 @@ namespace Strikeforce
                 Sprite sprite = Tileset[tileIndex];
 
                 int x = (int)grid.Location.x;
-                x -= halfWidth;
+                x -= halfLength;
 
-                int z = Height - (int)grid.Location.y;
+                int z = Width - (int)grid.Location.y;
                 Vector3 position = new Vector3(x, 0, z);
 
                 GameObject tilePrefab = GameManager.Singleton.TilePrefab;
@@ -286,7 +287,7 @@ namespace Strikeforce
             float halfHeight = 0.5f * spawnZoneSize.Height;
 
             float spawnX = 0;
-            float spawnY = 5;
+            float spawnY = RaiderAltitude;
             float spawnZ = spawnZoneLocation.y + halfHeight;
 
             Vector3 raiderSpawn = new Vector3(spawnX, spawnY, spawnZ);

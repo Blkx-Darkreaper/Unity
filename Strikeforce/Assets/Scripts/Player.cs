@@ -19,12 +19,13 @@ namespace Strikeforce
         public Hud RaidHud;
         [HideInInspector]
         public Raider CurrentRaider;
-        public string RaiderPrefabName = "Raider";
+        public string RaiderPrefabName = "Raider";  //testing
         [HideInInspector]
         public Checkpoint PreviousCheckpoint = null;
         [HideInInspector]
         public Inventory CurrentInventory;
         protected bool isInBuildMode = true;
+        protected bool HasControl = false;
         public GridCursor BuildCursor;
         //public GridCursor BuyCursor;
         public LinkedList<Sector> Sectors { get; protected set; }
@@ -93,6 +94,8 @@ namespace Strikeforce
             mainCamera.rect = new Rect(0.2f, 0f, 0.6f, 1f);
 
             MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            this.HasControl = true;
         }
 
         protected void Update()
@@ -130,7 +133,7 @@ namespace Strikeforce
             Spawnpoint spawnpoint = spawnSector.Spawn;
 
             spawnSector.SetOwnership(this);
-            SetCameraOverhead(spawnpoint.Location);
+            SetOverheadCameraPosition(spawnpoint.Location);
 
             // Get the build cursor
             this.BuildCursor.Bounds = CurrentLevel.Bounds;
@@ -139,6 +142,7 @@ namespace Strikeforce
             //this.BuyCursor.Bounds = BuildHud.Bounds;
 
             BuildCursor.transform.position = new Vector3(spawnpoint.Location.x, spawnpoint.Location.y, spawnpoint.Location.z);
+            BuildCursor.transform.parent = CurrentLevel.gameObject.transform;   // Make position relative to base
         }
 
         protected void SpawnRaider()	// Testing
@@ -147,8 +151,10 @@ namespace Strikeforce
             this.BuildHud.enabled = isInBuildMode;
             this.RaidHud.enabled = !isInBuildMode;
 
-            // Get spawn point from level
-            Vector3 spawnLocation = CurrentLevel.GetRaiderSpawnLocation();
+            // Get spawn point from enemy level
+            Team enemyTeam = GameManager.Singleton.GetOtherTeam(CurrentTeam);
+            Level enemyLevel = enemyTeam.HomeBase;
+            Vector3 spawnLocation = enemyLevel.GetRaiderSpawnLocation();
 
             // Spawn the raider at the spawnpoint
             GameObject raiderObject = Instantiate(
@@ -156,14 +162,14 @@ namespace Strikeforce
                 spawnLocation,
                 Quaternion.identity) as GameObject;
 
-            // Make the raider a child of the player
-            raiderObject.transform.parent = gameObject.transform;
+            // Make the raider a child of the enemy base
+            raiderObject.transform.parent = enemyLevel.gameObject.transform;  // Make position relative to enemy base
 
             this.CurrentRaider = raiderObject.GetComponent<Raider>();
 
             //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
             NetworkServer.SpawnWithClientAuthority(CurrentRaider.gameObject, gameObject);
-            GameManager.Singleton.RegisterEntity(CurrentRaider);
+            GameManager.Singleton.CmdRegisterEntity(CurrentRaider);
 
             Hardpoint hardpointPrefab = GlobalAssets.GetMiscPrefab("Hardpoint").GetComponent<Hardpoint>();
 
@@ -206,16 +212,16 @@ namespace Strikeforce
             GameObject basicShotPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BASIC_SHOT);
             Weapon basicShot1 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
             basicShot1.transform.parent = CurrentRaider.transform;
-            GameManager.Singleton.RegisterEntity(basicShot1);
+            GameManager.Singleton.CmdRegisterEntity(basicShot1);
 
             Weapon basicShot2 = GameObject.Instantiate(basicShotPrefab).GetComponent<Weapon>() as Weapon;
             basicShot2.transform.parent = CurrentRaider.transform;
-            GameManager.Singleton.RegisterEntity(basicShot2);
+            GameManager.Singleton.CmdRegisterEntity(basicShot2);
 
             GameObject boltPrefab = GlobalAssets.GetWeaponPrefab(Weapon.Types.BOLT);
             Weapon bolt = GameObject.Instantiate(boltPrefab).GetComponent<Weapon>() as Weapon;
             bolt.transform.parent = CurrentRaider.transform;
-            GameManager.Singleton.RegisterEntity(bolt);
+            GameManager.Singleton.CmdRegisterEntity(bolt);
 
             bool equipped = CurrentRaider.EquipWeapon(basicShot1, HardpointPosition.Center, 0, 1, 0);
             equipped &= CurrentRaider.EquipWeapon(basicShot2, HardpointPosition.Center, 0, 2, 0);
@@ -230,7 +236,7 @@ namespace Strikeforce
             }
 
             Vector3 raiderPosition = raiderObject.transform.position;
-            SetCameraOverhead(raiderPosition);
+            SetOverheadCameraPosition(raiderPosition);
 
             // Set raider and camera initial velocity
             float initialVelocity = CurrentRaider.StartingSpeed;
@@ -245,15 +251,73 @@ namespace Strikeforce
             {
                 Debug.Log(String.Format("Raider {0} of player {1} failed to take off", CurrentRaider.EntityId, PlayerId));
             }
+
+            this.HasControl = true;
         }
 
-        protected void SetCameraOverhead(Vector3 position)
+        protected Raider SpawnRaider(string raiderPrefabName, Level spawnLevel, Vector3 spawnLocation)
+        {
+            GameObject raiderPrefab = GlobalAssets.GetVehiclePrefab(raiderPrefabName);
+
+            // Spawn the raider at the spawnpoint
+            GameObject raiderObject = Instantiate(
+                raiderPrefab,
+                spawnLocation,
+                Quaternion.identity) as GameObject;
+
+            // Make the raider a child of the enemy base
+            raiderObject.transform.parent = spawnLevel.gameObject.transform;
+
+            Raider raider = raiderObject.GetComponent<Raider>();
+
+            //NetworkServer.SpawnWithClientAuthority(raiderObject, connectionToClient);
+            NetworkServer.SpawnWithClientAuthority(raider.gameObject, gameObject);
+            GameManager.Singleton.CmdRegisterEntity(raider);
+
+            return raider;
+        }
+
+        protected void LaunchRaider(RaiderLoadout loadout, Level spawnLevel, Vector3 spawnLocation)
+        {
+            string raiderPrefabName = loadout.RaiderType;
+
+            Raider raider = SpawnRaider(raiderPrefabName, spawnLevel, spawnLocation);
+            raider.Loadout = loadout;
+
+            this.CurrentRaider = raider;
+
+            Vector3 raiderPosition = raider.gameObject.transform.position;
+            SetOverheadCameraPosition(raiderPosition);
+
+            // Set raider and camera initial velocity
+            float initialVelocity = raider.StartingSpeed;
+            raider.SetForwardVelocity(initialVelocity);
+
+            Vector3 raiderVelocity = raider.GetVelocity();
+            SetMainCameraVelocity(raiderVelocity.x, raiderVelocity.y, raiderVelocity.z);
+
+            // Make raider airbourne
+            raider.TakeOff();
+            if (raider.IsAirborne == false)
+            {
+                Debug.Log(String.Format("Raider {0} of player {1} failed to take off", raider.EntityId, PlayerId));
+            }
+        }
+
+        protected void SetOverheadCameraPosition(Vector3 position)
         {
             float x = position.x;
             float z = position.z;
-            KeepLevelInMainView(ref x, ref z);
+            SetOverheadCameraPosition(new Vector2(x, z));
+        }
 
-            Vector3 overheadView = new Vector3(x, 10, z);
+        protected void SetOverheadCameraPosition(Vector2 position)
+        {
+            float x = position.x;
+            float y = position.y;
+            KeepLevelInMainView(ref x, ref y);
+
+            Vector3 overheadView = new Vector3(x, 10, y);
 
             mainCamera.transform.position = overheadView;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
@@ -261,11 +325,21 @@ namespace Strikeforce
 
         public void LeftStick(float x, float y, float z)
         {
+            if (HasControl == false)
+            {
+                return;
+            }
+
             MovePlayer(x, y, z);
         }
 
         public void RightStick(float x, float y, float z)
         {
+            if (HasControl == false)
+            {
+                return;
+            }
+
             if (isInBuildMode == false)
             {
                 return;
@@ -276,6 +350,11 @@ namespace Strikeforce
 
         public void DPad(float x, int y, float z)
         {
+            if (HasControl)
+            {
+                return;
+            }
+
             if (isInBuildMode == false)
             {
                 return;
@@ -361,8 +440,8 @@ namespace Strikeforce
 
             float levelX = CurrentLevel.transform.position.x;
             float levelY = CurrentLevel.transform.position.z;
-            int levelWidth = CurrentLevel.Width;
-            int levelHeight = CurrentLevel.Height;
+            int levelWidth = CurrentLevel.Length;
+            int levelHeight = CurrentLevel.Width;
 
             float minX = (viewWidth - levelWidth) / 2f + levelX;
             float maxX = (levelWidth - viewWidth) / 2f + levelX;
@@ -385,8 +464,8 @@ namespace Strikeforce
 
             float levelX = CurrentLevel.transform.position.x;
             float levelY = CurrentLevel.transform.position.z;
-            int levelWidth = CurrentLevel.Width;
-            int levelHeight = CurrentLevel.Height;
+            int levelWidth = CurrentLevel.Length;
+            int levelHeight = CurrentLevel.Width;
 
             float minX = (viewWidth - levelWidth) / 2f + levelX;
             float maxX = (levelWidth - viewWidth) / 2f + levelX;
@@ -400,6 +479,11 @@ namespace Strikeforce
 
         public void RespondToKeyEvent(KeyEvent keyEvent)
         {
+            if (isLocalPlayer == false)
+            {
+                return;
+            }
+
             ActionKey key = keyEvent.Key;
 
             if (keyEvent.IsComplete == false)
@@ -409,6 +493,14 @@ namespace Strikeforce
             else
             {
                 Debug.Log(string.Format("{0} key released at {1}", key.ToString(), Time.time.ToString()));
+            }
+
+            if (HasControl == false)
+            {
+                if (key != ActionKey.Menu)
+                {
+                    return;
+                }
             }
 
             switch (key)
@@ -724,7 +816,7 @@ namespace Strikeforce
 
             IsSettingConstructionPoint = false;
 
-            GameManager.Singleton.RegisterEntity(structure);
+            GameManager.Singleton.CmdRegisterEntity(structure);
             structure.Owner = this;
             structure.StartConstruction();
         }
@@ -927,11 +1019,6 @@ namespace Strikeforce
 
         protected void SetIsBoosting(bool isBoosting)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -943,11 +1030,6 @@ namespace Strikeforce
 
         protected void SetPrimaryFiring(bool isFiring)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -959,11 +1041,6 @@ namespace Strikeforce
 
         protected void SetSecondaryFiring(bool isFiring)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -975,11 +1052,6 @@ namespace Strikeforce
 
         protected void SetSpecialFiring(bool isFiring)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -991,11 +1063,6 @@ namespace Strikeforce
 
         protected void SetEquipmentActive(bool isActive)
         {
-            if (isLocalPlayer == false)
-            {
-                return;
-            }
-
             Raider raider = CurrentRaider;
             if (raider == null)
             {
@@ -1181,6 +1248,105 @@ namespace Strikeforce
                     }
                     break;
             }
+        }
+
+        protected void SetBuildRaidModes(bool buildMode)
+        {
+            this.isInBuildMode = buildMode;
+            this.BuildHud.enabled = buildMode;
+            this.RaidHud.enabled = !buildMode;
+        }
+
+        protected void ToggleBuildRaidModes()
+        {
+            this.isInBuildMode = !isInBuildMode;
+            this.BuildHud.enabled = isInBuildMode;
+            this.RaidHud.enabled = !isInBuildMode;
+        }
+
+        public void StartLevelRaid(RaiderLoadout loadout)
+        {
+            this.HasControl = false;
+
+            ToggleBuildRaidModes();
+
+            // Get spawn point from enemy level
+            Team enemyTeam = GameManager.Singleton.GetOtherTeam(CurrentTeam);
+            Level enemyLevel = enemyTeam.HomeBase;
+            Vector3 spawnLocation = enemyLevel.GetRaiderSpawnLocation();
+
+            // Fade out
+            MenuManager.Singleton.ShowLoadingScreen();
+
+            // Spawn raider
+            LaunchRaider(loadout, enemyLevel, spawnLocation);
+
+            // Fade in
+            MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            this.HasControl = true;
+        }
+
+        public void RestartRaidFromCheckpoint(RaiderLoadout loadout)
+        {
+            this.HasControl = false;
+
+            ToggleBuildRaidModes();
+
+            //Fade out
+            MenuManager.Singleton.ShowLoadingScreen();
+
+            // Get enemy base
+            Team enemyTeam = GameManager.Singleton.GetOtherTeam(CurrentTeam);
+            Level enemyLevel = enemyTeam.HomeBase;
+
+            // Get checkpoint starting point
+            Vector2 checkpointLocation = PreviousCheckpoint.Location;
+            int altitude = CurrentLevel.RaiderAltitude;
+
+            Vector3 spawnLocation = new Vector3(checkpointLocation.x, altitude, checkpointLocation.z - 5);
+
+            // Spawn raider
+            LaunchRaider(loadout, enemyLevel, spawnLocation);
+
+            // Fade in
+            MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            this.HasControl = true;
+        }
+
+        public void BugOut()
+        {
+            // Disable Raider control
+            this.HasControl = false;
+
+            // Lock camera position
+            SetMainCameraVelocity(0f, 0f, 0f);
+
+            // Fade out
+            MenuManager.Singleton.ShowLoadingScreen();
+
+            // Unspawn raider from map
+            Raider raider = this.CurrentRaider;
+            this.CurrentRaider = null;
+
+            GameManager.Singleton.CmdRemoveEntity(raider);
+
+            // Return control to Build cursor
+            ToggleBuildRaidModes();
+
+            // Fade in
+            MenuManager.Singleton.HideLoadingScreenDelayed();
+
+            this.HasControl = true;
+        }
+
+        public void EndLevelRaid()
+        {
+            BugOut();
+
+            // Remove last checkpoint
+            this.PreviousCheckpoint = null;
         }
     }
 }

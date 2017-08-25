@@ -45,12 +45,14 @@ namespace Strikeforce
             this.firingPointOffset = offset;
         }
 
-        public void Fire()
+        [Command]
+        public void CmdFire()
         {
-            Fire(0, 0, 1);
+            CmdFire(0, 0, 1);
         }
 
-        public void Fire(int angleSpread, int horizontalSpread, int groupingBonus)
+        [Command]
+        public void CmdFire(int angleSpread, int horizontalSpread, int groupingBonus)
         {
             // Command function is called from the client, but invoked on the server
             bool active = Activate();

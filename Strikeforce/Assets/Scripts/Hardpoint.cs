@@ -7,7 +7,7 @@ namespace Strikeforce
 {
     public enum HardpointPosition { LeftOuterWing, LeftWing, Center, RightWing, RightOuterWing }
 
-    public class Hardpoint : NetworkBehaviour
+    public class Hardpoint : MonoBehaviour
     {
         [HideInInspector]
         public Vector2 Location;
