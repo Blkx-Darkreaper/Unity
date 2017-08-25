@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
-using System.Collections;
 using System.Collections.Generic;
-using System;
 
 namespace Strikeforce
 {
@@ -299,11 +297,22 @@ namespace Strikeforce
             string direction;
             if (x == 0)
             {
-                return;
+                if (z == 0)
+                {
+                    return;
+                }
             }
 
-            direction = Direction.UP;
+            direction = Direction.RIGHT;
             if (x < 0)
+            {
+                direction = Direction.LEFT;
+            }
+            if (z > 0)
+            {
+                direction = Direction.UP;
+            }
+            if (z < 0)
             {
                 direction = Direction.DOWN;
             }

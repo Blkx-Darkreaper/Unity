@@ -58,6 +58,10 @@ namespace Strikeforce
             this.allUnits = new LinkedList<Vehicle>();
             this.allStructures = new LinkedList<Structure>();
             this.IsSettingConstructionPoint = false;
+
+            this.BuildCursor = Instantiate(BuildCursor, this.gameObject.transform).GetComponent<GridCursor>();
+            this.BuildHud = Instantiate(BuildHud, this.gameObject.transform).GetComponent<Hud>();
+            this.RaidHud = Instantiate(RaidHud, this.gameObject.transform).GetComponent<Hud>();
         }
 
         protected void Start()
