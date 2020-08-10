@@ -17,7 +17,15 @@ namespace Strikeforce
         public Rank Ranking { get; protected set; }
         public bool IsCurrentProfile { get; protected set; }
         [JsonIgnore]
-        public Player Player;
+        public Player player;
+
+        public Profile(string username, int avatarId)
+        {
+            this.Username = username;
+            this.AvatarId = avatarId;
+            this.IsCurrentProfile = true;
+            this.Ranking = new Rank();
+        }
 
         [JsonConstructor]
         public Profile(string username, int avatarId, bool isCurrentProfile, Rank ranking)
@@ -64,11 +72,11 @@ namespace Strikeforce
         public virtual void DropPlayer()
         {
             // Transfer player inventory to team
-            Player.CurrentInventory.TransferAllTo(Player.CurrentTeam.SharedInventory);
+            player.buildMode.currentInventory.TransferAllTo(player.currentTeam.sharedInventory);
 
             //Network.RemoveRPCs(Player);
             //Network.DestroyPlayerObjects(Player);
-            this.Player = null;
+            this.player = null;
         }
 
         public virtual void DrawPlayerAvatar()

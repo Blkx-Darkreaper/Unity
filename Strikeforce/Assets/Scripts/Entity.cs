@@ -5,8 +5,8 @@ namespace Strikeforce
 {
     public class Entity : NetworkBehaviour
     {
-        public int EntityId { get; set; }
-        public Level CurrentLevel { get; protected set; }
+        public int entityId { get; set; }
+        public Level currentLevel;
         public struct EntityProperties
         {
             public const string ID = "Id";
@@ -15,14 +15,17 @@ namespace Strikeforce
 
         protected virtual void Awake()
         {
-            GameManager.Singleton.CmdRegisterEntity(this);
+            if(currentLevel == null)
+            {
+                throw new UnityException(string.Format("{0} cannot be registered without having an associated level", name));
+            }
 
-            this.CurrentLevel = GameObject.FindGameObjectWithTag(Tags.LEVEL).GetComponent<Level>();
+            GameEntityManager.singleton.RegisterEntity(this);
         }
 
         protected virtual void DestroyEntity()
         {
-            GameManager.Singleton.CmdRemoveEntity(this);
+            GameEntityManager.singleton.RemoveEntity(this);
 
             Debug.Log(string.Format("{0} has been destroyed", name));
         }

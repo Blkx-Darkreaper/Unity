@@ -32,11 +32,11 @@ namespace Strikeforce
 
         protected override void BuildMenu()
         {
-            this.teamA = GameManager.Singleton.AllTeams[0];
-            this.JoinTeamAText = string.Format("{0} {1}", JOIN_TEAM, teamA.Name);
+            this.teamA = GameplayManager.singleton.allTeams[0];
+            this.JoinTeamAText = string.Format("{0} {1}", JOIN_TEAM, teamA.name);
 
-            this.teamB = GameManager.Singleton.AllTeams[1];
-            this.JoinTeamBText = string.Format("{0} {1}", JOIN_TEAM, teamB.Name);
+            this.teamB = GameplayManager.singleton.allTeams[1];
+            this.JoinTeamBText = string.Format("{0} {1}", JOIN_TEAM, teamB.name);
 
             base.BuildMenu();
         }
@@ -78,22 +78,24 @@ namespace Strikeforce
 
         protected void SelectTeam(Team selectedTeam)
         {
-            Profile playerAccount = ProfileManager.Singleton.CurrentProfile;
+            Profile playerAccount = ProfileManager.singleton.CurrentProfile;
             if(playerAccount == null)
             {
                 SelectionError("No profile loaded");
                 return;
             }
 
-            bool canJoinTeam = GameManager.Singleton.CanJoinTeam(playerAccount, selectedTeam);
+            bool canJoinTeam = GameplayManager.singleton.CanJoinTeam(playerAccount, selectedTeam);
             if(canJoinTeam == false)
             {
-                SelectionError(string.Format("Cannot join team {0}. Teams would be too unbalanced.", selectedTeam.Name));
+                SelectionError(string.Format("Cannot join team {0}. Teams would be too unbalanced.", selectedTeam.name));
                 return;
             }
 
-            GameManager.Singleton.CmdJoinTeam(playerAccount, selectedTeam);
-            GameManager.Singleton.CmdStartGame();  //Testing
+            //GameplayManager.singleton.CmdJoinTeam(playerAccount.Username, selectedTeam.name);
+            GameplayManager.singleton.CmdJoinTeam(playerAccount.Username, selectedTeam.teamId);
+
+            GameplayManager.singleton.CmdStartGame();  //Testing
         }
 
         protected void SelectionError(string errorMessage)

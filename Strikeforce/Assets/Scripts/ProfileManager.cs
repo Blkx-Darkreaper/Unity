@@ -8,19 +8,19 @@ namespace Strikeforce
 {
     public class ProfileManager : Manager
     {
-        public static ProfileManager Singleton = null;
+        public static ProfileManager singleton = null;
         public string ProfileSaveFile = @"profiles.json";
         public Dictionary<string, Profile> AllProfiles = new Dictionary<string, Profile>();
         public Profile CurrentProfile { get; protected set; }
 
         public void Awake()
         {
-            if (Singleton == null)
+            if (singleton == null)
             {
                 DontDestroyOnLoad(gameObject);
-                Singleton = this;
+                singleton = this;
             }
-            if (Singleton != this)
+            if (singleton != this)
             {
                 Destroy(gameObject);
                 return;
@@ -90,7 +90,7 @@ namespace Strikeforce
 
         public string[] GetAllUsernames()
         {
-            string[] usernames = GameManager.GetAllUsernames(AllProfiles);
+            string[] usernames = GameplayManager.GetAllUsernames(AllProfiles);
             return usernames;
         }
 
@@ -98,7 +98,7 @@ namespace Strikeforce
             return AllProfiles.ContainsKey(username);
         }
 
-        public Profile GetProfile(string username, int avatarId)
+        public Profile SwitchToProfile(string username, int avatarId)
         {
             Profile profile;
 
@@ -114,6 +114,18 @@ namespace Strikeforce
 
             SetCurrentProfile(profile);
 
+            return profile;
+        }
+
+        public Profile GetProfile(string username)
+        {
+            bool profileExists = AllProfiles.ContainsKey(username);
+            if (profileExists == false)
+            {
+                return null;
+            }
+            
+            Profile profile = AllProfiles[username];
             return profile;
         }
 

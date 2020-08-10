@@ -10,7 +10,7 @@ namespace Strikeforce
         public int SectorId { get; protected set; }
         public Zone Parent { get; protected set; }
         public Spawnpoint Spawn { get; protected set; }
-        public Player Owner { get; protected set; }
+        public Player currentOwner { get; protected set; }
         protected int totalBuildings { get; set; }
         public float BuildingConstructionTimeBonus = 0.05f;
 
@@ -48,23 +48,23 @@ namespace Strikeforce
 
         public void SetOwnership(Player owner)
         {
-            if (Owner != null)
+            if (currentOwner != null)
             {
-                Owner.Sectors.Remove(this);
+                currentOwner.buildMode.sectors.Remove(this);
             }
 
-            this.Owner = owner;
+            this.currentOwner = owner;
             if (owner == null)
             {
                 return;
             }
 
-            owner.Sectors.AddFirst(this);
+            owner.buildMode.sectors.AddFirst(this);
         }
 
         public void RemoveOwnership()
         {
-            if (Owner == null)
+            if (currentOwner == null)
             {
                 return;
             }

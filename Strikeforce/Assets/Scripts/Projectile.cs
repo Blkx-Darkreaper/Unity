@@ -4,19 +4,47 @@ namespace Strikeforce
 {
     public class Projectile : Destructible
     {
-        public int Damage;
-        public bool IsFriendly;
-        public bool IsAntiAir;
-        public bool IsAntiGround;
-        public bool IsIndestructible;
-        public float CurrentRangeToTarget { get; set; }
-        public Entity Target { get; set; }
+        public int damage;
+        public bool isFriendly;
+        public bool isAntiAir;
+        public bool isAntiGround;
+        public bool isIndestructible;
+        public float currentRangeToTarget { get; set; }
+        public Entity target { get; set; }
         public struct Type
         {
 
         }
 
-        protected override void Update() { }
+        public bool CanHitTarget(Destructible target)
+        {
+            bool canHit = false;
+
+            if (target.isAirborne == false)
+            {
+                canHit = isAntiGround;
+            }
+            else
+            {
+                canHit = isAntiAir;
+            }
+
+            if (canHit == false)
+            {
+                return false;
+            }
+
+            if (isFriendly == true)
+            {
+                Raider raider = target.transform.GetComponent<Raider>();
+                if (raider != null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         protected virtual bool HasHitTarget(Entity target)
         {
@@ -25,7 +53,7 @@ namespace Strikeforce
 
         public override void TakeDamage(int amount, RaycastHit hit)
         {
-            if (IsIndestructible == true)
+            if (isIndestructible == true)
             {
                 return;
             }
@@ -37,13 +65,13 @@ namespace Strikeforce
         {
             bool anti = false;
 
-            if (target.IsAirborne == false)
+            if (this.isAirborne == false)
             {
-                anti = IsAntiGround;
+                anti = isAntiGround;
             }
             else
             {
-                anti = IsAntiAir;
+                anti = isAntiAir;
             }
 
             if (anti == false)
@@ -51,7 +79,7 @@ namespace Strikeforce
                 return;
             }
 
-            if (IsFriendly == true)
+            if (isFriendly == true)
             {
                 Raider raider = target.transform.GetComponent<Raider>();
                 if (raider != null)
@@ -60,7 +88,7 @@ namespace Strikeforce
                 }
             }
 
-            target.TakeDamage(Damage, hit);
+            target.TakeDamage(damage, hit);
         }
 
         protected virtual void OnCollisionEnter(Collision collision)
@@ -72,11 +100,17 @@ namespace Strikeforce
                 return;
             }
 
+            bool canHit = CanHitTarget(hitDestructible);
+            if (canHit == false)
+            {
+                return;
+            }
+
             RaycastHit hit = new RaycastHit();
             hit.transform.position = collision.transform.position;
 
-            this.TakeDamage(Damage, hit);
-            hitDestructible.TakeDamage(Damage, hit);
+            this.TakeDamage(damage, hit);
+            hitDestructible.TakeDamage(damage, hit);
         }
     }
 }

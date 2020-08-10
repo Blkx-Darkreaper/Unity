@@ -1,24 +1,22 @@
 ﻿using UnityEngine;
-using System.Drawing;
-using System.Collections;
 
 namespace Strikeforce
 {
     public class Equipment : Entity
     {
-        public int Width;
-        public int Height;
-        public string Description = string.Empty;
-        public bool IsRemovable = true;
-        public bool IsWeapon = false;
-        public bool IsActive { get; protected set; }
-        public Raider Parent;
-        public float Cost;
-        public int Level = 1;
-        public float EnergyCost;
-        public float Cooldown;
+        public int width;
+        public int height;
+        public string description = string.Empty;
+        public bool isRemovable = true;
+        public bool isWeapon = false;
+        public bool isActive { get; protected set; }
+        public Raider parent;
+        public float cost;
+        public int level = 1;
+        public float energyCost;
+        public float cooldown;
         protected float cooldownRemaining = 0f;
-        public string CurrentStatus { get; protected set; }
+        public string currentStatus { get; protected set; }
         public struct Status
         {
             public const string READY = "Ready";
@@ -28,25 +26,25 @@ namespace Strikeforce
 
         protected override void Awake()
         {
-            this.CurrentStatus = Status.READY;
+            this.currentStatus = Status.READY;
         }
 
         protected virtual void Start()
         {
-            GameManager.Singleton.CmdRegisterEntity(this);
+            GameEntityManager.singleton.RegisterEntity(this);
         }
 
         protected virtual void Update()
         {
             if (cooldownRemaining <= 0)
             {
-                cooldownRemaining = 0;
+                this.cooldownRemaining = 0;
                 return;
             }
 
-            cooldownRemaining -= Time.deltaTime;
+            this.cooldownRemaining -= Time.deltaTime;
 
-            if (CurrentStatus.Equals(Status.DISABLED))
+            if (currentStatus.Equals(Status.DISABLED))
             {
                 return;
             }
@@ -56,9 +54,9 @@ namespace Strikeforce
                 return;
             }
 
-            this.CurrentStatus = Status.READY;
+            this.currentStatus = Status.READY;
 
-            Use(IsActive);
+            Use(isActive);
         }
 
         public virtual bool Activate()
@@ -69,14 +67,14 @@ namespace Strikeforce
             }
 
             // Check equipment has sufficient energy
-            if (Parent.CurrentEnergy < EnergyCost)
+            if (parent.CurrentEnergy < energyCost)
             {
                 return false;
             }
 
-            Parent.UpdateEnergy(EnergyCost);
-            this.CurrentStatus = Equipment.Status.RECHARGING;
-            this.cooldownRemaining = Cooldown;
+            this.parent.UpdateEnergy(energyCost);
+            this.currentStatus = Equipment.Status.RECHARGING;
+            this.cooldownRemaining = cooldown;
 
             return true;
         }
@@ -85,19 +83,19 @@ namespace Strikeforce
         {
             Use(true);
 
-            this.IsActive = false;
+            this.isActive = false;
         }
 
         public virtual void Use(bool isActive)
         {
-            if(isActive == false)
+            if (isActive == false)
             {
-                this.IsActive = false;
+                this.isActive = false;
                 return;
             }
 
-            this.IsActive = Activate();
-            if (IsActive == false)
+            this.isActive = Activate();
+            if (this.isActive == false)
             {
                 return;
             }

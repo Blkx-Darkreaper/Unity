@@ -1,8 +1,7 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.Drawing;
 using System.Collections.Generic;
-using Random = UnityEngine.Random;
 using Newtonsoft.Json;
 
 namespace Strikeforce
@@ -10,17 +9,17 @@ namespace Strikeforce
     public class Level : MonoBehaviour
     {
         [HideInInspector]
-        public int Length;
+        public int length;
         [HideInInspector]
-        public int Width;
-        public int RaiderAltitude = 5;
-        public static int TileLength = 32;
+        public int width;
+        public int raiderAltitude = 5;
+        public static int tileLength = 32;
         protected string levelName;
         [HideInInspector]
-        public GameObject BoundingBox;
-        public Rectangle Bounds { get { return new Rectangle((int)transform.position.x, (int)transform.position.z, Length, Width); } }
-        public Spawnpoint HeadquartersSpawn;
-        public Sprite[] Tileset;
+        public GameObject boundingBox;
+        public Rectangle bounds { get { return new Rectangle((int)transform.position.x, (int)transform.position.z, length, width); } }
+        public Spawnpoint headquartersSpawn;
+        public Sprite[] tileset;
         protected List<GameObject> allMapTiles;
         protected GameObject allGridObjects;
         protected SortedList<int, Zone> allZones;
@@ -38,11 +37,11 @@ namespace Strikeforce
 
         public void LoadMap(string mapName)
         {
-            if(mapName == null)
+            if (mapName == null)
             {
                 throw new NullReferenceException("Map name is null");
             }
-            if(mapName.Equals(string.Empty))
+            if (mapName.Equals(string.Empty))
             {
                 throw new InvalidOperationException("No map name provided");
             }
@@ -108,14 +107,14 @@ namespace Strikeforce
                 return;
             }
 
-            Level.TileLength = map.TileLength;
+            Level.tileLength = map.TileLength;
 
-            this.Length = (int)map.MapSize.Width;
-            int halfLength = Length / 2;
-            this.Width = (int)map.MapSize.Height;
+            this.length = (int)map.MapSize.Width;
+            int halfLength = length / 2;
+            this.width = (int)map.MapSize.Height;
 
             // Set build Bounding box
-            LoadBoundingBox(Length, Width);
+            LoadBoundingBox(length, width);
 
             allGridObjects = new GameObject("GridsObject");
             allGridObjects.transform.parent = gameObject.transform;
@@ -124,15 +123,15 @@ namespace Strikeforce
             foreach (Grid grid in allMapGrids)
             {
                 int tileIndex = grid.Tile.TilesetIndex;
-                Sprite sprite = Tileset[tileIndex];
+                Sprite sprite = tileset[tileIndex];
 
                 int x = (int)grid.Location.x;
                 x -= halfLength;
 
-                int z = Width - (int)grid.Location.y;
+                int z = width - (int)grid.Location.y;
                 Vector3 position = new Vector3(x, 0, z);
 
-                GameObject tilePrefab = GameManager.Singleton.TilePrefab;
+                GameObject tilePrefab = GameManager.singleton.tilePrefab;
                 GameObject tile = Instantiate(tilePrefab, position, Quaternion.Euler(new Vector3(90, 0, 0))) as GameObject;
                 tile.transform.parent = allGridObjects.transform;
 
@@ -169,13 +168,13 @@ namespace Strikeforce
 
                 allZones.Add(zoneId, zone);
 
-                if(nextAvailableSector == null)
+                if (nextAvailableSector == null)
                 {
                     nextAvailableSector = zone.FirstSector;
                 }
 
                 bool hasHQ = zone.HasHeadquartersSpawn;
-                if(hasHQ == false)
+                if (hasHQ == false)
                 {
                     continue;
                 }
@@ -188,8 +187,8 @@ namespace Strikeforce
         {
             this.allCheckpoints = new Dictionary<int, Checkpoint>();
 
-            GameObject checkpointPrefab = GameManager.Singleton.CheckpointPrefab;
-            
+            GameObject checkpointPrefab = GameManager.singleton.checkpointPrefab;
+
             //foreach (Vector2 location in checkpointsToAdd)
             //{
             //    int y = (int)location.y;
@@ -212,7 +211,7 @@ namespace Strikeforce
                 nextZone.UpdateUnlockThreshold();
 
                 // Update the last unlocked zone
-                if(currentZone.IsLocked == false)
+                if (currentZone.IsLocked == false)
                 {
                     this.lastUnlockedZone = currentZone;
                 }
@@ -232,7 +231,7 @@ namespace Strikeforce
 
         public void SetHeadquartersSpawn(Sector sector)
         {
-            this.HeadquartersSpawn = sector.Spawn;
+            this.headquartersSpawn = sector.Spawn;
             this.nextAvailableSector = sector;
         }
 
@@ -245,7 +244,7 @@ namespace Strikeforce
 
             int nextSectorId = sectorId + 1;
 
-            while(!zoneToCheck.AllSectors.ContainsKey(nextSectorId))
+            while (!zoneToCheck.AllSectors.ContainsKey(nextSectorId))
             {
                 zoneToCheck = zoneToCheck.NextZone;
             }
@@ -264,20 +263,20 @@ namespace Strikeforce
                 return;
             }
 
-            this.BoundingBox = Instantiate(boundingBoxPrefab, position, Quaternion.identity) as GameObject;
-            this.BoundingBox.transform.localScale = new Vector3(width, 20, height);
-            this.BoundingBox.transform.parent = gameObject.transform;
+            this.boundingBox = Instantiate(boundingBoxPrefab, position, Quaternion.identity) as GameObject;
+            this.boundingBox.transform.localScale = new Vector3(width, 20, height);
+            this.boundingBox.transform.parent = gameObject.transform;
         }
 
         public Vector3 GetRaiderSpawnLocation()
         {
             Zone spawnZone = lastUnlockedZone.NextZone;
-            if(spawnZone == null)
+            if (spawnZone == null)
             {
                 spawnZone = lastUnlockedZone;
             }
 
-            if(spawnZone == null)
+            if (spawnZone == null)
             {
                 throw new InvalidOperationException("No unlocked zones. Cannot get raider spawn location");
             }
@@ -287,7 +286,7 @@ namespace Strikeforce
             float halfHeight = 0.5f * spawnZoneSize.Height;
 
             float spawnX = 0;
-            float spawnY = RaiderAltitude;
+            float spawnY = raiderAltitude;
             float spawnZ = spawnZoneLocation.y + halfHeight;
 
             Vector3 raiderSpawn = new Vector3(spawnX, spawnY, spawnZ);
@@ -297,7 +296,7 @@ namespace Strikeforce
         public void KeepInBounds(float x, float z, ref float deltaX, ref float deltaZ)
         {
             // Keep in level bounds
-            GlobalAssets.KeepInBounds(Bounds, x, z, ref deltaX, ref deltaZ);
+            GlobalAssets.KeepInBounds(bounds, x, z, ref deltaX, ref deltaZ);
         }
     }
 }

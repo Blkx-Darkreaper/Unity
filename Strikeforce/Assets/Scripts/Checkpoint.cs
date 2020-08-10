@@ -1,42 +1,42 @@
 ﻿using UnityEngine;
 using System.Drawing;
-using Newtonsoft.Json;
 
 namespace Strikeforce
 {
     public class Checkpoint : MonoBehaviour
     {
-        public Vector2 Location;
-        public Size Size;
-        public bool IsFinalCheckpoint { get; protected set; }
+        public Vector2 location;
+        public Size size;
+        public bool isFinalCheckpoint { get; protected set; }
 
         protected void OnTriggerEnter(Collider other)
         {
             Raider raider = other.gameObject.GetComponent<Raider>();
-            if(raider == null)
+            if (raider == null)
             {
                 return;
             }
 
-            if(IsFinalCheckpoint == true)
+            if (isFinalCheckpoint == true)
             {
-                raider.Owner.EndLevelRaid();
-            }
-
-            bool isBuggingOut = CheckIsBuggingOut(raider.Owner);
-            if(isBuggingOut == true)
-            {
-                raider.Owner.BugOut();
+                raider.currentOwner.EndLevelRaid();
                 return;
             }
 
-            raider.Owner.PreviousCheckpoint = this;
+            bool isBuggingOut = CheckIsBuggingOut(raider.currentOwner);
+            if (isBuggingOut == true)
+            {
+                raider.currentOwner.BugOut();
+                return;
+            }
+
+            raider.currentOwner.raidMode.previousCheckpoint = this;
         }
 
         protected bool CheckIsBuggingOut(Player player)
         {
-            Checkpoint previousCheckpoint = player.PreviousCheckpoint;
-            if(previousCheckpoint == this)
+            Checkpoint previousCheckpoint = player.raidMode.previousCheckpoint;
+            if (previousCheckpoint == this)
             {
                 return true;
             }

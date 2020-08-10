@@ -92,7 +92,7 @@ namespace Strikeforce
             MenuManager.Singleton.ShowMenu(PreviousMenu);
 
             // Drop player
-            ProfileManager.Singleton.CurrentProfile.DropPlayer();
+            ProfileManager.singleton.CurrentProfile.DropPlayer();
         }
     }
 }

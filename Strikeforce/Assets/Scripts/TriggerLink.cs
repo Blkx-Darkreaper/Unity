@@ -212,7 +212,7 @@ namespace Strikeforce
             string weaponType = weapon.Type;
             if (weaponType.Equals(DominantWeaponType) == true)
             {
-                weapon.CmdFire();
+                weapon.CmdFireSimple();
                 return;
             }
 

@@ -117,7 +117,7 @@ namespace Strikeforce
 
         protected void Start()
         {
-            profile = ProfileManager.Singleton.CurrentProfile;
+            profile = ProfileManager.singleton.CurrentProfile;
             if (profile == null)
             {
                 return;
@@ -133,11 +133,6 @@ namespace Strikeforce
 
         protected void Update()
         {
-            if (isLocalPlayer == false)
-            {
-                //    return;
-            }
-
             LeftStick();
             RightStick();
 
@@ -238,26 +233,26 @@ namespace Strikeforce
 
         protected void SelectEntity(Selectable entityToSelect)
         {
-            Player player = profile.Player;
+            Player player = profile.player;
             if (player == null)
             {
                 return;
             }
 
-            player.SelectedEntity = entityToSelect;
+            player.buildMode.selectedEntity = entityToSelect;
             entityToSelect.SetSelection(true);
         }
 
         protected void Deselect()
         {
-            Player player = profile.Player;
+            Player player = profile.player;
             if (player == null)
             {
                 return;
             }
 
-            player.SelectedEntity.SetSelection(false);
-            player.SelectedEntity = null;
+            player.buildMode.selectedEntity.SetSelection(false);
+            player.buildMode.selectedEntity = null;
         }
 
         protected void LeftStick()
@@ -281,7 +276,7 @@ namespace Strikeforce
                 return;
             }
 
-            Player player = profile.Player;
+            Player player = profile.player;
             if (player == null)
             {
                 return;
@@ -328,7 +323,7 @@ namespace Strikeforce
             float x = Input.GetAxis(rightStickHor) * 0.1f;
             float y = Input.GetAxis(rightStickVert) * 0.1f;
 
-            Player player = profile.Player;
+            Player player = profile.player;
             if (player == null)
             {
                 return;
@@ -345,7 +340,7 @@ namespace Strikeforce
             float x = Input.GetAxis(dpadX);
             float y = Input.GetAxis(dpadY);
 
-            Player player = profile.Player;
+            Player player = profile.player;
             if (player == null)
             {
                 return;
@@ -470,7 +465,7 @@ namespace Strikeforce
         protected void HandleMenuButtonToggled()
         {
             // If not in match go back
-            if(profile.Player == null)
+            if(profile.player == null)
             {
                 Menu currentMenu = MenuManager.Singleton.CurrentMenu;
                 MenuManager.Singleton.ShowMenu(currentMenu.PreviousMenu);
@@ -609,7 +604,7 @@ namespace Strikeforce
 
         protected void PlayerHandleKeyEvent(KeyEvent keyEvent)
         {
-            Player player = profile.Player;
+            Player player = profile.player;
             if (player == null)
             {
                 return;

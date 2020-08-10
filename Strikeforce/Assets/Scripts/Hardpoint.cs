@@ -10,17 +10,17 @@ namespace Strikeforce
     public class Hardpoint : MonoBehaviour
     {
         [HideInInspector]
-        public Vector2 Location;
-        public HardpointPosition Position { get; protected set; }
-        public static Size PixelsPerSlot = new Size(42, 42);
-        public int Width { get { return EquippedItems.GetLength(1); } }
-        public int Height { get { return EquippedItems.GetLength(0); } }
-        public Equipment[,] EquippedItems { get; protected set; }
+        public Vector2 location;
+        public HardpointPosition position { get; protected set; }
+        public static Size pixelsPerSlot = new Size(42, 42);
+        public int width { get { return equippedItems.GetLength(1); } }
+        public int height { get { return equippedItems.GetLength(0); } }
+        public Equipment[,] equippedItems { get; protected set; }
         protected Dictionary<string, LinkedList<Weapon>> allWeaponTypes { get; set; }
-        public string DominantWeaponType { get; protected set; }
-        public int AngledSpread { get; protected set; }
-        public int HorizontalSpread { get; protected set; }
-        public int GroupingBonus { get; protected set; }
+        public string dominantWeaponType { get; protected set; }
+        public int angledSpread { get; protected set; }
+        public int horizontalSpread { get; protected set; }
+        public int groupingBonus { get; protected set; }
         protected TriggerLink primaryFire;
         protected TriggerLink secondaryFire;
         protected TriggerLink specialFire;
@@ -28,17 +28,17 @@ namespace Strikeforce
         protected void Awake()
         {
             this.allWeaponTypes = new Dictionary<string, LinkedList<Weapon>>();
-            this.DominantWeaponType = string.Empty;
-            this.AngledSpread = 0;
-            this.HorizontalSpread = 0;
-            this.GroupingBonus = 0;
+            this.dominantWeaponType = string.Empty;
+            this.angledSpread = 0;
+            this.horizontalSpread = 0;
+            this.groupingBonus = 0;
         }
 
         public void Init(int relativeToCenterX, int relativeToCenterY, int width, int height, HardpointPosition position)
         {
-            this.Location = new Vector2(relativeToCenterX, relativeToCenterY);
-            this.Position = position;
-            this.EquippedItems = new Equipment[width, height];
+            this.location = new Vector2(relativeToCenterX, relativeToCenterY);
+            this.position = position;
+            this.equippedItems = new Equipment[width, height];
 
             //TriggerLink[] allTriggers = GetComponentsInChildren<TriggerLink>();
 
@@ -63,7 +63,7 @@ namespace Strikeforce
 
         public bool Contains(Equipment item)
         {
-            foreach (Equipment itemToCheck in EquippedItems)
+            foreach (Equipment itemToCheck in equippedItems)
             {
                 if (itemToCheck != item)
                 {
@@ -78,14 +78,14 @@ namespace Strikeforce
 
         public bool IsEquippable(Equipment item, int row, int column)
         {
-            int itemWidth = item.Width;
-            if (itemWidth > this.Width)
+            int itemWidth = item.width;
+            if (itemWidth > this.width)
             {
                 return false;
             }
 
-            int itemHeight = item.Height;
-            if (itemHeight > this.Height)
+            int itemHeight = item.height;
+            if (itemHeight > this.height)
             {
                 return false;
             }
@@ -94,7 +94,7 @@ namespace Strikeforce
             {
                 for (int y = row; y < itemHeight; y++)
                 {
-                    if (EquippedItems[x, y] != null)
+                    if (equippedItems[x, y] != null)
                     {
                         return false;
                     }
@@ -106,25 +106,25 @@ namespace Strikeforce
 
         public void Equip(Equipment item, int row, int column, Raider parent)
         {
-            int itemWidth = item.Width;
-            int itemHeight = item.Height;
+            int itemWidth = item.width;
+            int itemHeight = item.height;
 
             for (int x = column; x < itemWidth; x++)
             {
                 for (int y = row; y < itemHeight; y++)
                 {
-                    EquippedItems[x, y] = item;
+                    equippedItems[x, y] = item;
                 }
             }
 
-            if (item.IsWeapon == false)
+            if (item.isWeapon == false)
             {
                 return;
             }
 
             // Set Parent of weapon
             Weapon weapon = (Weapon)item;
-            weapon.Parent = parent;
+            weapon.parent = parent;
 
             LinkedList<Weapon> weaponType;
             bool hasType = this.allWeaponTypes.ContainsKey(weapon.Type);
@@ -143,28 +143,28 @@ namespace Strikeforce
 
         public Equipment Unequip(int row, int column)
         {
-            Equipment item = EquippedItems[row, column];
-            bool isRemovable = item.IsRemovable;
+            Equipment item = equippedItems[row, column];
+            bool isRemovable = item.isRemovable;
             if (isRemovable == false)
             {
                 return null;
             }
 
-            for (int x = 0; x < this.Width; x++)
+            for (int x = 0; x < this.width; x++)
             {
-                for (int y = 0; y < this.Height; y++)
+                for (int y = 0; y < this.height; y++)
                 {
-                    Equipment itemToCheck = EquippedItems[x, y];
+                    Equipment itemToCheck = equippedItems[x, y];
                     if (itemToCheck.Equals(item) == false)
                     {
                         continue;
                     }
 
-                    EquippedItems[x, y] = null;
+                    equippedItems[x, y] = null;
                 }
             }
 
-            if(item.IsWeapon == true)
+            if(item.isWeapon == true)
             {
                 Weapon weapon = (Weapon)item;
 
@@ -217,9 +217,9 @@ namespace Strikeforce
             SetHorizontalSpread();
             SetGroupingBonus();
 
-            primaryFire.ReadyWeapons(sortedWeapons, DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
-            secondaryFire.ReadyWeapons(sortedWeapons, DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
-            specialFire.ReadyWeapons(sortedWeapons, DominantWeaponType, AngledSpread, HorizontalSpread, GroupingBonus);
+            primaryFire.ReadyWeapons(sortedWeapons, dominantWeaponType, angledSpread, horizontalSpread, groupingBonus);
+            secondaryFire.ReadyWeapons(sortedWeapons, dominantWeaponType, angledSpread, horizontalSpread, groupingBonus);
+            specialFire.ReadyWeapons(sortedWeapons, dominantWeaponType, angledSpread, horizontalSpread, groupingBonus);
         }
 
         protected LinkedList<Weapon> SetFiringOrder()
@@ -241,7 +241,7 @@ namespace Strikeforce
             }
 
             // Set the dominant weapon type
-            this.DominantWeaponType = firingOrder[firingOrder.Keys[0]];
+            this.dominantWeaponType = firingOrder[firingOrder.Keys[0]];
 
             LinkedList<Weapon> sortedWeapons = new LinkedList<Weapon>();
             foreach (int key in firingOrder.Keys)
@@ -260,7 +260,7 @@ namespace Strikeforce
 
         protected void SetAngledSpread()
         {
-            if (DominantWeaponType.Equals(Weapon.Types.BOLT) == true)
+            if (dominantWeaponType.Equals(Weapon.Types.BOLT) == true)
             {
                 return;
             }
@@ -271,12 +271,12 @@ namespace Strikeforce
             }
 
             int quantity = allWeaponTypes[Weapon.Types.BOLT].Count;
-            this.AngledSpread = quantity * 5;
+            this.angledSpread = quantity * 5;
         }
 
         protected void SetHorizontalSpread()
         {
-            if (DominantWeaponType.Equals(Weapon.Types.FLAMEBURST) == true)
+            if (dominantWeaponType.Equals(Weapon.Types.FLAMEBURST) == true)
             {
                 return;
             }
@@ -287,12 +287,12 @@ namespace Strikeforce
             }
 
             int quantity = allWeaponTypes[Weapon.Types.FLAMEBURST].Count;
-            this.HorizontalSpread = quantity * 10;
+            this.horizontalSpread = quantity * 10;
         }
 
         protected void SetGroupingBonus()
         {
-            if (DominantWeaponType.Equals(Weapon.Types.WAVE) == true)
+            if (dominantWeaponType.Equals(Weapon.Types.WAVE) == true)
             {
                 return;
             }
@@ -303,7 +303,7 @@ namespace Strikeforce
             }
 
             int quantity = allWeaponTypes[Weapon.Types.WAVE].Count;
-            this.GroupingBonus = quantity;
+            this.groupingBonus = quantity;
         }
 
         public void SetPrimaryFire(bool isFiring)

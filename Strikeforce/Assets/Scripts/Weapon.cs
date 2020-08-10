@@ -29,7 +29,7 @@ namespace Strikeforce
         {
             base.Awake();
 
-            this.IsWeapon = true;
+            this.isWeapon = true;
             firingSound = GetComponent<AudioSource>();
 
             LoadProjectilePrefab();
@@ -46,7 +46,7 @@ namespace Strikeforce
         }
 
         [Command]
-        public void CmdFire()
+        public void CmdFireSimple()
         {
             CmdFire(0, 0, 1);
         }
@@ -65,7 +65,7 @@ namespace Strikeforce
 
             GameObject singleShotPrefab = projectilePrefabs[groupingBonus - 1]; //Grouping is 1 based
 
-            Vector3 parentLocation = Parent.transform.position;
+            Vector3 parentLocation = parent.transform.position;
             float x = parentLocation.x;
             float y = parentLocation.y;
             float z = parentLocation.z;
@@ -96,9 +96,9 @@ namespace Strikeforce
             Projectile projectile = bullet.GetComponent<Projectile>();
 
             // make the bullet move away in front of the player
-            Vector3 angleVector = Parent.transform.forward;
+            Vector3 angleVector = parent.transform.forward;
 
-            bullet.GetComponentInChildren<Rigidbody>().velocity = angleVector * projectile.MaxVelocity;
+            bullet.GetComponentInChildren<Rigidbody>().velocity = angleVector * projectile.maxVelocity;
 
             // spawn the bullet on the clients
             NetworkServer.Spawn(bullet);
@@ -109,7 +109,7 @@ namespace Strikeforce
 
         protected void SplitShot(Vector3 firingPoint, GameObject bulletPrefab, int angleSpread, int horizontalSpread)
         {
-            Vector3 rightOffet = Parent.transform.right * 0.1f;
+            Vector3 rightOffet = parent.transform.right * 0.1f;
             Vector3 leftOffset = -rightOffet;
 
             Vector3 leftFiringPoint = new Vector3(firingPoint.x, firingPoint.y, firingPoint.z) + leftOffset;
@@ -122,12 +122,12 @@ namespace Strikeforce
             Projectile projectile = leftBullet.GetComponent<Projectile>();
 
             // make the bullets move away in front of the player
-            Vector3 angleVector = Parent.transform.forward;
-            Quaternion rightAngle = Quaternion.AngleAxis(angleSpread, Parent.transform.forward);
-            Quaternion leftAngle = Quaternion.AngleAxis(-angleSpread, Parent.transform.forward);
+            Vector3 angleVector = parent.transform.forward;
+            Quaternion rightAngle = Quaternion.AngleAxis(angleSpread, parent.transform.forward);
+            Quaternion leftAngle = Quaternion.AngleAxis(-angleSpread, parent.transform.forward);
 
-            leftBullet.GetComponentInChildren<Rigidbody>().velocity = (angleVector + rightAngle.eulerAngles) * projectile.MaxVelocity;
-            rightBullet.GetComponentInChildren<Rigidbody>().velocity = (angleVector + leftAngle.eulerAngles) * projectile.MaxVelocity;
+            leftBullet.GetComponentInChildren<Rigidbody>().velocity = (angleVector + rightAngle.eulerAngles) * projectile.maxVelocity;
+            rightBullet.GetComponentInChildren<Rigidbody>().velocity = (angleVector + leftAngle.eulerAngles) * projectile.maxVelocity;
 
             // spawn the bullets on the clients
             NetworkServer.Spawn(leftBullet);

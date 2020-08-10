@@ -43,12 +43,12 @@ namespace Strikeforce
 
         private static void LoadUsernames()
         {
-            if (ProfileManager.Singleton == null)
+            if (ProfileManager.singleton == null)
             {
                 throw new InvalidOperationException("Profile Manager failed to load");
             }
 
-            string[] allUsernames = ProfileManager.Singleton.GetAllUsernames();
+            string[] allUsernames = ProfileManager.singleton.GetAllUsernames();
             SelectionList.AddAllEntries(allUsernames);
         }
 
@@ -116,12 +116,12 @@ namespace Strikeforce
 
         protected void SelectProfile(string usernameToFind)
         {
-            if (ProfileManager.Singleton == null)
+            if (ProfileManager.singleton == null)
             {
                 throw new InvalidOperationException("Profile Manager failed to load");
             }
 
-            Profile profile = ProfileManager.Singleton.GetProfile(usernameToFind, avatarIndex);
+            Profile profile = ProfileManager.singleton.SwitchToProfile(usernameToFind, avatarIndex);
             if (profile == null)
             {
                 return;

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Networking;
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -10,20 +11,20 @@ namespace Strikeforce
         protected Queue<string> buildQueue;
         protected float currentBuildProgress = 0f;
         protected bool contextOptionSelected = false;
-        public float ConstructionTime;
+        public float constructionTime;
         protected float currentConstructionProgress = 0f;
-        public bool IsConstructionComplete { get; protected set; }
+        public bool isConstructionComplete { get; protected set; }
         protected const string CONSTRUCTION_MESSAGE = "Building...";
-        public bool IsRepairing = false;
-        public int RepairCost;
-        public bool IsDamaged { get{
-                int damageThreshold = 2 * MaxHitPoints / 3;
-                return CurrentHitPoints > damageThreshold;
+        public bool isRepairing = false;
+        public int repairCost;
+        public bool isDamaged { get{
+                int damageThreshold = 2 * maxHitPoints / 3;
+                return currentHitPoints > damageThreshold;
         } }
         protected Vector3 spawnPoint;
-        public Vector3 RallyPoint { get; protected set; }
-        public Texture2D RallyPointIcon;
-        public Texture2D SellIcon;
+        public Vector3 rallyPoint { get; protected set; }
+        public Texture2D rallyPointIcon;
+        public Texture2D sellIcon;
         protected struct StructureProperties
         {
             public const string IS_CONSTRUCTION_COMPLETE = "IsConstructionComplete";
@@ -37,11 +38,11 @@ namespace Strikeforce
         {
             base.Awake();
             this.buildQueue = new Queue<string>();
-            float spawnX = SelectionBounds.center.x + transform.forward.x * SelectionBounds.extents.x + transform.forward.x * 10;
-            float spawnZ = SelectionBounds.center.z + transform.forward.z * SelectionBounds.extents.z + transform.forward.z * 10;
+            float spawnX = selectionBounds.center.x + transform.forward.x * selectionBounds.extents.x + transform.forward.x * 10;
+            float spawnZ = selectionBounds.center.z + transform.forward.z * selectionBounds.extents.z + transform.forward.z * 10;
             this.spawnPoint = new Vector3(spawnX, 0f, spawnZ);
-            this.RallyPoint = spawnPoint;
-            this.IsConstructionComplete = false;
+            this.rallyPoint = spawnPoint;
+            this.isConstructionComplete = false;
         }
 
         protected override void Start()
@@ -49,9 +50,8 @@ namespace Strikeforce
             base.Start();
         }
 
-        protected override void Update()
+        protected virtual void Update()
         {
-            base.Update();
             Build();
         }
 
@@ -59,7 +59,7 @@ namespace Strikeforce
         {
             base.OnGUI();
 
-            if (IsConstructionComplete == true)
+            if (isConstructionComplete == true)
             {
                 return;
             }
@@ -67,10 +67,11 @@ namespace Strikeforce
             DrawConstructionProgress();
         }
 
+        [Client]
         private void DrawConstructionProgress()
         {
             GUI.skin = GlobalAssets.SelectionBoxSkin;
-            Rect selectionBox = GameManager.CalculateSelectionBox(SelectionBounds, playingArea);
+            Rect selectionBox = GameManager.CalculateSelectionBox(selectionBounds, playingArea);
 
             // Draw the selection box around the currently selected object, within the bounds of the main draw area
             GUI.BeginGroup(playingArea);
@@ -83,14 +84,15 @@ namespace Strikeforce
 
         public int GetTotalRepairCost()
         {
-            int damage = MaxHitPoints - CurrentHitPoints;
+            int damage = maxHitPoints - currentHitPoints;
 
-            int repairCost = Math.Max(1, Cost / MaxHitPoints);
+            int repairCost = Math.Max(1, cost / maxHitPoints);
 
             int totalCost = repairCost * damage;
             return totalCost;
         }
 
+        [Server]
         protected void AddVehicleToBuildQueue(string unitName)
         {
             GameObject unitGameObject = GlobalAssets.GetVehiclePrefab(unitName);
@@ -100,22 +102,23 @@ namespace Strikeforce
                 return;
             }
 
-            if (Owner != null)
+            if (currentOwner != null)
             {
-                bool sufficientFunds = Owner.CurrentInventory.HasSufficientResources(ResourceType.Money, vehicle.Cost);
+                bool sufficientFunds = currentOwner.buildMode.currentInventory.HasSufficientResources(ResourceType.Money, vehicle.cost);
                 if (sufficientFunds == false)
                 {
-                    Owner.CurrentInventory.InsufficientResources(ResourceType.Money);
+                    currentOwner.buildMode.currentInventory.InsufficientResources(ResourceType.Money);
                     return;
                 }
 
-                Owner.CurrentInventory.UpdateResource(ResourceType.Money, -vehicle.Cost);
+                currentOwner.buildMode.currentInventory.UpdateResource(ResourceType.Money, -vehicle.cost);
             }
 
             buildQueue.Enqueue(unitName);
-            this.BuildTime = vehicle.BuildTime;
+            this.buildTime = vehicle.buildTime;
         }
 
+        [Server]
         protected void Build()
         {
             if (buildQueue.Count <= 0)
@@ -124,17 +127,17 @@ namespace Strikeforce
             }
 
             currentBuildProgress += Time.deltaTime;
-            if (currentBuildProgress < BuildTime)
+            if (currentBuildProgress < buildTime)
             {
                 return;
             }
-            if (Owner == null)
+            if (currentOwner == null)
             {
                 return;
             }
 
             string unitName = buildQueue.Dequeue();
-            Owner.SpawnUnit(unitName, spawnPoint, RallyPoint, transform.rotation, this);
+            currentOwner.buildMode.SpawnUnit(unitName, spawnPoint, rallyPoint, transform.rotation, this);
             currentBuildProgress = 0f;
         }
 
@@ -151,7 +154,7 @@ namespace Strikeforce
                 return 0f;
             }
 
-            float completionPercentage = currentBuildProgress / BuildTime;
+            float completionPercentage = currentBuildProgress / buildTime;
             return completionPercentage;
         }
 
@@ -159,11 +162,11 @@ namespace Strikeforce
         {
             base.SetSelection(selected);
 
-            if (Owner == null)
+            if (currentOwner == null)
             {
                 return;
             }
-            if (Owner.IsNPC == true)
+            if (currentOwner.isNPC == true)
             {
                 return;
             }
@@ -180,12 +183,12 @@ namespace Strikeforce
                 {
                     return;
                 }
-                if (RallyPoint == GlobalAssets.InvalidLocation)
+                if (rallyPoint == GlobalAssets.InvalidLocation)
                 {
                     return;
                 }
 
-                flag.transform.localPosition = RallyPoint;
+                flag.transform.localPosition = rallyPoint;
                 flag.transform.forward = transform.forward;
                 flag.Enable();
             }
@@ -203,7 +206,7 @@ namespace Strikeforce
             {
                 return;
             }
-            if (player.IsNPC == true)
+            if (player.isNPC == true)
             {
                 return;
             }
@@ -224,7 +227,7 @@ namespace Strikeforce
             }
 
             float x = hitPoint.x;
-            float y = hitPoint.y + player.SelectedEntity.transform.position.y;  // Ensures rallyPoint stays on top of the surface it is on
+            float y = hitPoint.y + player.buildMode.selectedEntity.transform.position.y;  // Ensures rallyPoint stays on top of the surface it is on
             float z = hitPoint.z;
             Vector3 pointClicked = new Vector3(x, y, z);
             UpdateRallyPointPosition(pointClicked);
@@ -232,7 +235,7 @@ namespace Strikeforce
 
         private void UpdateRallyPointPosition(Vector3 updatedPoint)
         {
-            RallyPoint = updatedPoint;
+            rallyPoint = updatedPoint;
 
             RallyPoint flag = GetComponentInChildren<RallyPoint>();
             if (flag == null)
@@ -246,7 +249,7 @@ namespace Strikeforce
         public bool HasValidSpawnPoint()
         {
             bool hasSpawnPoint = spawnPoint != GlobalAssets.InvalidLocation;
-            bool hasRallyPoint = RallyPoint != GlobalAssets.InvalidLocation;
+            bool hasRallyPoint = rallyPoint != GlobalAssets.InvalidLocation;
 
             return hasSpawnPoint && hasRallyPoint;
         }
@@ -255,11 +258,11 @@ namespace Strikeforce
         {
             base.SetHoverState(entityUnderMouse);
 
-            if (Owner == null)
+            if (currentOwner == null)
             {
                 return;
             }
-            if (Owner.IsNPC == true)
+            if (currentOwner.isNPC == true)
             {
                 return;
             }
@@ -274,30 +277,31 @@ namespace Strikeforce
                 return;
             }
 
-            CursorState previousState = Owner.BuildHud.PreviousCursorState;
+            CursorState previousState = currentOwner.buildMode.hud.PreviousCursorState;
             if (previousState != CursorState.rallyPoint)
             {
                 return;
             }
 
-            Owner.BuildHud.SetCursorState(CursorState.rallyPoint);
+            currentOwner.buildMode.hud.SetCursorState(CursorState.rallyPoint);
         }
 
+        [Server]
         public void Sell()
         {
-            if (Owner == null)
+            if (currentOwner == null)
             {
                 return;
             }
 
-            Owner.CurrentInventory.UpdateResource(ResourceType.Money, SellValue);
+            currentOwner.buildMode.currentInventory.UpdateResource(ResourceType.Money, sellValue);
 
             if (isSelected == true)
             {
                 SetSelection(false);
             }
 
-            GameManager.Singleton.CmdRemoveEntity(this);
+            GameEntityManager.singleton.RemoveEntity(this);
         }
 
         public virtual void ToggleContextOption()
@@ -305,16 +309,18 @@ namespace Strikeforce
             contextOptionSelected = !contextOptionSelected;
         }
 
+        [Server]
         public void StartConstruction()
         {
             UpdateBounds();
-            IsConstructionComplete = false;
-            CurrentHitPoints = 0;
+            this.isConstructionComplete = false;
+            this.currentHitPoints = 0;
         }
 
+        [Server]
         public void CancelConstruction()
         {
-            if (Owner == null)
+            if (currentOwner == null)
             {
                 return;
             }
@@ -324,52 +330,56 @@ namespace Strikeforce
                 SetSelection(false);
             }
 
-            GameManager.Singleton.CmdRemoveEntity(this);
+            GameEntityManager.singleton.RemoveEntity(this);
         }
 
+        [Server]
         public void Construct(int amount)
         {
-            CurrentHitPoints += amount;
+            this.currentHitPoints += amount;
 
-            if (CurrentHitPoints < MaxHitPoints)
+            if (currentHitPoints < maxHitPoints)
             {
                 return;
             }
 
-            CurrentHitPoints = MaxHitPoints;
-            IsConstructionComplete = true;
+            this.currentHitPoints = maxHitPoints;
+            this.isConstructionComplete = true;
             RestoreMaterials();
             SetTeamColour();
         }
 
+        [Server]
         public void Repair(int amount)
         {
-            if (IsRepairing == false)
+            if (isRepairing == false)
             {
                 return;
             }
 
             // Check if there are sufficient funds
-            int fundsRequired = amount / 2 * RepairCost;
-            bool sufficientFunds = Owner.CurrentInventory.HasSufficientResources(ResourceType.Money, fundsRequired);
+            int fundsRequired = amount / 2 * repairCost;
+            bool sufficientFunds = currentOwner.buildMode.currentInventory.HasSufficientResources(ResourceType.Money, fundsRequired);
             if (sufficientFunds == false)
             {
-                IsRepairing = false;
+                this.isRepairing = false;
                 return;
             }
 
-            Owner.CurrentInventory.UpdateResource(ResourceType.Money, -fundsRequired);
+            currentOwner.buildMode.currentInventory.UpdateResource(ResourceType.Money, -fundsRequired);
 
-            CurrentHitPoints += amount;
+            this.currentHitPoints += amount;
 
-            if (CurrentHitPoints < MaxHitPoints)
+            if (currentHitPoints < maxHitPoints)
             {
                 return;
             }
 
-            CurrentHitPoints = MaxHitPoints;
+            this.currentHitPoints = maxHitPoints;
+            this.isRepairing = false;
         }
 
+        [Server]
         public override void TakeDamage(int amount, RaycastHit hit)
         {
             base.TakeDamage(amount, hit);

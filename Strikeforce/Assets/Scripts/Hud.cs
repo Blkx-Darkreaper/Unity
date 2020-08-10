@@ -46,7 +46,7 @@ namespace Strikeforce
         {
             FitToScreen();
 
-            profile = ProfileManager.Singleton.CurrentProfile;
+            profile = ProfileManager.singleton.CurrentProfile;
 
             SetCursorState(CursorState.select);
             InitResources();
@@ -132,13 +132,13 @@ namespace Strikeforce
             //    return;
             //}
 
-            if (profile.Player == null)
+            if (profile.player == null)
             {
                 Debug.Log(string.Format("Player is null"));
                 return;
             }
 
-            if (profile.Player.IsNPC == true)
+            if (profile.player.isNPC == true)
             {
                 //Debug.Log(string.Format("Non-Human player"));
                 return;
@@ -193,7 +193,7 @@ namespace Strikeforce
 
         protected void DrawHealthBar()
         {
-            Raider raider = profile.Player.CurrentRaider;
+            Raider raider = profile.player.raidMode.currentRaider;
             if (raider == null)
             {
                 return;
@@ -205,12 +205,12 @@ namespace Strikeforce
             // draw health bar background
             GUI.color = Color.grey;
             GUI.backgroundColor = Color.grey;
-            GUI.Box(new Rect(pos.x - 26, Screen.height - pos.y + 20, raider.MaxHitPoints / 2, 7), ".", BackStyle);
+            GUI.Box(new Rect(pos.x - 26, Screen.height - pos.y + 20, raider.maxHitPoints / 2, 7), ".", BackStyle);
 
             // draw health bar amount
             GUI.color = Color.green;
             GUI.backgroundColor = Color.green;
-            GUI.Box(new Rect(pos.x - 25, Screen.height - pos.y + 21, raider.CurrentHitPoints / 2, 5), ".", HealthStyle);
+            GUI.Box(new Rect(pos.x - 25, Screen.height - pos.y + 21, raider.currentHitPoints / 2, 5), ".", HealthStyle);
         }
 
         protected float DrawPlayerAvatar(float x, float y, float height)
@@ -240,7 +240,7 @@ namespace Strikeforce
                 drawCustomCursor = true;
             }
             //drawCustomCursor = drawCustomCursor && MouseOnScreen();
-            if (profile.Player.IsSettingConstructionPoint == true)
+            if (profile.player.buildMode.isSettingConstructionPoint == true)
             {
                 Cursor.visible = false;
                 return;
@@ -352,24 +352,24 @@ namespace Strikeforce
 
         protected void DrawAvailableActions()
         {
-            if (profile.Player == null)
+            if (profile.player == null)
             {
                 return;
             }
-            if (profile.Player.SelectedEntity == null)
+            if (profile.player.buildMode.selectedEntity == null)
             {
                 return;
             }
 
-            bool ownedByPlayer = profile.Player.SelectedEntity.IsOwnedByPlayer(profile.Player);
+            bool ownedByPlayer = profile.player.buildMode.selectedEntity.IsOwnedByPlayer(profile.player);
             if (ownedByPlayer == false)
             {
                 return;
             }
 
             ResetSlider();
-            string[] allActions = profile.Player.SelectedEntity.Actions;
-            previousSelection = profile.Player.SelectedEntity;
+            string[] allActions = profile.player.buildMode.selectedEntity.actions;
+            previousSelection = profile.player.buildMode.selectedEntity;
         }
 
         protected void ResetSlider()
@@ -378,7 +378,7 @@ namespace Strikeforce
             {
                 return;
             }
-            if (previousSelection == profile.Player.SelectedEntity)
+            if (previousSelection == profile.player.buildMode.selectedEntity)
             {
                 return;
             }
@@ -415,8 +415,8 @@ namespace Strikeforce
         protected void DrawResourceIcon(ResourceType type, int iconLeft, int textLeft, int topEdge)
         {
             Texture2D icon = allResources[type];
-            int value = profile.Player.CurrentInventory.GetResourceAmount(type);
-            int maxValue = profile.Player.CurrentInventory.GetMaxResourceAmount(type);
+            int value = profile.player.buildMode.currentInventory.GetResourceAmount(type);
+            int maxValue = profile.player.buildMode.currentInventory.GetMaxResourceAmount(type);
             string text = string.Format("{0} / {1}", value, maxValue);
             GUI.DrawTexture(new Rect(iconLeft, topEdge, ICON_WIDTH, ICON_HEIGHT), icon);
             GUI.Label(new Rect(textLeft, topEdge, TEXT_WIDTH, TEXT_HEIGHT), text);

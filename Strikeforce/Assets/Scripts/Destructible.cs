@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 namespace Strikeforce
@@ -6,16 +6,22 @@ namespace Strikeforce
     public class Destructible : Selectable
     {
         public const int MAX_DAMAGE = 999;
-        public int MaxHitPoints;
+        public int maxHitPoints;
         [HideInInspector]
         [SyncVar]
-        public int CurrentHitPoints;
+        public int currentHitPoints;
         protected float healthPercentage { get; set; }
         protected GUIStyle healthStyle { get; set; }
         private const int HEALTH_BAR_VERTICAL_OFFSET = 7;
         private const int HEALTH_BAR_HEIGHT = 5;
-        [SyncVar]
-        public bool IsAirborne = false;
+        protected string explosionName;
+        public struct HealthStatus
+        {
+            public const string PRISTINE = "Pristine";
+            public const string MARRED = "Marred";
+            public const string DAMAGED = "Damaged";
+            public const string CRITICALLY_DAMAGED = "Critically Damaged";
+        }
         protected struct DestructibleProperties
         {
             public const string HIT_POINTS = "HitPoints";
@@ -25,8 +31,8 @@ namespace Strikeforce
         {
             base.Awake();
 
-            healthStyle = new GUIStyle();
-            CurrentHitPoints = MaxHitPoints;
+            this.healthStyle = new GUIStyle();
+            this.currentHitPoints = maxHitPoints;
         }
 
         protected override void Start()
@@ -68,26 +74,26 @@ namespace Strikeforce
 
         protected virtual void UpdateHealthPercentage(float healthyThreshold, float damagedThreshold)
         {
-            if (MaxHitPoints == 0)
+            if (maxHitPoints == 0)
             {
-                healthPercentage = 0f;
+                this.healthPercentage = 0f;
                 return;
             }
 
-            healthPercentage = (float)CurrentHitPoints / (float)MaxHitPoints;
+            this.healthPercentage = (float)currentHitPoints / (float)maxHitPoints;
 
             if (healthPercentage > healthyThreshold)
             {
-                healthStyle.normal.background = GlobalAssets.HealthBarTextures.Healthy;
+                this.healthStyle.normal.background = GlobalAssets.HealthBarTextures.Healthy;
                 return;
             }
             if (healthPercentage > damagedThreshold)
             {
-                healthStyle.normal.background = GlobalAssets.HealthBarTextures.Damaged;
+                this.healthStyle.normal.background = GlobalAssets.HealthBarTextures.Damaged;
                 return;
             }
 
-            healthStyle.normal.background = GlobalAssets.HealthBarTextures.Critical;
+            this.healthStyle.normal.background = GlobalAssets.HealthBarTextures.Critical;
         }
 
         public virtual void TakeDamage(int amount, RaycastHit hit)
@@ -95,38 +101,42 @@ namespace Strikeforce
             TakeDamage(amount);
         }
 
-        public virtual void TakeDamage(int amount)
+        public virtual void TakeDamage(int damage)
         {
             if (isServer == false)
             {
                 return;
             }
 
-            CurrentHitPoints -= amount;
+            this.currentHitPoints -= damage;
 
             string ownersName = "Neutral";
-            if (Owner != null)
+            if (currentOwner != null)
             {
-                ownersName = string.Format("{0}'s", Owner.PlayerId.ToString());
+                ownersName = string.Format("{0}'s", currentOwner.playerId.ToString());
             }
 
-            Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, amount));
+            Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, damage));
 
-            Flash(Color.red, 5f);
+            _RenderFlashing flashComp = GetComponent<_RenderFlashing>();
+            if (flashComp)
+            {
+                flashComp.Flash(Color.red, 5f);
+            }
 
-            if (CurrentHitPoints > 0)
+            if (currentHitPoints > 0)
             {
                 return;
             }
 
+            Explode();
             DestroyEntity();
         }
 
         protected void Explode()
         {
-            string explosionName = "";
             GameObject explosion = GlobalAssets.GetMiscPrefab(explosionName);
-            if(explosion == null)
+            if (explosion == null)
             {
                 return;
             }
@@ -136,12 +146,12 @@ namespace Strikeforce
 
         protected override void DestroyEntity()
         {
-            GameManager.Singleton.CmdRemoveEntity(this);
+            GameEntityManager.singleton.RemoveEntity(this);
 
             string ownersName = "Neutral";
-            if (Owner != null)
+            if (currentOwner != null)
             {
-                ownersName = string.Format("{0}'s", Owner.PlayerId.ToString());
+                ownersName = string.Format("{0}'s", currentOwner.playerId.ToString());
             }
 
             Debug.Log(string.Format("{0} {1} has been destroyed", ownersName, name));

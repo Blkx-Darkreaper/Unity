@@ -31,7 +31,7 @@ namespace Strikeforce
         {
             base.Awake();
 
-            this.MaxVelocity = 5;
+            this.maxVelocity = 5;
             this.pathfinder = GetComponentInChildren<NavMeshAgent>();
             this.allWaypoints = new Queue<Vector3>();
         }
@@ -43,7 +43,7 @@ namespace Strikeforce
             this.currentOrder = Order.None;
             if (pathfinder != null)
             {
-                this.pathfinder.speed = MaxVelocity;
+                this.pathfinder.speed = this.maxVelocity;
                 this.pathfinder.acceleration = Acceleration;
             }
             this.previousPosition = transform.position;
@@ -51,10 +51,8 @@ namespace Strikeforce
             this.FuelRemaining = 0f;
         }
 
-        protected override void Update()
+        protected virtual void Update()
         {
-            base.Update();
-
             UpdateDistanceTravelled();
         }
 
@@ -96,7 +94,7 @@ namespace Strikeforce
 
             Vector3 currentPosition = transform.position;
 
-            CurrentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
+            currentLevel.KeepInBounds(currentPosition.x, currentPosition.z, ref x, ref z);
 
             transform.Translate(x, 0, z);
         }

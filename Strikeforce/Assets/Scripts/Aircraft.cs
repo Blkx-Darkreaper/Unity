@@ -6,7 +6,7 @@ namespace Strikeforce
 {
     public class Aircraft : Vehicle
     {
-        public int StallSpeed = 3;
+        public int stallSpeed = 3;
         public float MaxBank = 30f;
         [SyncVar]
         protected float altitude;
@@ -39,19 +39,19 @@ namespace Strikeforce
                 return;
             }
 
-            if (IsAirborne == true)
+            if (this.isAirborne == true)
             {
                 return;
             }
 
             Rigidbody rigidbody = gameObject.GetComponentInChildren<Rigidbody>();
             float velocity = rigidbody.velocity.z;
-            if (velocity < StallSpeed)
+            if (velocity < stallSpeed)
             {
                 return;
             }
 
-            this.IsAirborne = true;
+            this.isAirborne = true;
         }
 
         public void Land()
@@ -61,17 +61,17 @@ namespace Strikeforce
                 return;
             }
 
-            if (IsAirborne == false)
+            if (this.isAirborne == false)
             {
                 return;
             }
 
-            if (MaxVelocity > StallSpeed)
+            if (this.maxVelocity > stallSpeed)
             {
                 return;
             }
 
-            this.IsAirborne = false;
+            this.isAirborne = false;
 
             if (LandingSound == null)
             {
@@ -120,17 +120,17 @@ namespace Strikeforce
                 return;
             }
 
-            CurrentHitPoints -= amount;
+            currentHitPoints -= amount;
 
             string ownersName = "Neutral";
-            if (Owner != null)
+            if (currentOwner != null)
             {
-                ownersName = string.Format("{0}'s", Owner.PlayerId.ToString());
+                ownersName = string.Format("{0}'s", currentOwner.playerId.ToString());
             }
 
             Debug.Log(string.Format("{0} {1} has taken {2} damage", ownersName, name, amount));
 
-            if (CurrentHitPoints > 0)
+            if (currentHitPoints > 0)
             {
                 return;
             }
@@ -152,7 +152,7 @@ namespace Strikeforce
             }
 
             this.IsFalling = true;
-            this.CurrentHitPoints = MaxHitPoints / 4;
+            this.currentHitPoints = maxHitPoints / 4;
 
             Rigidbody rigidBody = gameObject.GetComponent<Rigidbody>();
             if (rigidBody == null)
@@ -165,7 +165,7 @@ namespace Strikeforce
 
         public void ChangeAltitude(float amount)
         {
-            if (IsAirborne == false)
+            if (this.isAirborne == false)
             {
                 return;
             }

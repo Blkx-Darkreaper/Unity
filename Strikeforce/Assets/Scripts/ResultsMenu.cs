@@ -69,7 +69,7 @@ namespace Strikeforce
             buttonPressed = GUI.Button(new Rect(x, y, buttonWidth, buttonHeight), mainMenuText);
             if (buttonPressed == true)
             {
-                GameManager.Singleton.CmdLoadLevel(string.Empty);
+                GameplayManager.singleton.CmdLoadLevel(string.Empty);
                 SceneManager.LoadScene(Scenes.MatchLobby);
                 Cursor.visible = true;
             }

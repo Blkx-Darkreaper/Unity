@@ -1,26 +1,31 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Strikeforce
 {
     public class Selectable : Body
     {
-        public Texture2D BuildImage { get; set; }
-        public float BuildTime { get; set; }
-        public int Cost { get; set; }
-        public int SellValue { get; set; }
-        public string[] Actions { get; set; }
+        public Texture2D buildImage { get; set; }
+        public float buildTime { get; set; }
+        public int cost { get; set; }
+        public int sellValue { get; set; }
+        public string[] actions { get; set; }
+        public Rect playingArea { get; set; }
         protected bool isSelected { get; set; }
-        public Bounds SelectionBounds { get; protected set; }
-        public Player Owner { get; set; }
+        public Bounds selectionBounds { get; protected set; }
+        public Player currentOwner { get; set; }
         private List<Material> oldMaterials { get; set; }
+        protected struct SelectableProperties
+        {
+            public const string MESHES = "Meshes";
+        }
 
         protected override void Awake()
         {
             base.Awake();
 
-            SelectionBounds = GlobalAssets.InvalidBounds;
+            this.playingArea = new Rect(0f, 0f, 0f, 0f);
+            this.selectionBounds = GlobalAssets.InvalidBounds;
             //UpdateBounds();
         }
 
@@ -45,8 +50,8 @@ namespace Strikeforce
 
         protected void SetOwnership()
         {
-            Owner = GetComponentInParent<Player>();
-            if (Owner == null)
+            this.currentOwner = GetComponentInParent<Player>();
+            if (currentOwner == null)
             {
                 //Debug.Log(string.Format("{0} has no owner", entityName));
                 return;
@@ -62,29 +67,29 @@ namespace Strikeforce
             FactionColour[] allTeamColours = GetComponentsInChildren<FactionColour>();
             foreach (FactionColour teamColour in allTeamColours)
             {
-                if (Owner == null)
+                if (currentOwner == null)
                 {
-                    teamColour.GetComponent<Renderer>().material.color = GameManager.Singleton.DefaultColour;
+                    teamColour.GetComponent<Renderer>().material.color = GameplayManager.singleton.defaultColour;
                     continue;
                 }
 
-                teamColour.GetComponent<Renderer>().material.color = Owner.Colour;
+                teamColour.GetComponent<Renderer>().material.color = currentOwner.colour;
             }
         }
 
         public bool IsOwnedByPlayer(Player player)
         {
-            if (Owner == null)
+            if (currentOwner == null)
             {
                 return false;
             }
 
-            return Owner.Equals(player);
+            return currentOwner.Equals(player);
         }
 
         public virtual void SetSelection(bool selected)
         {
-            isSelected = selected;
+            this.isSelected = selected;
             if (selected == false)
             {
                 return;
@@ -96,7 +101,7 @@ namespace Strikeforce
         private void DrawSelection()
         {
             GUI.skin = GlobalAssets.SelectionBoxSkin;
-            Rect selectionBox = GameManager.CalculateSelectionBox(SelectionBounds, playingArea);
+            Rect selectionBox = GameManager.CalculateSelectionBox(selectionBounds, playingArea);
 
             GUI.BeginGroup(playingArea);
             DrawSelectionBox(selectionBox);
@@ -111,7 +116,7 @@ namespace Strikeforce
         public void UpdateBounds()
         {
             Bounds updatedBounds = new Bounds(transform.position, Vector3.zero);
-            GameObject meshes = transform.Find(BodyProperties.MESHES).gameObject;
+            GameObject meshes = transform.Find(SelectableProperties.MESHES).gameObject;
             Renderer[] allRenderers = meshes.GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in allRenderers)
             {
@@ -124,7 +129,7 @@ namespace Strikeforce
                 updatedBounds.Encapsulate(renderer.bounds);
             }
 
-            SelectionBounds = updatedBounds;
+            this.selectionBounds = updatedBounds;
         }
 
         public virtual void PerformAction(string actionToPerform) { }
@@ -182,7 +187,7 @@ namespace Strikeforce
             //	SetAttackTarget(hitEntity);
         }
 
-        private void ChangeSelection(Selectable otherEntity, Player player)
+        private void ChangeSelection(Selectable otherEntity, PlayerBuildMode player)
         {
             if (otherEntity == this)
             {
@@ -190,13 +195,13 @@ namespace Strikeforce
             }
 
             SetSelection(false);
-            if (player.SelectedEntity != null)
+            if (player.selectedEntity != null)
             {
-                player.SelectedEntity.SetSelection(false);
+                player.selectedEntity.SetSelection(false);
             }
 
-            player.SelectedEntity = otherEntity;
-            playingArea = Hud.GetPlayingArea();
+            player.selectedEntity = otherEntity;
+            this.playingArea = Hud.GetPlayingArea();
             otherEntity.SetSelection(true);
         }
 

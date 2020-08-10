@@ -1,25 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Strikeforce;
 
 public class _DestroyOnContact : MonoBehaviour
 {
     public GameObject Explosion;
     public GameObject PlayerExplosion;
-    private GameManager gameManager;
     public int pointsValue;
-
-    public void Start()
-    {
-        GameObject gameManagerObject = GameObject.FindWithTag(Tags.GAME_MANAGER);
-        if (gameManagerObject == null)
-        {
-            Debug.Log("Cannot find 'GameController' script");
-            return;
-        }
-
-        gameManager = gameManagerObject.GetComponent<GameManager>();
-    }
 
     public void OnTriggerEnter(Collider other)
     {
@@ -48,6 +34,6 @@ public class _DestroyOnContact : MonoBehaviour
         }
 
         Instantiate(PlayerExplosion, other.transform.position, other.transform.rotation);
-        gameManager.GameOver();
+        GameplayManager.singleton.GameOver();
     }
 }

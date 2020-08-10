@@ -65,7 +65,7 @@ namespace Strikeforce
 
         public virtual void ExpandAndCenterAroundSelectable(Selectable selectable)
         {
-            Bounds selectionBounds = selectable.SelectionBounds;
+            Bounds selectionBounds = selectable.selectionBounds;
 
             float selectionX = selectable.transform.position.x;
             float selectionY = selectable.transform.position.z;

@@ -22,7 +22,7 @@ namespace Strikeforce
 
         public virtual void DestroyArmour()
         {
-            GameManager.Singleton.CmdRemoveEntity(this);
+            GameEntityManager.singleton.RemoveEntity(this);
 
             Debug.Log(string.Format("{0} has been destroyed", name));
         }
