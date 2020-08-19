@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cover = Global.Cover;
@@ -114,11 +115,46 @@ public class Squad : MonoBehaviour
         return moveDistance;
     }
 
+    protected class SquadDistanceComparer : IComparer<float>
+    {
+        public int Compare(float x, float y)
+        {
+            string xStr = x.ToString();
+            string yStr = y.ToString();
+
+            int minLength = Math.Min(xStr.Length, yStr.Length);
+
+            for (int i = 0; i < minLength; i++)
+            {
+                if(i > xStr.Length)
+                {
+                    return -1;
+                }
+                if(i > yStr.Length)
+                {
+                    return 1;
+                }
+
+                int digitX = (int)xStr[i];
+                int digitY = (int)yStr[i];
+
+                if(digitX == digitY)
+                {
+                    continue;
+                }
+
+                return digitX - digitY;
+            }
+
+            return 1;
+        }
+    }
+
     public SortedList<float, Model> GetNearestSquadMembers(Model model)
     {
         int squadId = model.squad.ID;
 
-        SortedList<float, Model> allNearbySquadMembers = new SortedList<float, Model>();
+        SortedList<float, Model> allNearbySquadMembers = new SortedList<float, Model>(allSquadMembers.Count, new SquadDistanceComparer());
 
         foreach (Model squadMember in allSquadMembers)
         {

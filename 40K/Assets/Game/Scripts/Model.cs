@@ -40,8 +40,10 @@ public class Model : MonoBehaviour
     [ReadOnlyInInspector]
     public const float COHESION_DISTANCE = 2f;
     protected const float DISTANCE_THRESHOLD = 0.1f;
-    protected const float COHESION_CONSTANT = 10f;
-    protected const float VELOCITY_CONSTANT = 20f;
+    protected const float COHESION_CONSTANT = 1.5f;
+    protected const float SCATTER_CONSTANT = 10f;
+    protected const float LEADER_VELOCITY_CONSTANT = 1.5f;
+    protected const float VELOCITY_CONSTANT = 5f;
     protected const float SPEED_THRESHOLD = 0.5f;
 
     [ReadOnlyInInspector]
@@ -271,48 +273,121 @@ public class Model : MonoBehaviour
     //    return allNearestSquadMembers;
     //}
 
+    //public void MaintainCoherency()
+    //{
+    //    if(this == squad.squadLeader)
+    //    {
+    //        return;
+    //    }
+
+    //    SortedList<float, Model> allNearbySquadMembers = GetNearestSquadMembers();
+    //    float distanceSum = 0;
+    //    foreach(KeyValuePair<float, Model> nearbySquadMember in allNearbySquadMembers)
+    //    {
+    //        distanceSum += nearbySquadMember.Key;
+    //    }
+
+    //    float avgDistance = distanceSum / allNearbySquadMembers.Count;
+    //    this.DEBUG_avgDistance = avgDistance;
+
+    //    if (Mathf.Abs(avgDistance - COHESION_DISTANCE) <= DISTANCE_THRESHOLD)
+    //    {
+    //        this.agent.velocity = Vector3.zero;
+    //        return;
+    //    }
+
+    //    Vector3 velocity = this.agent.velocity;
+
+    //    Vector3 cohesionVectorOffset = BoidMoveTowardsCenterOfMass();
+    //    Vector3 separationVectorOffset = BoidMaintainSeparation();
+    //    Vector3 velocityVectorOffset = BoidMatchVelocity();
+
+    //    float squadLeaderSpeed = this.squad.squadLeader.agent.velocity.magnitude;
+    //    if (squadLeaderSpeed < SPEED_THRESHOLD)
+    //    {
+    //        velocityVectorOffset = Vector3.zero;
+    //    }
+
+    //    velocity += cohesionVectorOffset + separationVectorOffset + velocityVectorOffset;
+    //    float magnitude = velocity.magnitude;
+
+    //    float moveSpeed = this.squad.GetMaxMovementSpeed();
+    //    float adjMagnitude = Mathf.Clamp(magnitude, 0, moveSpeed);
+
+    //    Vector3 adjVelocity = velocity.normalized * adjMagnitude;
+    //    this.agent.velocity = adjVelocity;
+    //}
+
     public void MaintainCoherency()
     {
-        if(this == squad.squadLeader)
+        if (this == squad.squadLeader)
         {
             return;
         }
 
         SortedList<float, Model> allNearbySquadMembers = GetNearestSquadMembers();
-        float distanceSum = 0;
-        foreach(KeyValuePair<float, Model> nearbySquadMember in allNearbySquadMembers)
-        {
-            distanceSum += nearbySquadMember.Key;
-        }
-
-        float avgDistance = distanceSum / allNearbySquadMembers.Count;
-        this.DEBUG_avgDistance = avgDistance;
-
-        if (Mathf.Abs(avgDistance - COHESION_DISTANCE) <= DISTANCE_THRESHOLD)
-        {
-            this.agent.velocity = Vector3.zero;
-            return;
-        }
 
         Vector3 velocity = this.agent.velocity;
 
-        Vector3 cohesionVectorOffset = BoidMoveTowardsCenterOfMass();
-        Vector3 separationVectorOffset = BoidMaintainSeparation();
-        Vector3 velocityVectorOffset = BoidMatchVelocity();
+        Vector3 currentPosition = this.transform.position;
+
+        KeyValuePair<float, Model> squadMemberA = allNearbySquadMembers.ElementAt(0);
+        Vector3 squadMemberAPosition = squadMemberA.Value.transform.position;
+        float squadMemberADistance = squadMemberA.Key;
+
+        KeyValuePair<float, Model> squadMemberB = allNearbySquadMembers.ElementAt(1);
+        Vector3 squadMemberBPosition = squadMemberB.Value.transform.position;
+        float squadMemberBDistance = squadMemberB.Key;
+
+        float avgDistance = (squadMemberADistance + squadMemberBDistance) / 2f;
+        this.DEBUG_avgDistance = avgDistance;
+
+        Vector3 deltaPositionA = Vector3.zero;
+        if(squadMemberADistance - COHESION_DISTANCE > DISTANCE_THRESHOLD)
+        {
+            deltaPositionA = squadMemberAPosition - currentPosition;
+        }
+        if (COHESION_DISTANCE - squadMemberADistance > DISTANCE_THRESHOLD)
+        {
+            deltaPositionA = (currentPosition - squadMemberAPosition) * COHESION_CONSTANT;
+        }
+
+        Vector3 deltaPositionB = Vector3.zero;
+        if (squadMemberBDistance - COHESION_DISTANCE > DISTANCE_THRESHOLD)
+        {
+            deltaPositionB = squadMemberBPosition - currentPosition;
+        }
+        if (COHESION_DISTANCE - squadMemberBDistance > DISTANCE_THRESHOLD)
+        {
+            deltaPositionB = (currentPosition - squadMemberBPosition) * COHESION_CONSTANT;
+        }
+
+        Vector3 deltaPosition = deltaPositionA + deltaPositionB;
+
+        Vector3 velocityOffset = velocity / VELOCITY_CONSTANT;
+        if (velocity.magnitude < SPEED_THRESHOLD)
+        {
+            velocityOffset = Vector3.zero;
+        }
+
+        deltaPosition += velocityOffset;
+
+        Vector3 leaderVelocityOffset = this.squad.squadLeader.agent.velocity / LEADER_VELOCITY_CONSTANT;
 
         float squadLeaderSpeed = this.squad.squadLeader.agent.velocity.magnitude;
         if (squadLeaderSpeed < SPEED_THRESHOLD)
         {
-            velocityVectorOffset = Vector3.zero;
+            leaderVelocityOffset = Vector3.zero;
         }
 
-        velocity += cohesionVectorOffset + separationVectorOffset + velocityVectorOffset;
-        float magnitude = velocity.magnitude;
+        deltaPosition += leaderVelocityOffset;
+
+        float magnitude = deltaPosition.magnitude;
 
         float moveSpeed = this.squad.GetMaxMovementSpeed();
         float adjMagnitude = Mathf.Clamp(magnitude, 0, moveSpeed);
 
-        Vector3 adjVelocity = velocity.normalized * adjMagnitude;
+        Vector3 adjVelocity = deltaPosition.normalized * adjMagnitude;
         this.agent.velocity = adjVelocity;
     }
 
@@ -334,9 +409,9 @@ public class Model : MonoBehaviour
     {
         Vector3 sum = Vector3.zero;
 
-        foreach(Model model in squad.allSquadMembers)
+        foreach (Model model in squad.allSquadMembers)
         {
-            if(model == this)
+            if (model == this)
             {
                 continue;
             }
@@ -353,7 +428,7 @@ public class Model : MonoBehaviour
     {
         Vector3 vectorOffset = Vector3.zero;
 
-        foreach(Model model in squad.allSquadMembers)
+        foreach (Model model in squad.allSquadMembers)
         {
             if (model == this)
             {
@@ -361,7 +436,7 @@ public class Model : MonoBehaviour
             }
 
             float distance = GetDistanceBetweenTwoModels(model, this);
-            if(distance >= COHESION_DISTANCE)
+            if (distance >= COHESION_DISTANCE)
             {
                 continue;
             }
