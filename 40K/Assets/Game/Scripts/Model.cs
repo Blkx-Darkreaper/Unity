@@ -331,6 +331,7 @@ public class Model : MonoBehaviour
 
         Vector3 currentPosition = this.transform.position;
 
+        // Maintain spacing between 2 closest members
         KeyValuePair<float, Model> squadMemberA = allNearbySquadMembers.ElementAt(0);
         Vector3 squadMemberAPosition = squadMemberA.Value.transform.position;
         float squadMemberADistance = squadMemberA.Key;
@@ -345,25 +346,39 @@ public class Model : MonoBehaviour
         Vector3 deltaPositionA = Vector3.zero;
         if(squadMemberADistance - COHESION_DISTANCE > DISTANCE_THRESHOLD)
         {
-            deltaPositionA = squadMemberAPosition - currentPosition;
+            deltaPositionA = squadMemberAPosition - currentPosition;    // Move toward
         }
         if (COHESION_DISTANCE - squadMemberADistance > DISTANCE_THRESHOLD)
         {
-            deltaPositionA = (currentPosition - squadMemberAPosition) * COHESION_CONSTANT;
+            deltaPositionA = (currentPosition - squadMemberAPosition) * COHESION_CONSTANT;  // Move away
         }
 
         Vector3 deltaPositionB = Vector3.zero;
         if (squadMemberBDistance - COHESION_DISTANCE > DISTANCE_THRESHOLD)
         {
-            deltaPositionB = squadMemberBPosition - currentPosition;
+            deltaPositionB = squadMemberBPosition - currentPosition;    // Move toward
         }
         if (COHESION_DISTANCE - squadMemberBDistance > DISTANCE_THRESHOLD)
         {
-            deltaPositionB = (currentPosition - squadMemberBPosition) * COHESION_CONSTANT;
+            deltaPositionB = (currentPosition - squadMemberBPosition) * COHESION_CONSTANT;  // Move away
         }
 
-        Vector3 deltaPosition = deltaPositionA + deltaPositionB;
+        // Move towards squad leader if possible
+        Vector3 deltaPositionLeader = Vector3.zero;
 
+        float leaderDistance = GetDistanceBetweenTwoModels(this, squad.squadLeader);
+        if (leaderDistance - COHESION_DISTANCE > DISTANCE_THRESHOLD)
+        {
+            bool canMoveTowardsLeader = allNearbySquadMembers.ContainsValue(squad.squadLeader);
+            if (canMoveTowardsLeader == true)
+            {
+                deltaPositionLeader = squad.squadLeader.transform.position - currentPosition;    // Move toward
+            }
+        }
+
+        Vector3 deltaPosition = deltaPositionA + deltaPositionB + deltaPositionLeader;
+
+        // Maintain momentum
         Vector3 velocityOffset = velocity / VELOCITY_CONSTANT;
         if (velocity.magnitude < SPEED_THRESHOLD)
         {
@@ -372,6 +387,7 @@ public class Model : MonoBehaviour
 
         deltaPosition += velocityOffset;
 
+        // Match leader's speed and direction
         Vector3 leaderVelocityOffset = this.squad.squadLeader.agent.velocity / LEADER_VELOCITY_CONSTANT;
 
         float squadLeaderSpeed = this.squad.squadLeader.agent.velocity.magnitude;
