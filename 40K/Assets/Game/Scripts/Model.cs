@@ -11,6 +11,7 @@ public class Model : MonoBehaviour
     [ReadOnlyInInspector]
     public bool isSelected = false;
     public GameObject selection;
+    public bool isFixed = false;
 
     public Unit unit;
     public Squad squad;
@@ -80,6 +81,11 @@ public class Model : MonoBehaviour
 
     public void Update()
     {
+        if(isFixed == true)
+        {
+            return;
+        }
+
         MaintainCoherency();
 
         this.DEBUG_velocity = this.agent.velocity;

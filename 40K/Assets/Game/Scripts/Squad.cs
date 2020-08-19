@@ -70,17 +70,17 @@ public class Squad : MonoBehaviour
 
         this.moveDistance = minMoveDistance;
 
-        if (squadLeader.squad != this)
-        {
-            squadLeader = null;
-        }
-
-        if (squadLeader != null)
+        if(squadLeader == null)
         {
             return;
         }
 
-        this.squadLeader = allSquadMembers.First();
+        if (squadLeader.squad == this)
+        {
+            return;
+        }
+
+        squadLeader = null;
     }
 
     #endregion Unity
