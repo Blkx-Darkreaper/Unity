@@ -119,24 +119,35 @@ public class Squad : MonoBehaviour
     {
         public int Compare(float x, float y)
         {
-            string xStr = x.ToString();
-            string yStr = y.ToString();
+            string[] xArr = x.ToString().Split('.');
+            string[] yArr = y.ToString().Split('.');
 
-            int minLength = Math.Min(xStr.Length, yStr.Length);
+            int xInt = Int32.Parse(xArr[0]);
+            int yInt = Int32.Parse(yArr[0]);
+
+            if(xInt != yInt)
+            {
+                return xInt - yInt;
+            }
+
+            string xRem = xArr.Length > 1 ? xArr[1] : string.Empty;
+            string yRem = yArr.Length > 1 ? yArr[1] : string.Empty;
+
+            int minLength = Math.Min(xRem.Length, yRem.Length);
 
             for (int i = 0; i < minLength; i++)
             {
-                if(i > xStr.Length)
+                if(i > xRem.Length)
                 {
                     return -1;
                 }
-                if(i > yStr.Length)
+                if(i > yRem.Length)
                 {
                     return 1;
                 }
 
-                int digitX = (int)xStr[i];
-                int digitY = (int)yStr[i];
+                int digitX = Int32.Parse(xRem[i].ToString());
+                int digitY = Int32.Parse(yRem[i].ToString());
 
                 if(digitX == digitY)
                 {
@@ -146,7 +157,7 @@ public class Squad : MonoBehaviour
                 return digitX - digitY;
             }
 
-            return 1;
+            return xRem.Length - yRem.Length;
         }
     }
 
@@ -176,6 +187,11 @@ public class Squad : MonoBehaviour
                 {
                     Model hitModel = hit.transform.gameObject.GetComponentInParent<Model>();
                     if (hitModel == null)
+                    {
+                        continue;
+                    }
+
+                    if(hitModel.gameObject.activeInHierarchy != true)
                     {
                         continue;
                     }
