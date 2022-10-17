@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd05fe699698b06408461dd4834cd0b8, type: 3}
-  m_Name: LineTension
+  m_Name: LineTensionForce
   m_EditorClassIdentifier: 
   initialValue: {x: 0, y: 0}

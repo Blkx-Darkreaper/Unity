@@ -45,7 +45,7 @@ public class RodTipPhysics : MonoBehaviour
 
         forceVector.runtimeValue = force;
 
-        forces.AddForce(force, ForceMode2D.Force, true);
+        forces.AddForce(Color.yellow, force, ForceMode2D.Force, true);
 
         this.previousVelocity = currentVelocity;
     }

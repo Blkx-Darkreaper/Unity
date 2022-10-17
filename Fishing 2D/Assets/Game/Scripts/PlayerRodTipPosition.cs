@@ -9,7 +9,7 @@ using UnityEngine;
     [SerializeField] [Range(0, 1)] private float rodTipPathNeutralTPoint;
 
     private PlayerControls controls;
-    private Rigidbody2D rodTipBody;
+    private Rigidbody2D body;
 
     [ReadOnlyInInspector] public Vector2 rodTipMovement;
     [ReadOnlyInInspector] [Range(0, 1)] public float targetT;
@@ -20,7 +20,7 @@ using UnityEngine;
     {
         this.controls = new PlayerControls();
 
-        this.rodTipBody = GetComponent<Rigidbody2D>();
+        this.body = GetComponent<Rigidbody2D>();
     }
 
     // Start is called before the first frame update
@@ -55,10 +55,20 @@ using UnityEngine;
             return;
         }
 
-        Gizmos.color = Color.green; //testing
+        Gizmos.color = Color.yellow; //testing
 
         Vector2 startPoint = BezierCurve.CalculateBezierPoint(targetT, allPoints);
         Gizmos.DrawWireSphere(startPoint, gizmoRadius);
+
+        if(body == null)
+        {
+            return;
+        }
+
+        // Draw velocity vector
+        Vector2 endPoint = (Vector2)(transform.position) + body.velocity;
+        //Debug.DrawLine(transform.position, endPoint, Color.red);
+        Globals.Debug.DrawCustomLine(transform.position, endPoint, 3, Color.red);
     }
 
     void OnEnable()
@@ -101,7 +111,7 @@ using UnityEngine;
         //Vector2 previousPoint = BezierCurve.CalculateBezierPoint(previousT, allPoints);
 
         Vector2 velocity = (nextPoint - currentPoint) / Time.fixedDeltaTime;
-        rodTipBody.velocity = velocity;
+        body.velocity = velocity;
 
         this.previousT = this.currentT;
     }
