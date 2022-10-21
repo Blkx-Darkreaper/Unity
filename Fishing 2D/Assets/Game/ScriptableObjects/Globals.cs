@@ -4,6 +4,18 @@ using UnityEngine;
 
 public class Globals : ScriptableObject
 {
+    public const float FLOAT_PRECISION = 0.01f;
+
+    public static float FloorFloatToPrecision(float num)
+    {
+        if (Mathf.Abs(num) < Globals.FLOAT_PRECISION)
+        {
+            return 0f;
+        }
+
+        return num;
+    }
+
     public struct Debug
     {
         public static void DrawCustomLine(Vector2 start, Vector2 end, int lineThickness)

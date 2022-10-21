@@ -138,6 +138,54 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Debugging"",
+            ""id"": ""6eb3327b-1126-4df3-b8e3-033dbe0d50ef"",
+            ""actions"": [
+                {
+                    ""name"": ""Select Object"",
+                    ""type"": ""Button"",
+                    ""id"": ""9f2fd4a7-9c74-44dd-9357-aca42ed67b12"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Move Mouse"",
+                    ""type"": ""Value"",
+                    ""id"": ""5a0dd239-fc6b-4e4d-9968-dd2b346bd36d"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""79f1090e-f21d-47c6-a31c-c2c547b1c286"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Select Object"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6e955236-0fd7-491f-bee6-c035a0d493e7"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move Mouse"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -151,6 +199,10 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Movement = m_Player.FindAction("Movement", throwIfNotFound: true);
         m_Player_Rotation = m_Player.FindAction("Rotation", throwIfNotFound: true);
+        // Debugging
+        m_Debugging = asset.FindActionMap("Debugging", throwIfNotFound: true);
+        m_Debugging_SelectObject = m_Debugging.FindAction("Select Object", throwIfNotFound: true);
+        m_Debugging_MoveMouse = m_Debugging.FindAction("Move Mouse", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -296,6 +348,47 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Debugging
+    private readonly InputActionMap m_Debugging;
+    private IDebuggingActions m_DebuggingActionsCallbackInterface;
+    private readonly InputAction m_Debugging_SelectObject;
+    private readonly InputAction m_Debugging_MoveMouse;
+    public struct DebuggingActions
+    {
+        private @PlayerControls m_Wrapper;
+        public DebuggingActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @SelectObject => m_Wrapper.m_Debugging_SelectObject;
+        public InputAction @MoveMouse => m_Wrapper.m_Debugging_MoveMouse;
+        public InputActionMap Get() { return m_Wrapper.m_Debugging; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(DebuggingActions set) { return set.Get(); }
+        public void SetCallbacks(IDebuggingActions instance)
+        {
+            if (m_Wrapper.m_DebuggingActionsCallbackInterface != null)
+            {
+                @SelectObject.started -= m_Wrapper.m_DebuggingActionsCallbackInterface.OnSelectObject;
+                @SelectObject.performed -= m_Wrapper.m_DebuggingActionsCallbackInterface.OnSelectObject;
+                @SelectObject.canceled -= m_Wrapper.m_DebuggingActionsCallbackInterface.OnSelectObject;
+                @MoveMouse.started -= m_Wrapper.m_DebuggingActionsCallbackInterface.OnMoveMouse;
+                @MoveMouse.performed -= m_Wrapper.m_DebuggingActionsCallbackInterface.OnMoveMouse;
+                @MoveMouse.canceled -= m_Wrapper.m_DebuggingActionsCallbackInterface.OnMoveMouse;
+            }
+            m_Wrapper.m_DebuggingActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @SelectObject.started += instance.OnSelectObject;
+                @SelectObject.performed += instance.OnSelectObject;
+                @SelectObject.canceled += instance.OnSelectObject;
+                @MoveMouse.started += instance.OnMoveMouse;
+                @MoveMouse.performed += instance.OnMoveMouse;
+                @MoveMouse.canceled += instance.OnMoveMouse;
+            }
+        }
+    }
+    public DebuggingActions @Debugging => new DebuggingActions(this);
     public interface IFishingActions
     {
         void OnLineBrake(InputAction.CallbackContext context);
@@ -306,5 +399,10 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnRotation(InputAction.CallbackContext context);
+    }
+    public interface IDebuggingActions
+    {
+        void OnSelectObject(InputAction.CallbackContext context);
+        void OnMoveMouse(InputAction.CallbackContext context);
     }
 }

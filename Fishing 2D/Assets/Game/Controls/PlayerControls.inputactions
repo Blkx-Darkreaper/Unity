@@ -116,6 +116,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Debugging",
+            "id": "6eb3327b-1126-4df3-b8e3-033dbe0d50ef",
+            "actions": [
+                {
+                    "name": "Select Object",
+                    "type": "Button",
+                    "id": "9f2fd4a7-9c74-44dd-9357-aca42ed67b12",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Move Mouse",
+                    "type": "Value",
+                    "id": "5a0dd239-fc6b-4e4d-9968-dd2b346bd36d",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "79f1090e-f21d-47c6-a31c-c2c547b1c286",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select Object",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6e955236-0fd7-491f-bee6-c035a0d493e7",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move Mouse",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

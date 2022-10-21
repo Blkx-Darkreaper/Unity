@@ -26,7 +26,7 @@ public class PlayerReel : MonoBehaviour
     [ReadOnlyInInspector] public float currentReelControllerAngle;
     private float previousReelControllerAngle;
     [ReadOnlyInInspector] public float deltaReelControllerAngle;
-    private Quaternion previousReelRotation;
+    //private Quaternion previousReelRotation;
     [ReadOnlyInInspector] public float currentReelAngle;
     private float previousReelAngle;
     [ReadOnlyInInspector] public float deltaReelAngle;
@@ -34,7 +34,9 @@ public class PlayerReel : MonoBehaviour
     [Header("Line")]
     [SerializeField] private float lineBrakeForceMultiplier;
     [SerializeField] private float lineUnspoolResistanceForceMultiplier;
-    [SerializeField] private float lineLureMomentumMultiplier;
+    [SerializeField] private float castingForceMultiplier;
+    [SerializeField] [Range(0f, 1f)] private float castingHorImportancePercent;
+    [SerializeField] private float castingSpeedThreshold;
     [SerializeField] private float maxLine;
     [SerializeField] private DistanceJoint2D lineJoint;
     [SerializeField] private LineRenderer line;
@@ -45,17 +47,28 @@ public class PlayerReel : MonoBehaviour
     public event Action<float> onSlackChanged;
     public event Action<float> onTensionChanged;
 
-    [ReadOnlyInInspector] public float lineStrength = 0f;
+    [SerializeField] public bool resetMaxes = false;
+    [ReadOnlyInInspector] public float castingSpeed = 0f;
+    [ReadOnlyInInspector] public float previousCastingSpeed = 0f;
+    [ReadOnlyInInspector] public float deltaCastingSpeed = 0f;  //debug
+    [ReadOnlyInInspector] public float maxCastingSpeed = 0f;    //debug
+    [ReadOnlyInInspector] public float castingStrength = 0f;
+    [ReadOnlyInInspector] public float maxCastingStrength = 0f; //debug
+    [ReadOnlyInInspector] public bool isCasting = false;
+    [ReadOnlyInInspector] public bool wasCasting = false;
+    [ReadOnlyInInspector] public float lureRelStrength = 0f;
     [ReadOnlyInInspector] public float reelStrength = 0f;
-    [ReadOnlyInInspector] public float lineResistanceStrength = 0f;
-    [ReadOnlyInInspector] public float lineTensionStrength = 0f;
-    [ReadOnlyInInspector] public float slack;   //testing
+    [ReadOnlyInInspector] public float lineStrength = 0f;    //debug
     [ReadOnlyInInspector] public float lineBrakePressure = 0f;
+    [ReadOnlyInInspector] public float lineResistanceStrength = 0f;
+    [ReadOnlyInInspector] public float maxLineResistanceStrength = 0f;  //debug
+    [ReadOnlyInInspector] public float netLineStrength = 0f;
+    [ReadOnlyInInspector] public float previousNetLineStrength = 0f;
+    [ReadOnlyInInspector] public float maxNetLineStrength = 0f; //debug
     [ReadOnlyInInspector] public float lineRemaining;
     [ReadOnlyInInspector] public float lineOut = 0f;
-    [ReadOnlyInInspector] public float deltaLine = 0f;
-    [ReadOnlyInInspector] public Vector2 previousNetMomentum;
-    [ReadOnlyInInspector] public Vector2 motionForce;
+    [ReadOnlyInInspector] public float deltaLineOut = 0f;
+    [ReadOnlyInInspector] public float slack = 0f;   //debug
 
     [Header("Lure")]
     [SerializeField] private LurePhysics lure;
@@ -63,21 +76,16 @@ public class PlayerReel : MonoBehaviour
     private Rigidbody2D lureBody;
 
     [ReadOnlyInInspector] public Vector2 lureVelocity;
-    [ReadOnlyInInspector] public Vector2 lurePreviousVelocity;
     [ReadOnlyInInspector] public float lureSpeed = 0f;
-    [ReadOnlyInInspector] public float lureMomentum = 0f;
-    [ReadOnlyInInspector] public float lureSpeedDiff;
-    [ReadOnlyInInspector] public float lureMaxSpeed = 0f;
-    [ReadOnlyInInspector] public float lureStrength = 0f; //testing
-    [ReadOnlyInInspector] public float rodToLureAngle;  //testing
+    [ReadOnlyInInspector] public float maxLureSpeed = 0f;   //debug
+    [ReadOnlyInInspector] public float maxLureStrength = 0f; //debug
+    [ReadOnlyInInspector] public float rodToLureAngle;  //debug
 
     [Header("Rod")]
     [SerializeField] private RodTipPhysics rodTip;
+    [SerializeField] private Transform rodEnd;
 
     private Rigidbody2D rodTipBody;
-
-    [ReadOnlyInInspector] public Vector2 rodTipVelocity;
-    [ReadOnlyInInspector] public Vector2 rodTipPreviousVelocity;
 
     private PlayerControls controls;
 
@@ -108,20 +116,24 @@ public class PlayerReel : MonoBehaviour
         this.lineOut = lineJoint.distance;
         this.lineRemaining = maxLine - lineOut;
 
-        this.rodTipVelocity = Vector2.zero;
-        //this.rodTipPreviousVelocity = Vector2.zero;
-
         this.lureVelocity = Vector2.zero;
-        //this.lurePreviousVelocity = Vector2.zero;
-
-        this.previousNetMomentum = Vector2.zero;
-
-        this.motionForce = Vector2.zero;
     }
 
     void OnValidate()
     {
+        if (resetMaxes != true)
+        {
+            return;
+        }
 
+        this.maxCastingSpeed = 0f;
+        this.maxCastingStrength = 0f;
+        this.maxLureSpeed = 0f;
+        this.maxLureStrength = 0f;
+        this.maxLineResistanceStrength = 0f;
+        this.maxNetLineStrength = 0f;
+
+        this.resetMaxes = false;
     }
 
     void OnEnable()
@@ -276,130 +288,101 @@ public class PlayerReel : MonoBehaviour
             return;
         }
 
-        Momentum();
+        Casting();
 
         Tension();
 
         Slack();
 
-        this.lureSpeedDiff = lureMomentum - lureSpeed;
-        this.lureMaxSpeed = Mathf.Max(lureSpeed, lureMaxSpeed); //debug
+        this.maxLureSpeed = Mathf.Max(lureSpeed, maxLureSpeed); //debug
 
-        // Update force line is applying to lure
-        if (lineTensionStrength <= 0)
-        {
-            this.lineTensionForce.runtimeValue = Vector2.zero;
-            return;
-        }
+        //// Update force line is applying to lure
+        //if (netLineStrength <= 0)
+        //{
+        //    this.lineTensionForce.runtimeValue = Vector2.zero;
+        //    return;
+        //}
 
-        Vector2 rodTipDirection = (rodTipBody.transform.position - lureBody.transform.position).normalized;
-        this.lineTensionForce.runtimeValue = rodTipDirection * lineTensionStrength;
+        //Vector2 rodTipDirection = (rodTipBody.transform.position - lureBody.transform.position).normalized;
+        //this.lineTensionForce.runtimeValue = rodTipDirection * netLineStrength;
     }
 
     #region FixedUpdate
 
-    private void Momentum()
+    private void Casting()
     {
         Vector2 endPoint;
 
-        Vector2 rodTipToLureDirection = lureBody.transform.position - rodTipBody.transform.position;
-        Vector2 rodTipToLureNormalDir = rodTipToLureDirection.normalized;
+        Vector2 rodDirection = (rodTipBody.transform.position - rodEnd.position).normalized;
 
-        // Draw rod tip to lure direction
-        endPoint = (Vector2)lureBody.transform.position + rodTipToLureNormalDir * 0.5f;
-        Debug.DrawLine(lureBody.transform.position, endPoint, Color.cyan);
+        // Draw casting direction
+        endPoint = (Vector2)rodTipBody.transform.position + rodDirection;
+        Debug.DrawLine(rodTipBody.transform.position, endPoint, Color.cyan);
 
-        //float rodTipToLureDirAngle = Vector2.SignedAngle(Vector2.right, rodTipToLureDirection);
+        Vector2 rodTipToLureDirection = (lureBody.transform.position - rodTipBody.transform.position).normalized;
 
-        this.rodTipVelocity = rodTipBody.velocity;
-        //Vector2 rotatedRodTipVelocity = Quaternion.Euler(0, 0, -rodTipToLureDirAngle) * rodTipVelocity;
+        float lureDotProd = Vector2.Dot(lureVelocity, rodDirection);
+        Vector2 relLureVelocity = rodDirection * lureDotProd;
 
-        float rodDotProd = Vector2.Dot(rodTipVelocity, -rodTipToLureNormalDir);
-        Vector2 relRodTipVelocity = -rodTipToLureNormalDir * rodDotProd;
+        Vector2 horDirection = Vector2.right;
+        if (lureVelocity.x < 0)
+        {
+            horDirection = Vector2.left;
+        }
+
+        float horDotProd = Vector2.Dot(relLureVelocity, horDirection);
+
+        // Adding lure velocity at high casting force multipliers makes lure really twitchy
+        this.castingSpeed = Globals.FloorFloatToPrecision(Mathf.Abs(lureDotProd * (1 - castingHorImportancePercent)
+            + horDotProd * castingHorImportancePercent));
 
         // Draw rod tip velocity vector
-        endPoint = (Vector2)rodTipBody.transform.position + relRodTipVelocity;
-        //Vector2 endPoint = (Vector2)rodTipBody.transform.position + rodTipToLureNormalDir;
-        Debug.DrawLine(rodTipBody.transform.position, endPoint, Color.red);
-
-        this.lureVelocity = lureBody.velocity;
-        //Vector2 rotatedLureVelocity = Quaternion.Euler(0, 0, -rodTipToLureDirAngle) * lureVelocity;
-
-        //Vector2 relLureVelocity3 = Quaternion.Euler(0, 0, rodTipToLureDirAngle)
-        //    * new Vector2(rotatedLureVelocity.x, 0);    // method 3
-
-        //float lureVelocityAngle = Vector2.Angle(rodTipToLureDirection, lureVelocity);
-        //float lureVelocityAngle2 = Vector2.Angle(rodTipToLureNormalDir, lureVelocity);
-        //float lureVelocityAngle3 = Vector2.Angle(Vector2.right, rotatedLureVelocity);
-
-        //Vector2 relLureVelocity2 = rodTipToLureNormalDir * rotatedLureVelocity.magnitude
-        //    * MathF.Cos(lureVelocityAngle * Mathf.Deg2Rad); // method 2
-
-        float lureDotProd = Vector2.Dot(lureVelocity, rodTipToLureNormalDir);
-        Vector2 relLureVelocity = rodTipToLureNormalDir * lureDotProd;
-
-        // Draw lure velocity vector
-        endPoint = (Vector2)lureBody.transform.position + relLureVelocity;
+        endPoint = (Vector2)lureBody.transform.position + rodTipToLureDirection * castingSpeed;
         Debug.DrawLine(lureBody.transform.position, endPoint, Color.white);
 
-        Vector2 netMomentum = lureBody.mass * (relRodTipVelocity + relLureVelocity);
+        this.deltaCastingSpeed = Globals.FloorFloatToPrecision(castingSpeed - previousCastingSpeed);   //debug
+        this.maxCastingSpeed = Mathf.Max(castingSpeed, maxCastingSpeed);    //debug
 
-        Vector2 deltaMomentum = netMomentum - previousNetMomentum;
-        this.motionForce = deltaMomentum / Time.fixedDeltaTime;
+        // If casting speed exceeds threshold then disable line limit
+        this.isCasting = castingSpeed > castingSpeedThreshold;
 
-        this.lureMomentum = motionForce.magnitude;
-        //this.lureMomentum = 0;  //testing
+        if (isCasting == true)
+        {
+            lineJoint.enabled = false;
+        }
 
-        this.previousNetMomentum = netMomentum;
+        if(isCasting != true && wasCasting == true)
+        {
+            float distance = Vector2.Distance(rodTipBody.transform.position, lureBody.transform.position);
+            lineJoint.distance = distance;
+
+            lineJoint.enabled = true;
+        }
+
+        float deltaMomentum = lureBody.mass * (castingSpeed - previousCastingSpeed);
+        this.castingStrength = deltaMomentum / Time.fixedDeltaTime * castingForceMultiplier;  // Needs to always be positive or line will retract
+        this.castingStrength = Globals.FloorFloatToPrecision(Mathf.Clamp(castingStrength, 0, float.MaxValue));
+
+        this.maxCastingStrength = Mathf.Max(castingStrength, maxCastingStrength);   //debug
+
+        this.previousCastingSpeed = castingSpeed;
+        this.wasCasting = isCasting;
     }
 
     private void Tension()
     {
         // If net force component away from rod tip towards lure is positive then unspool line
         Vector2 lureNetForce = lure.netForce.runtimeValue;
-        this.lureStrength = lureNetForce.magnitude;
+        this.maxLureStrength = lureNetForce.magnitude;
 
-        Vector2 lureDirection = (lureBody.transform.position - rodTipBody.transform.position).normalized;
+        Vector2 rodTipLureDirection = (lureBody.transform.position - rodTipBody.transform.position).normalized;
 
         // Get component of lure momentum away from rod tip
         this.lureVelocity = lureBody.velocity;
-        this.lureSpeed = lureVelocity.magnitude;
+        this.lureSpeed = Globals.FloorFloatToPrecision(lureVelocity.magnitude);
 
-        //Vector2 castingDirection = (Vector2)lureBody.transform.position + lureDirection;
-        ////Vector2 lureLineVelocity = ((Vector2)lureBody.transform.position - lureVelocity) * rodTipDirection * lureSpeed;
-        //Vector2 lureLineVelocity = castingDirection + lureVelocity;
-
-        //// Lure velocity away from rod tip
-        //////Vector2 endPoint = castingDirection * lureSpeed;    //debug
-        ////Vector2 endPoint = lureLineVelocity;    //debug
-        ////Debug.DrawLine(lureBody.transform.position, endPoint, Color.red);   // debug
-
-        //// TOFIX
-        //// LureLine speed should usually be less than lure speed
-        ////this.lureMomentum = lureLineVelocity.magnitude * lureSpeed * lineLureMomentumMultiplier;
-
-        ////float angle = Vector2.Angle(lureDirection, lureNetForce);
-        ////this.rodToLureAngle = angle;    //testing
-
-        ////float positiveStrength = 0f;
-        ////if (angle > -90 && angle < 90)
-        ////{
-        ////    positiveStrength = lureNetForce.magnitude * Mathf.Cos(angle * Mathf.Deg2Rad);
-        ////}
-
-        //float rodToLureAngle = Vector2.Angle(rodTipBody.transform.position, lureBody.transform.position);
-        //float lureMovementAngle = Mathf.Atan2(lureVelocity.y, lureVelocity.x) * Mathf.Rad2Deg;
-        //float deltaAngle = Mathf.DeltaAngle(lureMovementAngle, rodToLureAngle);
-        //float castingSpeed = lureSpeed * (90f - deltaAngle) / 90f;
-        //castingSpeed = Mathf.Clamp(castingSpeed, 0, castingSpeed);
-
-        //this.lureMomentum = castingSpeed * lineLureMomentumMultiplier;
-
-        //// Lure casting velocity indicator
-        //Vector2 endPoint = (Vector2)rodTipBody.transform.position + rodTipBody.velocity;    //debug
-        //Debug.DrawLine(rodTipBody.transform.position, endPoint, Color.red);   // debug
-
-        this.lineStrength = Mathf.Clamp(Vector2.Dot(lureNetForce, lureDirection), 0, float.MaxValue);
+        float lureDotProd = Mathf.Clamp(Vector2.Dot(lureNetForce, rodTipLureDirection), 0, float.MaxValue);
+        this.lureRelStrength = Globals.FloorFloatToPrecision(lureDotProd);
 
         // If reel is applying a greater negative force then spool line
         this.reelStrength = 0;
@@ -416,9 +399,11 @@ public class PlayerReel : MonoBehaviour
             reelStrength = -deltaReelControllerAngle * reelForceMultiplier;
         }
 
+        this.reelStrength = Globals.FloorFloatToPrecision(reelStrength);
+
         // Determine net strength
         //float netStrength = lineStrength - reelStrength;
-        float netStrength = lineStrength + lureMomentum - reelStrength;
+        this.lineStrength = lureRelStrength + castingStrength - reelStrength;
 
         // If line brake is being applied then reduce net strength towards 0
         float lineBrakeResistance = lineBrakePressure * lineBrakeForceMultiplier;
@@ -430,34 +415,36 @@ public class PlayerReel : MonoBehaviour
             this.lineResistanceStrength += lineUnspoolResistanceForceMultiplier * lineRemaining;
         }
 
-        if (netStrength == 0f)
+        this.lineResistanceStrength = Globals.FloorFloatToPrecision(lineResistanceStrength);
+        this.maxLineResistanceStrength = Mathf.Max(lineResistanceStrength, maxLineResistanceStrength);
+
+        this.netLineStrength = lineStrength;
+
+        if (lineStrength > 0)
         {
-            this.lineTensionStrength = 0f;
+            this.netLineStrength = Mathf.Clamp(lineStrength - lineResistanceStrength, 0, lineStrength);
+        }
+        if (lineStrength < 0)
+        {
+            this.netLineStrength = Mathf.Clamp(lineStrength + lineResistanceStrength, lineStrength, 0);
+        }
+
+        this.netLineStrength = Globals.FloorFloatToPrecision(netLineStrength);
+        this.maxNetLineStrength = Mathf.Max(netLineStrength, maxNetLineStrength);
+
+        if (netLineStrength != 0)
+        {
+            AdjustLineOut(lineStrength * spoolingSpeed);
+
+            RotateReel(deltaLineOut / spoolingSpeed, Time.fixedDeltaTime);
+        }
+
+        if (previousNetLineStrength == netLineStrength)
+        {
             return;
         }
 
-        if (netStrength > 0)
-        {
-            netStrength = Mathf.Clamp(netStrength - lineResistanceStrength, 0, netStrength);
-        }
-        if (netStrength < 0)
-        {
-            netStrength = Mathf.Clamp(netStrength + lineResistanceStrength, netStrength, 0);
-        }
-
-        if (netStrength != 0)
-        {
-            AdjustLineOut(netStrength * spoolingSpeed);
-
-            RotateReel(deltaLine / spoolingSpeed, Time.fixedDeltaTime);
-        }
-
-        if (netStrength == lineTensionStrength)
-        {
-            return;
-        }
-
-        this.lineTensionStrength = netStrength;
+        this.previousNetLineStrength = netLineStrength;
 
         if (onTensionChanged == null)
         {
@@ -471,15 +458,13 @@ public class PlayerReel : MonoBehaviour
     {
         float distance = Vector2.Distance(rodTipBody.transform.position, lureBody.transform.position);
 
-        float slack = Mathf.Clamp(lineOut - distance, 0, maxLine);
-
+        this.slack = Globals.FloorFloatToPrecision(Mathf.Clamp(lineOut - distance, 0, maxLine));
         if (slack == lineSlack.runtimeValue)
         {
             return;
         }
 
         this.lineSlack.runtimeValue = slack;
-        this.slack = slack; //testing
 
         if (onSlackChanged == null)
         {
@@ -491,28 +476,28 @@ public class PlayerReel : MonoBehaviour
 
     private void AdjustLineOut(float delta)
     {
-        this.deltaLine = Mathf.Clamp(delta, -lineOut, lineRemaining);
-        if (deltaLine == 0)
+        this.deltaLineOut = Globals.FloorFloatToPrecision(Mathf.Clamp(delta, -lineOut, lineRemaining));
+        if (deltaLineOut == 0)
         {
             return;
         }
 
         // Stop reel out when no line remaining
-        if (lineOut >= (maxLine - spoolThreshold) && deltaLine > 0)
+        if (lineOut >= (maxLine - spoolThreshold) && deltaLineOut > 0)
         {
             return;
         }
 
         // Stop reel in when no line out remaining
-        if (lineRemaining >= (maxLine - spoolThreshold) && deltaLine < 0)
+        if (lineRemaining >= (maxLine - spoolThreshold) && deltaLineOut < 0)
         {
             // TODO: Player jamming sound
             return;
         }
 
-        this.lineOut = Mathf.Clamp(lineOut + deltaLine, 0, maxLine);
+        this.lineOut = Globals.FloorFloatToPrecision(Mathf.Clamp(lineOut + deltaLineOut, 0, maxLine));
         //this.lineRemaining = Mathf.Clamp(lineRemaining - deltaLine, 0, maxLine);
-        this.lineRemaining = Mathf.Clamp(maxLine - lineOut, 0, maxLine);
+        this.lineRemaining = Globals.FloorFloatToPrecision(Mathf.Clamp(maxLine - lineOut, 0, maxLine));
 
         lineJoint.distance = lineOut;
     }
@@ -520,7 +505,7 @@ public class PlayerReel : MonoBehaviour
     private void RotateReel(float delta, float timeElapsed)
     {
         // Spin reel as it spools out
-        this.deltaReelAngle = delta;
+        this.deltaReelAngle = Globals.FloorFloatToPrecision(delta);
 
         Quaternion currentRotation = Quaternion.Euler(0f, 0f, -deltaReelAngle);
         reelSprite.rotation *= currentRotation;
@@ -530,13 +515,13 @@ public class PlayerReel : MonoBehaviour
         //Quaternion normalizedRotation = up * rotationDiff;
         //this.deltaTurn = 
 
-        this.reelRotationVelocity = deltaReelAngle / timeElapsed;
-        this.currentReelAngle = previousReelAngle + delta;
+        this.reelRotationVelocity = Globals.FloorFloatToPrecision(deltaReelAngle / timeElapsed);
+        this.currentReelAngle = Globals.FloorFloatToPrecision(previousReelAngle + delta);
         reelBody.rotation -= deltaReelAngle;
         //reelBody.angularVelocity = -rotationVelocity; // tends to skip
         //reelBody.AddTorque(rotationVelocity);
 
-        this.previousReelRotation = currentRotation;
+        //this.previousReelRotation = currentRotation;
         this.previousReelAngle = currentReelAngle;
     }
 
