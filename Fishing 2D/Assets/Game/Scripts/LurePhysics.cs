@@ -40,13 +40,6 @@ public class LurePhysics : MonoBehaviour
     [Header("Fish")]
     [ReadOnlyInInspector] public Force fish;
 
-    [Header("Unspooling Resistance")]
-    //[SerializeField] private Vector2Variable unspoolingResistance;
-
-    [Header("Net Force")]
-    [SerializeField] public Vector2Variable netForce;
-
-    //private Collider2D collider;
     private Rigidbody2D body;
     private ForceManager forces;
 
@@ -107,20 +100,8 @@ public class LurePhysics : MonoBehaviour
         {
             return;
         }
-        //if (lineTensionVector == null)
-        if (reel.lineTensionForce == null)
-        {
-            return;
-        }
 
         Vector2 netForce = Vector2.zero;
-
-        // Note: makes lure respond strangely when reeling in
-        ////Vector2 lineTension = lineTensionVector.runtimeValue;
-        //Vector2 lineTension = reel.lineTensionForce.runtimeValue;
-        //forces.AddForce(lineTension, ForceMode2D.Force, true);
-
-        //netForce += lineTension;
 
         // Apply normal force if on ground
         Normal();
@@ -146,9 +127,6 @@ public class LurePhysics : MonoBehaviour
         }
 
         forces.AddForce(netForce);
-
-        // Add gravity component to net force
-        this.netForce.runtimeValue = netForce + forces.GetWeight().vector;
     }
 
     #region FixedUpdate
@@ -183,8 +161,6 @@ public class LurePhysics : MonoBehaviour
         {
             volumeSubmerged = 4 / 3 * Mathf.PI * Mathf.Pow(lureRadius, 3);
         }
-
-        //float weightStrength = forces.GetWeight().vector.magnitude; //testing
 
         float buoyacyStrength = volumeSubmerged * buoyancy.density * buoyancyForceModifier;
 
