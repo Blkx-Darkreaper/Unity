@@ -16,6 +16,14 @@ public class Globals : ScriptableObject
         return num;
     }
 
+    public static Vector2 GetVectorComponentInDirection(Vector2 vector, Vector2 direction)
+    {
+        float dotProd = Vector2.Dot(vector, direction);
+
+        Vector2 vectorComponent = dotProd * direction.normalized;
+        return vectorComponent;
+    }
+
     public struct Debug
     {
         public static void DrawCustomLine(Vector2 start, Vector2 end, int lineThickness)
